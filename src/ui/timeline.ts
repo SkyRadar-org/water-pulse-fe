@@ -83,7 +83,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   const playBtn = h('button', { class: 'tl-play', type: 'button', 'aria-label': T.timeline.play });
   const dateEl = h('div', { class: 'tl-date' });
   const trackEl = h('span', { class: 'tl-track' });
-  const maturityEl = h('span', { class: 'maturity' });
+  const maturityEl = h('span', { class: 'maturity', title: T.timeline.maturityHelp });
   const infoEl = h('div', { class: 'tl-info' });
   const summaryNote = h('div', { class: 'tl-summary-note', text: T.timeline.summaryNote });
   const latestNote = h('div', { class: 'tl-latest-note', text: T.timeline.latestNote });
@@ -130,8 +130,8 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   const legend = h(
     'div',
     { class: 'tl-legend' },
-    h('span', {}, h('i', { class: 'tl-key filled' }), T.timeline.validated),
-    h('span', {}, h('i', { class: 'tl-key hollow' }), T.timeline.provisional),
+    h('span', { title: T.timeline.maturityHelp }, h('i', { class: 'tl-key filled' }), T.timeline.validated),
+    h('span', { title: T.timeline.maturityHelp }, h('i', { class: 'tl-key hollow' }), T.timeline.provisional),
     h('span', { class: 'tl-legend-note', text: T.timeline.note }),
   );
   const body = h('div', { class: 'tl-body' }, axis, legend);

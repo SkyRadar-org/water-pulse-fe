@@ -113,6 +113,7 @@ export const en = {
     sowing: '1 Nov · winter-spring sowing opens',
     validated: 'Validated',
     provisional: 'Provisional',
+    maturityHelp: 'Data maturity set by the NISAR project: "Provisional" images are early releases that are still being calibrated and checked (before 22 Oct 2026); "Validated" images have passed the project\'s validation. We apply the same water rule to both, but provisional images may still change in later releases.',
     note: 'Each dot is a day the satellite took a picture. Click a dot or press ▶ to watch the flood change over the season.',
     summaryNote: 'Showing the whole-season summary — the time slider is paused',
     latestNote: 'The map shows the latest image of each commune. Press ▶ or pick a date to step through the acquisitions.',

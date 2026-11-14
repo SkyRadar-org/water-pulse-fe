@@ -113,6 +113,7 @@ export const vi: Strings = {
     sowing: '1/11 · bắt đầu xuống giống Đông Xuân',
     validated: 'Đã kiểm định (Validated)',
     provisional: 'Tạm thời (Provisional)',
+    maturityHelp: 'Mức hoàn thiện dữ liệu do dự án NISAR công bố: ảnh «Tạm thời» (Provisional) là bản phát hành sớm, còn đang hiệu chỉnh và kiểm tra (trước 22/10/2026); ảnh «Đã kiểm định» (Validated) đã qua kiểm định của dự án. Chúng tôi dùng cùng một quy tắc tách nước cho cả hai, nhưng ảnh tạm thời có thể thay đổi ở các bản phát hành sau.',
     note: 'Mỗi chấm là một ngày vệ tinh chụp ảnh. Bấm vào chấm, hoặc bấm ▶, để xem nước lũ thay đổi theo mùa.',
     summaryNote: 'Đang xem tổng kết cả mùa — thanh thời gian tạm dừng',
     latestNote: 'Bản đồ đang hiện ảnh gần nhất của từng xã. Bấm ▶ hoặc chọn một ngày để xem lần lượt từng lần chụp.',
