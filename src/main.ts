@@ -92,6 +92,7 @@ function tabFromHash(): Tab {
 
 async function buildMapView(view: HTMLElement, menuBtn: HTMLElement) {
   const [scenes, summaries] = await Promise.all([getScenes(), getSummaryLayers()]);
+  if (state.activeSummary && !summaries.some((l) => l.id === state.activeSummary)) set({ activeSummary: null });
 
   const sidebar = h('aside', { 'aria-label': T.app.menu });
   const mapEl = h('div', { id: 'map' });

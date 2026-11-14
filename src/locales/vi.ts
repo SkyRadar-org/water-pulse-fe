@@ -1,7 +1,7 @@
 import type { Strings } from './en.ts';
 
 const months = ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'];
-const areaNote = 'Diện tích nước theo NISAR cao hơn khoảng 1,4–1,5 lần so với OPERA DSWx-S1; hãy xem số km² chỉ là mức tham khảo.';
+const areaNote = 'Diện tích tính trên phần xã có ảnh quan sát, đã loại nước thường xuyên; số km² chỉ mang tính tham khảo.';
 const two = (n: number): string => String(n).padStart(2, '0');
 
 export const vi: Strings = {
@@ -27,9 +27,9 @@ export const vi: Strings = {
   tabs: { map: 'Bản đồ', communes: 'Danh sách xã', validation: 'Độ tin cậy', about: 'Giới thiệu' },
   maturity: { provisional: 'Tạm thời (Provisional)', validated: 'Đã kiểm định (Validated)' },
   status: {
-    receded: { long: 'Nước đã rút', short: 'Đã rút', icon: '✓' },
-    not_receded: { long: 'Còn ngập sau 1/11 — nguy cơ xuống giống muộn', short: 'Còn ngập', icon: '!' },
-    uncertain: { long: 'Chưa rõ (các ảnh không thống nhất)', short: 'Chưa rõ', icon: '?' },
+    receded: { long: 'Sẵn sàng: dưới 10% diện tích có nước', short: 'Sẵn sàng', icon: '✓' },
+    not_receded: { long: 'Còn ngập (≥30% diện tích có nước)', short: 'Còn ngập', icon: '!' },
+    uncertain: { long: 'Đang rút hoặc chưa đủ ảnh phủ', short: 'Đang rút / chưa rõ', icon: '?' },
     no_flood: { long: 'Không ngập đáng kể', short: 'Không ngập', icon: '–' },
   },
   months,
@@ -68,7 +68,7 @@ export const vi: Strings = {
       waterMap: 'Vùng có nước (Water map)',
       open: 'Ruộng ngập / nước mở',
       perm: 'Nước thường xuyên (sông, kênh)',
-      statusNote: 'Nhãn tình trạng: ✓ nước đã rút · ! còn ngập sau 1/11 · ? chưa rõ · – không ngập đáng kể.',
+      statusNote: 'Ảnh gần nhất đủ phủ: ✓ dưới 10% nước · ! từ 30% nước · ? đang rút hoặc chưa đủ ảnh phủ · – không ngập đáng kể.',
     },
   },
 
@@ -116,23 +116,25 @@ export const vi: Strings = {
     chartAria: (name) => `Tỷ lệ nước theo thời gian của ${name}`,
     yAxis: 'Nước, % diện tích đất',
     sowing: ['Mùa', 'xuống giống'],
-    tipLine: (pct, km2, valid) => `${pct}% nước · ${km2} km² trên ${valid} km²`,
+    tipLine: (pct, km2, valid) => `${pct}% nước · ${km2 ?? "—"} km² trên ${valid ?? "—"} km²`,
     track: (t) => `Quỹ đạo ${t}`,
+    noObservations: 'Chưa có dữ liệu quan sát cho xã này.',
     summary: (p, f) => {
       if (p.status === 'no_flood') return `${p.name} không ngập đáng kể trong mùa này (cao nhất ${p.peak_pct}% đất có nước, vào ${f.peak}).`;
       let s = `${p.name} bắt đầu ngập (từ 20% đất có nước) vào ${f.first}, ngập cao nhất ${p.peak_pct}% vào ${f.peak}, và ở ảnh cuối (${f.last}) còn ${p.last_pct}%. `;
-      if (p.status === 'not_receded') s += 'Nước chưa xuống dưới một nửa mức đỉnh, nên việc xuống giống vụ Đông Xuân ở đây có thể bị muộn.';
-      else if (p.status === 'receded') s += f.recBeforeSowing ? `Nước đã xuống dưới một nửa mức đỉnh vào khoảng ${f.rec}, trước mùa xuống giống ngày 1/11.` : `Nước xuống dưới một nửa mức đỉnh vào khoảng ${f.rec}, sau khi mùa xuống giống ngày 1/11 đã bắt đầu.`;
-      else s += 'Ảnh từ các quỹ đạo vệ tinh khác nhau cho kết quả không thống nhất nên chưa rõ tình hình.';
+      if (p.coverage_sufficient === false) s += 'Chưa có ảnh phủ đủ diện tích để đánh giá xuống giống.';
+      else if (p.status === 'not_receded') s += 'Ảnh gần nhất phủ ít nhất nửa xã còn từ 30% diện tích có nước; việc xuống giống có thể bị muộn.';
+      else if (p.status === 'receded') s += 'Ảnh gần nhất phủ ít nhất nửa xã có dưới 10% diện tích còn nước.';
+      else s += 'Ảnh gần nhất đủ phủ còn 10–30% diện tích có nước; nước đang rút.';
       return s;
     },
     note: (km2, valid) =>
-      `Diện tích ngập lớn nhất ≈ ${km2} km² trên ${valid} km² đất. ${areaNote} Dải màu cam: mùa xuống giống Đông Xuân, 1/11 – 31/12, An Giang. Chấm đặc là ảnh đã kiểm định, chấm rỗng là ảnh tạm thời; bấm vào chấm để xem ảnh ngày đó.`,
+      `Diện tích ngập lớn nhất ≈ ${km2 ?? "—"} km² trên ${valid ?? "—"} km² đất. ${areaNote} Dải màu cam: mùa xuống giống Đông Xuân, 1/11 – 31/12, An Giang. Chấm đặc là ảnh đã kiểm định, chấm rỗng là ảnh tạm thời; bấm vào chấm để xem ảnh ngày đó.`,
   },
 
   table: {
     title: 'Danh sách xã',
-    lead: 'Tất cả các xã trong vùng nghiên cứu: ngập từ khi nào, ngập cao nhất lúc nào và nước đã rút trước mùa xuống giống Đông Xuân (1/11) hay chưa. Bấm vào một dòng để xem xã đó trên bản đồ.',
+    lead: 'Thống kê mỗi xã dùng quỹ đạo của ảnh gần nhất phủ ít nhất nửa xã. Tình trạng dựa trên lượng nước còn lại, tách biệt với ngày nước xuống dưới nửa đỉnh. Bấm vào một dòng để xem xã đó trên bản đồ.',
     search: 'Tìm tên xã…',
     searchAria: 'Tìm xã theo tên',
     provinceAria: 'Lọc theo tỉnh',
@@ -153,7 +155,7 @@ export const vi: Strings = {
     lead: 'Chúng tôi đã đối chiếu bản đồ nước với những nguồn nào, và chỗ nào còn yếu.',
     plainTitle: 'Nói đơn giản',
     plain: [
-      'Bản đồ nước tìm thấy phần lớn lượng nước mà các bản đồ quang học độc lập (ảnh không mây) tìm thấy: NISAR đạt 64–77%, Sentinel-1 chỉ 43–60%, tính trên những ngày trời quang có thể so sánh.',
+      'Bản đồ nước tìm thấy phần lớn lượng nước mà các bản đồ quang học độc lập (ảnh không mây) tìm thấy: NISAR đạt 47–82%, Sentinel-1 chỉ 35–64%, tính trên những ngày trời quang có thể so sánh.',
       'NISAR nhìn thấy nước trên mặt ruộng cả khi có mây, nhưng không phân biệt được đó là lũ tự nhiên, xả lũ có kiểm soát hay bơm nước làm đất.',
       'Hãy dùng bản đồ để so sánh giữa các xã và các ngày. Các con số km² chỉ mang tính tham khảo.',
       'Đây không phải công cụ cảnh báo sớm: dữ liệu về sau mỗi lần vệ tinh bay qua 2–3 ngày.',
@@ -161,19 +163,19 @@ export const vi: Strings = {
     detailsTitle: 'Chi tiết kỹ thuật',
     areaTitle: 'Diện tích nước theo từng ảnh',
     areaAria: 'Diện tích nước theo từng ảnh, NISAR so với DSWx-S1',
-    areaNote: (n) => `Nét liền = NISAR (ứng dụng này), nét đứt = OPERA DSWx-S1. Chấm đặc là ảnh đã kiểm định (từ 22/10), chấm rỗng là ảnh tạm thời. Mỗi quỹ đạo là một đường riêng. ${n}`,
+    areaNote: (n) => `Đường biểu diễn diện tích xã có nước theo NISAR; chưa có tổng diện tích DSWx-S1 trên cùng vùng quan sát. Chấm đặc là ảnh đã kiểm định (từ 22/10), chấm rỗng là ảnh tạm thời. Mỗi quỹ đạo là một đường riêng. ${n}`,
     areaAxis: 'Diện tích nước, km²',
     track148: '(phía tây, ~37% vùng)',
     hlsTitle: 'NISAR và Sentinel-1 so với bản đồ quang học độc lập (DSWx-HLS)',
-    hlsNote: 'OPERA DSWx-HLS, lệch ±2 ngày, chỉ tính điểm ảnh không mây. In đậm = bên tốt hơn. NISAR tìm được nhiều nước hơn (độ phủ, recall); Sentinel-1 thận trọng hơn một chút (độ chính xác, precision). F1 là điểm tổng hợp cả hai.',
+    hlsNote: 'OPERA DSWx-HLS, lệch ±2 ngày, chỉ tính điểm ảnh không mây. In đậm = bên tốt hơn. NISAR tìm được nhiều nước hơn (độ phủ, recall); Dữ liệu chưa cung cấp precision (—). F1 là điểm tổng hợp recall và precision.',
     hlsCols: { date: 'Ngày', f1: 'F1', recall: 'Độ phủ (Recall)', precision: 'Độ chính xác (Precision)', only: 'Điểm chỉ NISAR thấy mà đúng là nước' },
     agreeTitle: 'Mức khớp với OPERA DSWx-S1',
-    kpiMedian: 'F1 trung vị (20 ngày)',
+    kpiMedian: 'F1 trung vị (25 lần đối chiếu)',
     kpiFlood: 'Mùa lũ (tháng 9–10)',
     kpiEarly: 'Tháng 6–7',
     f1Aria: 'Điểm F1 của bản đồ nước NISAR so với DSWx-S1 theo từng ảnh',
     f1Axis: 'F1 so với DSWx-S1',
-    f1Foot: 'Ngưỡng được hiệu chỉnh trên ngày 17/6 và 21/9; 20 ngày còn lại dùng để kiểm chứng.',
+    f1Foot: 'Ngưỡng được hiệu chỉnh trên ngày 17/6 và 21/9; 25 lần chụp khác dùng để kiểm chứng.',
     f1Track: (t) => `Quỹ đạo ${t}`,
     methodTitle: 'Phương pháp',
     limitsTitle: 'Giới hạn',
@@ -185,13 +187,13 @@ export const vi: Strings = {
 
   about: {
     answersTitle: 'Ứng dụng trả lời những câu hỏi nào',
-    answersLead: 'Với từng xã ở Tứ giác Long Xuyên và Đồng Tháp Mười (An Giang, Đồng Tháp), qua 22 lần NISAR bay qua từ 17/6 đến 29/10/2026, cộng thêm ảnh ngày 3/11:',
+    answersLead: 'Với từng xã ở Tứ giác Long Xuyên và Đồng Tháp Mười (An Giang, Đồng Tháp), qua 33 lần chụp NISAR trên ba quỹ đạo từ 17/6 đến 3/11/2026:',
     readTitle: 'Cách đọc bản đồ',
     read: [
       'Thanh thời gian chỉ có những ngày thật sự có ảnh NISAR; không có số liệu nào được suy đoán cho các ngày ở giữa.',
       'Ba quỹ đạo vệ tinh (track 047D, 083A, 148D) không bao giờ bị gộp: biểu đồ vẽ mỗi quỹ đạo một đường.',
       'Ảnh trước 22/10/2026 là «Tạm thời» (Provisional, chấm rỗng); từ 22/10 là «Đã kiểm định» (Validated, chấm đặc).',
-      'Số km² chỉ mang tính tham khảo: diện tích nước theo NISAR cao hơn khoảng 1,4–1,5 lần so với OPERA DSWx-S1.',
+      'Số km² tính trên phần xã có ảnh quan sát và đã loại nước thường xuyên.',
     ],
     readMore: ['Giới hạn và phương pháp tạo bản đồ nước nằm ở mục ', 'Độ tin cậy', '.'],
     limitsTitle: 'Các giới hạn đã biết',
@@ -223,17 +225,17 @@ export const vi: Strings = {
     positioning: 'Bổ sung cho việc lập bản đồ ngập lụt nhanh của Việt Nam: theo dõi cả mùa lũ bằng NISAR băng L, cập nhật 2–3 ngày sau mỗi lần vệ tinh bay qua.',
     heroNumbers: [
       { big: 'Năm lũ thấp', text: '2026 là năm lũ thấp ở Đồng bằng sông Cửu Long.' },
-      { big: '50/80', text: 'xã ngập nặng chưa rút xuống dưới một nửa mức đỉnh tính đến 29/10, ngay trước mùa xuống giống ngày 1/11.' },
-      { big: '64–77% so với 43–60%', text: 'So với bản đồ quang học độc lập, NISAR phát hiện được 64–77% lượng nước, trong khi Sentinel-1 chỉ 43–60%.' },
+      { big: '38/131', text: 'xã được đánh giá còn ngập trên ảnh gần nhất đủ phủ (từ 30% diện tích có nước).' },
+      { big: '47–82% so với 35–64%', text: 'Độ phủ phát hiện nước so với ảnh quang học độc lập: NISAR và Sentinel-1, qua 16 lần đối chiếu.' },
     ],
     questions: [
       { q: 'Ngập từ khi nào?', a: 'Ngày đầu tiên xã có từ 20% đất bị ngập nước.' },
       { q: 'Ngập cao nhất lúc nào?', a: 'Tỷ lệ đất ngập nước cao nhất và ngày xảy ra.' },
-      { q: 'Nước có rút trước khi xuống giống không?', a: 'Nước đã xuống dưới một nửa mức đỉnh trước ngày 1/11 (bắt đầu mùa xuống giống Đông Xuân) hay chưa.' },
+      { q: 'Nước có rút trước khi xuống giống không?', a: 'Ảnh gần nhất phủ ít nhất nửa xã: dưới 10% nước là sẵn sàng, 10–30% là đang rút, từ 30% là còn ngập.' },
     ],
     limits: [
       'Ngưỡng phân loại được hiệu chỉnh theo OPERA DSWx-S1 (băng C), vốn không phải là «sự thật mặt đất».',
-      '20 trong 22 lần chụp là sản phẩm TẠM THỜI (chưa kiểm định).',
+      '29 trong 33 lần chụp là sản phẩm TẠM THỜI (chưa kiểm định).',
       'NISAR phát hiện nước trên mặt ruộng; không phân biệt được lũ tự nhiên, xả lũ có kiểm soát hay bơm nước làm đất.',
       'Lớp thực vật ngập nước đã được thử và bỏ (F1 ≈ 0,02): lúa đang lớn cũng làm kênh HH sáng lên.',
       'Tháng 6–7 mức khớp thấp (F1 ≈ 0,3) do ruộng còn ướt, mới làm đất.',

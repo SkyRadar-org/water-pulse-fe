@@ -29,9 +29,9 @@ function hlsTable(rows: ValidationRow[]): HTMLElement {
       {},
       h('td', { text: fmtShort(r.date) }),
       ...pairs.flatMap((p) => {
-        const a = r[p.a] as number;
-        const b = r[p.b] as number;
-        return [h('td', { class: `num ${a > b ? 'best' : ''}`, text: fmt2(a) }), h('td', { class: `num ${b > a ? 'best' : ''}`, text: fmt2(b) })];
+        const a = r[p.a] as number | null;
+        const b = r[p.b] as number | null;
+        return [h('td', { class: `num ${a !== null && b !== null && a > b ? 'best' : ''}`, text: a === null ? '—' : fmt2(a) }), h('td', { class: `num ${a !== null && b !== null && b > a ? 'best' : ''}`, text: b === null ? '—' : fmt2(b) })];
       }),
       h('td', { class: 'num', text: `${r.nisar_only_true_pct}%` }),
     ),

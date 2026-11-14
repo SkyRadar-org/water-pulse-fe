@@ -17,16 +17,18 @@ export interface CommuneProps {
   osm_id: string;
   name: string;
   province: string;
-  valid_km2: number;
+  valid_km2: number | null;
   first_flood_date: string | null;
-  peak_pct: number;
-  peak_date: string;
+  peak_pct: number | null;
+  peak_date: string | null;
   half_date: string | null;
   recession_date: string | null; // null = not drained at the last image
-  last_pct: number;
-  last_date: string;
-  max_flooded_km2: number;
+  last_pct: number | null;
+  last_date: string | null;
+  max_flooded_km2: number | null;
   status: CommuneStatus;
+  reference_track?: Track;
+  coverage_sufficient?: boolean;
 }
 
 export interface SeriesPoint {
@@ -60,8 +62,8 @@ export interface ValidationRow {
   f1_s1: number;
   recall_nisar: number;
   recall_s1: number;
-  precision_nisar: number;
-  precision_s1: number;
+  precision_nisar: number | null;
+  precision_s1: number | null;
   nisar_only_true_pct: number;
 }
 

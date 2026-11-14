@@ -48,6 +48,7 @@ export function mountCommunePanel(host: HTMLElement, scenes: Scene[]): void {
   }
 
   function plainSummary(p: CommuneProps): string {
+    if (p.last_pct === null) return T.panel.noObservations;
     return T.panel.summary(p, {
       first: p.first_flood_date ? fmtDate(p.first_flood_date) : '—',
       peak: fmtDate(p.peak_date),
@@ -76,7 +77,7 @@ export function mountCommunePanel(host: HTMLElement, scenes: Scene[]): void {
       const canvas = h('canvas', { 'aria-label': T.panel.chartAria(p.name), role: 'img' });
 
       host.replaceChildren(
-        h('div', { class: 'cp-head' }, h('div', {}, h('h2', { text: p.name }), h('div', { class: 'cp-prov', text: p.province })), closeBtn),
+        h('div', { class: 'cp-head' }, h('div', {}, h('h2', { text: p.name }), h('div', { class: 'cp-prov', text: `${p.province}${p.reference_track ? ` · ${p.reference_track}` : ''}` })), closeBtn),
         h('div', { class: 'cp-status' }, h('span', { class: `chip ${p.status}`, text: `${STATUS_ICON(p.status)} ${STATUS_LABEL(p.status)}` })),
         h('p', { class: 'cp-plain', text: plainSummary(p) }),
         h(
@@ -84,7 +85,7 @@ export function mountCommunePanel(host: HTMLElement, scenes: Scene[]): void {
           { class: 'cp-stats' },
           stat(T.panel.first, p.first_flood_date ? fmtDate(p.first_flood_date) : '—', T.panel.firstHint),
           stat(T.panel.peak, fmtPct(p.peak_pct), fmtDate(p.peak_date)),
-          stat(T.panel.drained, p.recession_date ? fmtDate(p.recession_date) : T.panel.notYet, p.recession_date ? T.panel.belowHalf : T.panel.asOfLast),
+          stat(T.panel.drained, p.last_pct === null ? '—' : p.recession_date ? fmtDate(p.recession_date) : T.panel.notYet, p.recession_date ? T.panel.belowHalf : T.panel.asOfLast),
           stat(T.panel.last, fmtPct(p.last_pct), fmtDate(p.last_date)),
         ),
         h('div', { class: 'cp-chart' }, canvas),

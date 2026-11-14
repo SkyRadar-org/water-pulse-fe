@@ -13,7 +13,7 @@ function parts(d: string): [number, number, number] {
   return [dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate()];
 }
 
-export const fmtDate = (d: string): string => T.date(...parts(d));
+export const fmtDate = (d: string | null): string => d ? T.date(...parts(d)) : '—';
 export const fmtShort = (d: string): string => {
   const [, m, day] = parts(d);
   return T.dateShort(m, day);
@@ -21,7 +21,7 @@ export const fmtShort = (d: string): string => {
 
 const NUM = new Intl.NumberFormat(lang === 'vi' ? 'vi-VN' : 'en-GB', { maximumFractionDigits: 1 });
 export const fmtNum = (v: number): string => NUM.format(v);
-export const fmtPct = (v: number): string => `${NUM.format(v)}%`;
+export const fmtPct = (v: number | null): string => v === null ? '—' : `${NUM.format(v)}%`;
 /** Two decimals, with the decimal comma in Vietnamese (scores like 0,78). */
 export const fmt2 = (v: number): string => v.toFixed(2).replace('.', lang === 'vi' ? ',' : '.');
 

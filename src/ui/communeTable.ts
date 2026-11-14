@@ -22,16 +22,16 @@ const COLUMNS: { key: SortKey; numeric?: boolean }[] = [
 
 const STATUS_ORDER: Record<CommuneStatus, number> = { not_receded: 0, uncertain: 1, receded: 2, no_flood: 3 };
 
-function cmp(a: CommuneProps, b: CommuneProps, key: SortKey): number {
-  if (key === 'status') return STATUS_ORDER[a.status] - STATUS_ORDER[b.status];
+function cmp(a: CommuneProps, b: CommuneProps, key: SortKey, direction: 1 | -1): number {
+  if (key === 'status') return (STATUS_ORDER[a.status] - STATUS_ORDER[b.status]) * direction;
   const av = a[key];
   const bv = b[key];
-  // missing dates (never flooded / not drained yet) always sort as "latest"
+  // [Codex] Missing observations stay last in both sort directions.
   if (av === null && bv === null) return 0;
   if (av === null) return 1;
   if (bv === null) return -1;
-  if (typeof av === 'number' && typeof bv === 'number') return av - bv;
-  return String(av).localeCompare(String(bv), 'vi');
+  if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * direction;
+  return String(av).localeCompare(String(bv), 'vi') * direction;
 }
 
 export function mountCommuneTable(host: HTMLElement): void {
@@ -80,7 +80,7 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
     const q = fold(query.trim());
     return all
       .filter((c) => (!province || c.province === province) && (!status || c.status === status) && (!q || fold(c.name).includes(q)))
-      .sort((a, b) => cmp(a, b, sortKey) * sortDir || a.name.localeCompare(b.name, 'vi'));
+      .sort((a, b) => cmp(a, b, sortKey, sortDir) || a.name.localeCompare(b.name, 'vi'));
   };
 
   function renderHead() {
@@ -120,7 +120,7 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
           h('td', { class: 'num', text: fmtPct(c.peak_pct) }),
           h('td', { text: fmtDate(c.peak_date) }),
           h('td', { text: c.first_flood_date ? fmtDate(c.first_flood_date) : '—' }),
-          h('td', { text: c.recession_date ? fmtDate(c.recession_date) : c.status === 'no_flood' ? '—' : T.table.notYet }),
+          h('td', { text: c.recession_date ? fmtDate(c.recession_date) : c.last_pct === null || c.status === 'no_flood' ? '—' : T.table.notYet }),
           h('td', { class: 'num', text: fmtPct(c.last_pct) }),
           h('td', {}, h('span', { class: `chip ${c.status}`, text: `${STATUS_ICON(c.status)} ${STATUS_SHORT(c.status)}`, title: STATUS_LABEL(c.status) })),
         );
@@ -153,6 +153,8 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
     const data = rows().map((c) => ({
       commune: c.name,
       province: c.province,
+      reference_track: c.reference_track ?? '',
+      coverage_sufficient: c.coverage_sufficient ?? '',
       status: STATUS_LABEL(c.status),
       peak_pct: c.peak_pct,
       peak_date: c.peak_date,

@@ -1,0 +1,79 @@
+{
+  "verified_at": "2026-11-14T10:44:30.405859+07:00",
+  "host": "https://nisar-flood.skyradar.vn",
+  "scenes": 33,
+  "communes": 140,
+  "son_kien": {
+    "last_pct": 78.2,
+    "reference_track": "148D"
+  },
+  "checks": [
+    {
+      "path": "/health",
+      "method": "GET",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/frontend/scenes",
+      "method": "GET",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/frontend/communes",
+      "method": "GET",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/frontend/validation",
+      "method": "GET",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/frontend/area",
+      "method": "GET",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/frontend/communes/15416586/series",
+      "method": "GET",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/frontend/choropleth?date=2026-11-03&track=148D",
+      "method": "GET",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/unknown",
+      "method": "GET",
+      "status": 404,
+      "type": "application/json"
+    },
+    {
+      "path": "/static/water/2026-06-17_047D.png",
+      "method": "GET",
+      "status": 200,
+      "type": "image/png"
+    },
+    {
+      "path": "/static/water/2026-11-03_148D.png",
+      "method": "GET",
+      "status": 200,
+      "type": "image/png"
+    },
+    {
+      "path": "/api/frontend/scenes",
+      "method": "POST",
+      "status": 405,
+      "type": "application/json"
+    }
+  ],
+  "head_health": 200
+}

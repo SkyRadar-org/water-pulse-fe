@@ -85,6 +85,7 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
 
   // ---- season summary ----
   const summarySection = h('section', { class: 'sb-sec' }, h('h3', { text: T.sidebar.summary.title }), h('p', { class: 'note', text: T.sidebar.summary.hint }));
+  summarySection.hidden = summaries.length === 0;
   const radios: { id: string | null; el: HTMLInputElement }[] = [];
   const options: { id: SummaryLayer['id'] | null; title: string }[] = [
     { id: null, title: T.sidebar.summary.off },
@@ -116,7 +117,7 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
       h('h4', { text: T.sidebar.legend.share }),
       h('ul', { class: 'sb-leg' }, ...CHORO_COLORS.map((c, i) => swatch(c, CHORO_LABELS[i])), swatch(NO_DATA_COLOR, T.sidebar.legend.noData)),
       h('h4', { text: T.sidebar.legend.waterMap }),
-      h('ul', { class: 'sb-leg' }, swatch('#1d4ed8', T.sidebar.legend.open), swatch('#475569', T.sidebar.legend.perm)),
+      h('ul', { class: 'sb-leg' }, swatch('#1d4ed8', T.sidebar.legend.open)),
       h('p', { class: 'note', text: T.sidebar.legend.statusNote }),
     );
   }

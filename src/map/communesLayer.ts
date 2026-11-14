@@ -92,7 +92,9 @@ export function addCommunes(
         const v = next[id];
         if (v === undefined) {
           delete values[id];
-          map.removeFeatureState({ source: SRC, id }, 'pct');
+          // Real acquisitions only cover some communes. Use the no-data sentinel;
+          // removing a never-created state crashes MapLibre 6's state reconciler.
+          map.setFeatureState({ source: SRC, id }, { pct: -1 });
         } else {
           values[id] = v;
           map.setFeatureState({ source: SRC, id }, { pct: v });

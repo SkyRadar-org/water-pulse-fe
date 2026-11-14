@@ -1,5 +1,6 @@
 export const GIBS_LAYER = 'NISAR_L2_Geocoded_Polarimetric_Covariance';
-export const GIBS_MAX_ZOOM = 13;
+// [Codex] Higher native zooms return broken NISAR tiles; MapLibre can overscale zoom 10.
+export const GIBS_MAX_ZOOM = 10;
 
 /** GIBS WMTS (EPSG:3857) tile template for one acquisition date. Note the {z}/{y}/{x} order. */
 export function gibsTiles(date: string): string[] {

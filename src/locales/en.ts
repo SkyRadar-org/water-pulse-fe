@@ -1,7 +1,7 @@
 import type { CommuneProps, CommuneStatus, Maturity } from '../data/types.ts';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const areaNote = 'NISAR water area runs ~1.4–1.5× higher than OPERA DSWx-S1; treat absolute km² as indicative.';
+const areaNote = 'Areas refer to observed commune coverage; absolute km² are indicative. Permanent water is excluded.';
 
 export const en = {
   htmlLang: 'en',
@@ -26,9 +26,9 @@ export const en = {
   tabs: { map: 'Map', communes: 'Communes', validation: 'Validation', about: 'About' },
   maturity: { provisional: 'Provisional', validated: 'Validated' } as Record<Maturity, string>,
   status: {
-    receded: { long: 'Drained', short: 'Drained', icon: '✓' },
-    not_receded: { long: 'Still flooded after 1 Nov — late-sowing risk', short: 'Still flooded', icon: '!' },
-    uncertain: { long: 'Mixed signal', short: 'Mixed signal', icon: '?' },
+    receded: { long: 'Ready: below 10% water', short: 'Ready', icon: '✓' },
+    not_receded: { long: 'Still wet (≥30% water)', short: 'Still wet', icon: '!' },
+    uncertain: { long: 'Draining or insufficient coverage', short: 'Draining / unknown', icon: '?' },
     no_flood: { long: 'No significant flooding', short: 'No flooding', icon: '–' },
   } as Record<CommuneStatus, { long: string; short: string; icon: string }>,
   months,
@@ -67,7 +67,7 @@ export const en = {
       waterMap: 'Water detected',
       open: 'Flooded field / open water',
       perm: 'Permanent water (rivers, canals)',
-      statusNote: 'Status labels: ✓ drained · ! still flooded after 1 Nov · ? mixed signal · – no significant flooding.',
+      statusNote: 'Latest covering image: ✓ below 10% water · ! at least 30% water · ? draining or insufficient coverage · – no significant flooding.',
     },
   },
 
@@ -115,23 +115,25 @@ export const en = {
     chartAria: (name: string): string => `Water percentage over time for ${name}`,
     yAxis: 'Water, % of land',
     sowing: ['Sowing', 'window'],
-    tipLine: (pct: number, km2: number, valid: number): string => `${pct}% water · ${km2} km² of ${valid} km²`,
+    tipLine: (pct: number, km2: number, valid: number): string => `${pct}% water · ${km2 ?? "—"} km² of ${valid ?? "—"} km²`,
     track: (t: string): string => `Track ${t}`,
+    noObservations: 'No observations are available for this commune.',
     summary: (p: CommuneProps, f: { first: string; peak: string; last: string; rec: string; recBeforeSowing: boolean }): string => {
       if (p.status === 'no_flood') return `${p.name} had no significant flooding this season (highest ${p.peak_pct}% of land under water, on ${f.peak}).`;
       let s = `${p.name} first passed 20% under water on ${f.first}, peaked at ${p.peak_pct}% on ${f.peak}, and at the last image (${f.last}) it stood at ${p.last_pct}%. `;
-      if (p.status === 'not_receded') s += 'Water had not fallen below half of its peak, so winter-spring sowing here may be late.';
-      else if (p.status === 'receded') s += f.recBeforeSowing ? `Water fell below half of its peak around ${f.rec}, before the 1 Nov sowing window.` : `Water fell below half of its peak around ${f.rec}, after the 1 Nov sowing window opened.`;
-      else s += 'Images from different satellite tracks disagree, so the situation is not clear yet.';
+      if (p.coverage_sufficient === false) s += 'Coverage is insufficient for a sowing assessment.';
+      else if (p.status === 'not_receded') s += 'At least 30% water remains on the latest image covering half the commune; sowing may be delayed.';
+      else if (p.status === 'receded') s += 'Water covers less than 10% on the latest image covering half the commune.';
+      else s += 'Water covers 10–30% on the latest covering image; drainage is still in progress.';
       return s;
     },
-    note: (km2: number, valid: number): string =>
-      `Peak flooded area ≈ ${km2} km² of ${valid} km² of land. ${areaNote} Shaded band: Đông Xuân (winter-spring) sowing window, 1 Nov – 31 Dec, An Giang. Filled dots are validated images, hollow dots provisional; click a dot to jump to that image.`,
+    note: (km2: number | null, valid: number | null): string =>
+      `Peak flooded area ≈ ${km2 ?? "—"} km² of ${valid ?? "—"} km² of land. ${areaNote} Shaded band: Đông Xuân (winter-spring) sowing window, 1 Nov – 31 Dec, An Giang. Filled dots are validated images, hollow dots provisional; click a dot to jump to that image.`,
   },
 
   table: {
     title: 'Communes',
-    lead: 'Every commune in the study area: when it flooded, when it peaked, and whether the water had drained before the 1 Nov winter-spring sowing window. Click a row to see it on the map.',
+    lead: 'Commune summaries use the track of the latest image covering at least half the commune. Status describes water remaining, not the half-peak date. Click a row to see it on the map.',
     search: 'Search commune…',
     searchAria: 'Search commune by name',
     provinceAria: 'Filter by province',
@@ -152,7 +154,7 @@ export const en = {
     lead: 'What we checked the water maps against, and where they are weak.',
     plainTitle: 'In plain words',
     plain: [
-      'The water maps find most of the water that independent optical (cloud-free) maps find: 64–77% for NISAR against 43–60% for Sentinel-1, on the clear-sky days that can be compared.',
+      'The water maps find most of the water that independent optical (cloud-free) maps find: 47–82% for NISAR against 35–64% for Sentinel-1, on the clear-sky days that can be compared.',
       'NISAR sees water on the surface of the fields even through clouds, but it cannot say whether the flood is natural, a controlled release, or pumping for land preparation.',
       'Use the maps to compare communes and dates. Treat square-kilometre figures as indicative only.',
       'This is not an early-warning tool: data arrive 2–3 days after each satellite pass.',
@@ -160,19 +162,19 @@ export const en = {
     detailsTitle: 'Technical details',
     areaTitle: 'Water area per image',
     areaAria: 'Water area per image, NISAR versus DSWx-S1',
-    areaNote: (n: string): string => `Solid = NISAR (this app), dashed = OPERA DSWx-S1. Filled dots are validated images (22 Oct onward), hollow dots provisional. Each track is its own line. ${n}`,
+    areaNote: (n: string): string => `Lines show NISAR observed commune area; comparable DSWx-S1 area totals are unavailable. Filled dots are validated images (22 Oct onward), hollow dots provisional. Each track is its own line. ${n}`,
     areaAxis: 'Water area, km²',
     track148: '(west ~37% of the area)',
     hlsTitle: 'NISAR vs Sentinel-1 against independent optical maps (DSWx-HLS)',
-    hlsNote: 'OPERA DSWx-HLS, ±2 days, clear-sky pixels only. Bold = better of the two. NISAR finds more of the water (recall); Sentinel-1 is slightly more conservative (precision). F1 combines both.',
+    hlsNote: 'OPERA DSWx-HLS, ±2 days, clear-sky pixels only. Bold = better of the two. NISAR finds more of the water (recall); Precision is not supplied in this dataset (—). F1 combines recall and precision.',
     hlsCols: { date: 'Date', f1: 'F1', recall: 'Recall', precision: 'Precision', only: 'NISAR-only pixels that are water' },
     agreeTitle: 'Agreement with OPERA DSWx-S1',
-    kpiMedian: 'Median F1 (20 dates)',
+    kpiMedian: 'Median F1 (25 comparisons)',
     kpiFlood: 'Flood season (Sep–Oct)',
     kpiEarly: 'June–July',
     f1Aria: 'F1 score of NISAR water versus DSWx-S1 per image',
     f1Axis: 'F1 vs DSWx-S1',
-    f1Foot: 'Threshold calibrated on 17 Jun and 21 Sep; the other 20 dates are held-out checks.',
+    f1Foot: 'Threshold calibrated on 17 Jun and 21 Sep; 25 other acquisitions are held-out checks.',
     f1Track: (t: string): string => `Track ${t}`,
     methodTitle: 'Method',
     limitsTitle: 'Limits',
@@ -184,13 +186,13 @@ export const en = {
 
   about: {
     answersTitle: 'What the app answers',
-    answersLead: 'For every commune of the Long Xuyên Quadrangle and the Plain of Reeds (An Giang, Đồng Tháp), across 22 NISAR passes from 17 Jun to 29 Oct 2026 plus a 3 Nov image:',
+    answersLead: 'For every commune of the Long Xuyên Quadrangle and the Plain of Reeds (An Giang, Đồng Tháp), across 33 NISAR acquisitions on three tracks from 17 Jun to 3 Nov 2026:',
     readTitle: 'How to read the map',
     read: [
       'The time slider only offers dates with a real NISAR image; nothing is interpolated between them.',
       'Three satellite tracks (047D, 083A, 148D) are never merged: charts draw one line per track.',
       'Images before 22 Oct 2026 are Provisional (hollow dots); from 22 Oct they are Validated (filled dots).',
-      'Square kilometres are indicative: NISAR water area runs ~1.4–1.5× higher than OPERA DSWx-S1.',
+      'Square kilometres describe observed commune coverage and exclude permanent water.',
     ],
     readMore: ['Limits and the method behind the water map are on the ', 'Validation', ' tab.'],
     limitsTitle: 'Known limits',
@@ -222,17 +224,17 @@ export const en = {
     positioning: "Complements Vietnam's rapid flood mapping by tracking the whole flood season with NISAR L-band, updated 2–3 days after each overpass.",
     heroNumbers: [
       { big: 'Low-flood year', text: '2026 was a low-flood year in the Mekong Delta.' },
-      { big: '50 of 80', text: 'heavily flooded communes had not drained halfway by 29 Oct, just before the 1 Nov sowing window.' },
-      { big: '64–77% vs 43–60%', text: 'Against independent optical maps, NISAR detected 64–77% of water vs 43–60% for Sentinel-1.' },
+      { big: '38 of 131', text: 'assessed communes still wet on the latest covering image (at least 30% water).' },
+      { big: '47–82% vs 35–64%', text: 'Water recall against independent optical maps: NISAR versus Sentinel-1, across 16 comparisons.' },
     ],
     questions: [
       { q: 'Since when is it flooded?', a: 'First date a commune reaches 20% of its land under water.' },
       { q: 'When was the peak?', a: 'The highest share of land under water, and the day it happened.' },
-      { q: 'Did it drain before sowing?', a: 'Whether water fell below half of the peak before the winter-spring sowing window opens on 1 Nov.' },
+      { q: 'Did it drain before sowing?', a: 'Latest image covering at least half the commune: below 10% water = ready, 10–30% = draining, at least 30% = still wet.' },
     ],
     limits: [
       'Threshold calibrated against OPERA DSWx-S1 (C-band), which is not ground truth.',
-      '20 of 22 acquisitions are PROVISIONAL products.',
+      '29 of 33 acquisitions are PROVISIONAL products.',
       'NISAR detects water on the field surface; it cannot tell natural flood, controlled flood release, or pumping for land preparation apart.',
       'Flooded-vegetation layer was tested and dropped (F1 ≈ 0.02): growing rice also brightens HH.',
       'June–July agreement is weak (F1 ≈ 0.3) due to wet, freshly prepared paddies.',

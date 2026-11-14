@@ -7,7 +7,11 @@
     "dev": "vite",
     "mock": "node scripts/make-mock.mjs",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:cloudflare": "node scripts/build-cloudflare.mjs",
+    "dev:cloudflare": "wrangler pages dev dist --port 8788",
+    "deploy:cloudflare": "wrangler pages deploy dist --project-name nisar-flood",
+    "test:cloudflare": "node --test tests/cloudflare-worker.test.mjs"
   },
   "dependencies": {
     "chart.js": "^4.6.1",
@@ -21,6 +25,7 @@
     "@types/papaparse": "^5.5.2",
     "pngjs": "^7.0.0",
     "typescript": "^7.0.2",
-    "vite": "^8.3.8"
+    "vite": "^8.3.8",
+    "wrangler": "4.162.0"
   }
 }

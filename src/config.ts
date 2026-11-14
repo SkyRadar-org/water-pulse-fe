@@ -1,9 +1,12 @@
 /** Data source: 'mock' (public/mock), 'static' (public/data, exported by the backend) or 'api'. */
 export type DataMode = 'mock' | 'static' | 'api';
 
-export const DATA_MODE: DataMode = 'mock';
+const mode = import.meta.env.VITE_DATA_MODE ?? 'api';
+if (!['mock', 'static', 'api'].includes(mode)) throw new Error(`Invalid VITE_DATA_MODE: ${mode}`);
+export const DATA_MODE: DataMode = mode as DataMode;
 export const STATIC_BASE = '/data';
-export const API_BASE = 'https://api.example.org';
+/** Backend origin; empty uses the same origin (Vite proxies /api and /static in development). */
+export const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/$/, '');
 
 export const MAP_CENTER: [number, number] = [105.47, 10.62];
 export const MAP_ZOOM = 9;

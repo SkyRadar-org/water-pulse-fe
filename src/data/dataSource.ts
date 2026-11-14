@@ -16,7 +16,8 @@ const base = DATA_MODE === 'api' ? API_BASE : DATA_MODE === 'static' ? STATIC_BA
 
 /** Relative asset URLs (PNG) are resolved against the active data base; absolute ones are kept. */
 export function resolveAsset(url: string): string {
-  if (/^([a-z]+:)?\/\//i.test(url) || url.startsWith('/') || url.startsWith('data:')) return url;
+  if (/^([a-z]+:)?\/\//i.test(url) || url.startsWith('data:')) return url;
+  if (url.startsWith('/')) return DATA_MODE === 'api' ? `${base}${url}` : url;
   return `${base}/${url}`;
 }
 
@@ -31,8 +32,8 @@ function endpoint(name: string, params?: Record<string, string>): string {
       validation: '/api/validation',
       choropleth: '/api/choropleth',
     };
-    if (name.startsWith('series:')) return `${base}/api/communes/${encodeURIComponent(name.slice(7))}/series`;
-    return `${base}${paths[name]}${q}`;
+    if (name.startsWith('series:')) return `${base}/api/frontend/communes/${encodeURIComponent(name.slice(7))}/series`;
+    return `${base}${paths[name].replace('/api/', '/api/frontend/')}${q}`;
   }
   if (name.startsWith('series:')) return `${base}/series/${encodeURIComponent(name.slice(7))}.json`;
   if (name === 'choropleth') return `${base}/choropleth/${params!.date}_${params!.track}.json`;
