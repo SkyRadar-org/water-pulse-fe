@@ -5,6 +5,7 @@ import { fmtDate, fmtNum, fmtPct, fold } from '../format.ts';
 import { T } from '../i18n.ts';
 import { set, state } from '../state.ts';
 import { h } from './dom.ts';
+import { trendTag } from './trend.ts';
 import { heroBlock } from './about.ts';
 
 export type OverviewGroup = 'all' | 'high' | 'medium' | 'low' | 'insufficient';
@@ -494,6 +495,7 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
         kind === 'partial'
           ? h('span', { class: 'ov-pct-partial-tag', text: T.overview.list.partialValueNote })
           : h('span', { class: 'ov-pct-group-tag', text: T.overview.list.groupBadge[group] }),
+        kind === 'partial' ? null : trendTag(c),
       ),
       h(
         'div',

@@ -34,7 +34,14 @@ export interface CommuneProps {
   status: CommuneStatus;
   reference_track?: Track;
   coverage_sufficient?: boolean;
+  /** [Claude] Measured change vs the previous image of the same orbit (not a forecast); null without a comparable image. */
+  trend?: WaterTrend | null;
+  trend_pp_12d?: number | null; // percentage points per 12 days
+  prev_date?: string | null;
+  prev_pct?: number | null;
 }
+
+export type WaterTrend = 'falling' | 'steady' | 'rising';
 
 export interface SeriesPoint {
   date: string;

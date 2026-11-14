@@ -8,6 +8,7 @@ import { T } from '../i18n.ts';
 import { STATUS_ICON, STATUS_LABEL } from '../palette.ts';
 import { set, state, subscribe } from '../state.ts';
 import { h } from './dom.ts';
+import { trendBlock } from './trend.ts';
 import { icon } from './icons.ts';
 
 export const slug = (s: string): string =>
@@ -120,6 +121,7 @@ export function mountCommunePanel(host: HTMLElement, scenes: Scene[]): void {
         h('p', { class: 'cp-label', text: hasAssessment(p) ? T.panel.latestEvidence : p.last_pct === null ? T.panel.noObservations : T.panel.partialEvidence }),
         h('div', { class: 'cp-latest' }, h('strong', { text: fmtPct(p.last_pct) }), h('span', { text: p.last_date ? fmtDate(p.last_date) : '' })),
         h('p', { class: 'cp-observed note', text: (p.observed_pct != null ? T.story.coverage(fmtNum(Math.floor(p.observed_pct * 10) / 10)) + '. ' : '') + T.story.waterNote }),
+        ...(trendBlock(p) ? [trendBlock(p)!] : []),
         h('p', { class: 'cp-next', text: decision }), evidence, viewImage,
         history,
       );

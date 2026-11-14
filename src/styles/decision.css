@@ -70,3 +70,19 @@
   .ov-row-btn { font-size: 12px; white-space: normal; }
   .ov-track-tag { display: none; }
 }
+
+/* [Claude] Measured water trend (arrow + words; colour is secondary). */
+.trend { margin: 8px 0 2px; padding: 10px 12px; border: 1px solid var(--line); border-left-width: 4px; border-radius: 8px; background: #fff; }
+.trend p { margin: 0; }
+.trend-head { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+.trend-icon { font-size: 20px; line-height: 1; font-weight: 700; }
+.trend-detail { font-size: 13px; margin-top: 4px !important; color: var(--ink-2); }
+.trend-note { font-size: 12px; margin-top: 4px !important; }
+.trend-falling { border-left-color: #0369a1; }
+.trend-steady { border-left-color: #64748b; }
+.trend-rising { border-left-color: #b45309; }
+.trend-tag { font-size: 0.72rem; padding: 0.1rem 0.35rem; border-radius: 4px; background: #f1f5f9; color: #334155; white-space: nowrap; }
+.trend-tag.trend-rising { background: #fef3c7; color: #92400e; }
+.trend-tag.trend-falling { background: #e0f2fe; color: #075985; }
+.ov-pct-wrap { flex-wrap: wrap; row-gap: 4px; }
+.ov-pct-group-tag, .ov-pct-partial-tag { white-space: nowrap; }

@@ -58,6 +58,14 @@ export const vi: Strings = {
   tabs: { overview: 'Tổng quan', map: 'Bản đồ', reports: 'Báo cáo thống kê', validation: 'Độ tin cậy', about: 'Giới thiệu' },
   tabsShort: { reports: 'Báo cáo' },
   maturity: { provisional: 'Tạm thời (Provisional)', validated: 'Đã kiểm định (Validated)' },
+  trend: {
+    falling: { icon: '↓', label: 'Nước đang giảm' },
+    steady: { icon: '→', label: 'Nước đứng yên' },
+    rising: { icon: '↑', label: 'Nước đang tăng' },
+    detail: (prevPct, prevDate, pct, date) => `${prevPct} ngày ${prevDate} → ${pct} ngày ${date}, cùng quỹ đạo`,
+    note: 'So hai ảnh gần nhất của cùng một quỹ đạo (cách nhau tối đa 24 ngày). Đây là số đo, không phải dự báo: mực nước ở đây phụ thuộc việc mở cống và bơm.',
+    short: { falling: '↓ đang giảm', steady: '→ đứng yên', rising: '↑ đang tăng' },
+  },
   status: {
     receded: { long: 'Ít nước: dưới 10% diện tích', short: 'Ít nước', icon: '✓' },
     not_receded: { long: 'Còn ngập (≥30% diện tích có nước)', short: 'Còn ngập', icon: '!' },

@@ -58,6 +58,15 @@ export const en = {
   /** Narrow-screen labels; tabs without an entry keep their full label. */
   tabsShort: { reports: 'Reports' } as Partial<Record<'overview' | 'map' | 'reports' | 'validation' | 'about', string>>,
   maturity: { provisional: 'Provisional', validated: 'Validated' } as Record<Maturity, string>,
+  // [Claude] Direction of change between two real images of the same orbit. Measured, never a forecast.
+  trend: {
+    falling: { icon: '↓', label: 'Water falling' },
+    steady: { icon: '→', label: 'Water steady' },
+    rising: { icon: '↑', label: 'Water rising' },
+    detail: (prevPct: string, prevDate: string, pct: string, date: string): string => `${prevPct} on ${prevDate} → ${pct} on ${date}, same orbit`,
+    note: 'Change between the last two images of the same orbit (at most 24 days apart). A measurement, not a forecast: water levels here depend on sluices and pumping.',
+    short: { falling: '↓ falling', steady: '→ steady', rising: '↑ rising' },
+  },
   status: {
     receded: { long: 'Low water: below 10%', short: 'Low water', icon: '✓' },
     not_receded: { long: 'Still wet (≥30% water)', short: 'Still wet', icon: '!' },
