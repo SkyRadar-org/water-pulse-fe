@@ -10,7 +10,7 @@ const FONT = ['Noto Sans Regular'];
 export function baseStyle(): maplibregl.StyleSpecification {
   return {
     version: 8,
-    glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
+    glyphs: `${location.origin}/fonts/{fontstack}/{range}.pbf`,
     sources: {
       basemap: {
         type: 'raster',
