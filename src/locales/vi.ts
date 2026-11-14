@@ -10,7 +10,7 @@ export const vi: Strings = {
   ...viOverview,
   ...viReports,
   story: {
-    title: 'NISAR theo dõi nước trên đồng ruộng Đồng bằng sông Cửu Long qua mùa lũ, tổng hợp theo từng xã.',
+    title: 'NISAR theo dõi ngập ruộng Đồng bằng sông Cửu Long qua mùa lũ, theo từng xã.',
     lead: 'Thí điểm ở Tứ giác Long Xuyên và Đồng Tháp Mười. Xem nơi còn nhiều nước, kiểm tra ngày quan trắc và mở ảnh làm bằng chứng.',
     high: 'xã nhiều nước / xã đủ phủ đánh giá',
     optical: 'F1 cao hơn Sentinel-1 · đối chiếu quang học, tháng 8–11',

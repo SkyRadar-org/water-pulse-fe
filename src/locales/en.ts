@@ -9,7 +9,7 @@ export const en = {
   ...enOverview,
   ...enReports,
   story: {
-    title: 'NISAR follows water on the fields of the Mekong Delta through the flood season, commune by commune.',
+    title: 'NISAR tracks field flooding across the Mekong Delta through the flood season, commune by commune.',
     lead: 'Pilot area: the Long Xuyên Quadrangle and the Plain of Reeds. See where water remains, check the observation date, then inspect the evidence.',
     high: 'high-water / assessed communes',
     optical: 'higher F1 vs Sentinel-1 · optical comparisons, Aug–Nov',
