@@ -62,7 +62,6 @@ function skeleton(): HTMLElement {
   return h(
     'div',
     { class: 'rp-skeleton', role: 'status', 'aria-live': 'polite' },
-    h('span', { class: 'sr-only', text: T.reports.loading }),
     h('p', { class: 'rp-loading-text', text: T.reports.loading }),
     h('div', { class: 'rp-kpis' }, bar('kpi'), bar('kpi'), bar('kpi'), bar('kpi')),
     bar('chart'),
@@ -171,13 +170,23 @@ function build(root: HTMLElement, all: CommuneProps[], scenes: Scene[], choro: M
   const provSel = h('select', {}, h('option', { value: '', text: R.allProvinces }), ...provinces.map((p) => h('option', { value: p, text: p })));
   const trackSel = h('select', {}, h('option', { value: 'all', text: R.allTracks }), ...TRACKS.map((t) => h('option', { value: t, text: R.trackOption(t) })));
   const scopeLine = h('p', { class: 'rp-scope', role: 'status', 'aria-live': 'polite' });
+  const resetBtn = h('button', { type: 'button', class: 'rp-btn rp-reset', text: R.resetFilters });
   const filters = h(
     'form',
     { class: 'rp-filters', 'aria-label': R.filtersAria },
-    h('div', { class: 'rp-filter-row' }, field(R.period, periodSel, 'rp-field-period'), fromField, toField, field(R.province, provSel), field(R.track, trackSel)),
+    h('div', { class: 'rp-filter-row' }, field(R.period, periodSel, 'rp-field-period'), fromField, toField, field(R.province, provSel), field(R.track, trackSel), resetBtn),
     scopeLine,
+    h('p', { class: 'rp-hint', text: R.orbitHint }),
   );
   filters.addEventListener('submit', (ev) => ev.preventDefault());
+  resetBtn.addEventListener('click', () => {
+    periodSel.value = 'all';
+    provSel.value = '';
+    trackSel.value = 'all';
+    filter = { from: first, to: last, province: '', track: 'all' };
+    applyPeriod();
+    render();
+  });
 
   const content = h('div', { class: 'rp-content' });
   root.replaceChildren(head, printMeta, filters, content, status);

@@ -239,6 +239,16 @@
   color: var(--ink-2);
 }
 
+.rp-hint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.rp-reset {
+  margin-left: auto;
+}
+
 /* ---------- KPI band ---------- */
 .rp-kpis {
   display: grid;
@@ -590,6 +600,24 @@
 }
 
 @media (max-width: 767px) {
+  .rp-sort,
+  .rp-menu-item,
+  .rp-icon-btn {
+    min-height: 44px;
+  }
+  .rp-icon-btn {
+    min-width: 44px;
+  }
+  .rp-field select,
+  .rp-search,
+  .rp-btn {
+    min-height: 44px;
+  }
+  .rp-reset {
+    grid-column: 1 / -1;
+    margin-left: 0;
+    justify-content: center;
+  }
   .rp-head {
     flex-direction: column;
     gap: 14px;
@@ -659,6 +687,8 @@
     padding: 0 !important;
   }
   .rp-export,
+  .rp-reset,
+  .rp-hint,
   .rp-icon-btn,
   .rp-filter-row,
   .rp-table-tools,

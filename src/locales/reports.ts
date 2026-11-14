@@ -21,6 +21,8 @@ export const enReports = {
     trackOption: (t: string): string => `Orbit ${t}`,
     scopeLine: (n: number, from: string, to: string, communes: number): string =>
       `${n} acquisition${n === 1 ? '' : 's'} from ${from} to ${to} · ${communes} communes in scope`,
+    resetFilters: 'Reset filters',
+    orbitHint: 'An orbit is one repeating satellite flight path; each orbit passes over the area on different dates and covers different communes.',
     noScenes: 'No acquisition falls in this period for the selected orbit. Widen the period or choose “All orbits”.',
 
     export: 'Export',
@@ -39,7 +41,7 @@ export const enReports = {
     kpiObserved: 'Communes observed',
     kpiObservedSub: (total: number): string => `of ${total} communes in scope`,
     kpiHigh: 'Communes reaching ≥ 30% water',
-    kpiHighSub: (pct: string): string => `${pct} of observed communes, at least once`,
+    kpiHighSub: (pct: string): string => `${pct} of observed communes, at least once in the period (differs from the Overview, which shows only the latest image)`,
     kpiBusiest: 'Most communes ≥ 30% in one image',
     kpiBusiestSub: (date: string, track: string): string => `${date} · orbit ${track}`,
     kpiNone: 'None',
@@ -125,6 +127,8 @@ export const viReports: typeof enReports = {
     allTracks: 'Tất cả quỹ đạo',
     trackOption: (t) => `Quỹ đạo ${t}`,
     scopeLine: (n, from, to, communes) => `${n} lần chụp từ ${from} đến ${to} · ${communes} xã trong phạm vi`,
+    resetFilters: 'Xóa bộ lọc',
+    orbitHint: 'Quỹ đạo là một đường bay lặp lại của vệ tinh; mỗi quỹ đạo bay qua vùng này vào những ngày khác nhau và phủ những xã khác nhau.',
     noScenes: 'Không có lần chụp nào trong thời kỳ này với quỹ đạo đã chọn. Hãy mở rộng thời kỳ hoặc chọn «Tất cả quỹ đạo».',
 
     export: 'Xuất báo cáo',
@@ -143,7 +147,7 @@ export const viReports: typeof enReports = {
     kpiObserved: 'Xã có quan trắc',
     kpiObservedSub: (total) => `trên ${total} xã trong phạm vi`,
     kpiHigh: 'Xã từng có ≥ 30% nước',
-    kpiHighSub: (pct) => `${pct} số xã có quan trắc, ít nhất một lần`,
+    kpiHighSub: (pct) => `${pct} số xã có quan trắc, ít nhất một lần trong kỳ (khác Tổng quan, vốn chỉ xét ảnh gần nhất)`,
     kpiBusiest: 'Nhiều xã ≥ 30% nhất trong một ảnh',
     kpiBusiestSub: (date, track) => `${date} · quỹ đạo ${track}`,
     kpiNone: 'Không có',

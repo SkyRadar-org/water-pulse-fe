@@ -40,8 +40,8 @@
   margin: 0 0 12px;
   padding: 10px 12px;
   background: #eff6ff;
-  border-left: 4px solid var(--brand-2);
-  border-radius: 6px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
   font-size: 14.5px;
   line-height: 1.5;
 }
