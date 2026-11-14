@@ -130,6 +130,11 @@ export function mountMap(container: HTMLElement): MapView {
       [scenes, summaries] = await Promise.all([getScenes(), getSummaryLayers()]);
       const first = sceneOf(state) ?? scenes[0];
       addImageLayers(map, first);
+      // [Claude] Warm the cache so Play does not flicker.
+      scenes.forEach((sc) => {
+        new Image().src = sc.waterPng;
+        new Image().src = sc.radarJpg ?? sc.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg');
+      });
       const data = await getCommunes();
       collection = data;
       communes = addCommunes(map, data, { onSelect: (osmId) => set({ selectedCommune: osmId }) });

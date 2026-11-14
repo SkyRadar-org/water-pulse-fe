@@ -106,6 +106,7 @@ export const vi: Strings = {
     provisional: 'Tạm thời (Provisional)',
     note: 'Mỗi chấm là một ngày vệ tinh chụp ảnh. Bấm vào chấm, hoặc bấm ▶, để xem nước lũ thay đổi theo mùa.',
     summaryNote: 'Đang xem tổng kết cả mùa — thanh thời gian tạm dừng',
+    latestNote: 'Bản đồ đang hiện ảnh gần nhất của từng xã. Bấm ▶ hoặc chọn một ngày để xem lần lượt từng lần chụp.',
     collapse: 'Thu gọn / mở rộng',
     dotLabel: (date, track, m) => `${date}, quỹ đạo ${track}, ${m}`,
     region: 'Thanh thời gian',

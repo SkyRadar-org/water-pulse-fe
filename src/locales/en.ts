@@ -105,6 +105,7 @@ export const en = {
     provisional: 'Provisional',
     note: 'Each dot is a day the satellite took a picture. Click a dot or press ▶ to watch the flood change over the season.',
     summaryNote: 'Showing the whole-season summary — the time slider is paused',
+    latestNote: 'The map shows the latest image of each commune. Press ▶ or pick a date to step through the acquisitions.',
     collapse: 'Collapse / expand',
     dotLabel: (date: string, track: string, m: string): string => `${date}, track ${track}, ${m}`,
     region: 'Time slider',

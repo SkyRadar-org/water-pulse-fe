@@ -54,7 +54,7 @@ export const state: State = {
   selectedCommune: null,
   flyNonce: 0,
   activeSummary: null,
-  layers: { basemap: true, radar: false, water: true, communes: true, provinces: true },
+  layers: { basemap: true, radar: true, water: true, communes: true, provinces: true },
   opacity: { radar: 0.85, water: 0.9, communes: 0.6 },
   playing: false,
   radarMissing: false,

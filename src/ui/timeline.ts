@@ -54,7 +54,8 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   function play() {
     const list = visible(state.trackFilter);
     const idx = list.findIndex((s) => same(s, { date: state.selectedDate, track: state.selectedTrack }));
-    if (idx >= list.length - 1) select(list[0]);
+    // From the "latest per commune" view, or at the end, start from the first acquisition (select() switches to one-acquisition mode).
+    if (state.mapMode === 'latest' || idx < 0 || idx >= list.length - 1) select(list[0]);
     set({ playing: true });
     timer = window.setInterval(() => {
       if (!step(1)) stop();
@@ -68,6 +69,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   const maturityEl = h('span', { class: 'maturity' });
   const infoEl = h('div', { class: 'tl-info' });
   const summaryNote = h('div', { class: 'tl-summary-note', text: T.timeline.summaryNote });
+  const latestNote = h('div', { class: 'tl-latest-note', text: T.timeline.latestNote });
 
   const seg = h('div', { class: 'tl-seg', role: 'group', 'aria-label': T.timeline.trackGroup, title: T.timeline.trackHelp });
   const segBtns = new Map<TrackFilter, HTMLButtonElement>();
@@ -106,7 +108,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     host.classList.add('collapsed');
     collapseBtn.textContent = '▴';
   }
-  host.append(head, summaryNote, body);
+  host.append(head, summaryNote, latestNote, body);
 
   const dots = new Map<string, HTMLButtonElement>();
   const key = (s: { date: string; track: Track }) => `${s.date}|${s.track}`;
@@ -196,7 +198,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     window.dispatchEvent(new Event('resize'));
   });
   document.addEventListener('keydown', (ev) => {
-    if (state.tab !== 'map' || state.mapMode !== 'scene' || state.activeSummary) return;
+    if (state.tab !== 'map' || state.activeSummary) return;
     const t = ev.target as HTMLElement;
     if (/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName) && (t as HTMLInputElement).type !== 'checkbox' && (t as HTMLInputElement).type !== 'radio') return;
     if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') {
@@ -216,6 +218,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     const scene = current(s);
     for (const [f, b] of segBtns) b.setAttribute('aria-pressed', String(f === s.trackFilter));
     host.classList.toggle('summary-mode', s.activeSummary !== null);
+    host.classList.toggle('latest-mode', s.mapMode === 'latest' && s.activeSummary === null);
     playBtn.textContent = s.playing ? '❚❚' : '▶';
     playBtn.setAttribute('aria-label', s.playing ? T.timeline.pause : T.timeline.play);
     if (!scene) return;
@@ -235,7 +238,8 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   }
 
   subscribe((s) => {
-    if (s.mapMode === 'latest' && s.playing) stop();
+    // Other controls pause by setting playing=false or switching to 'latest'; clear the timer too, or it keeps stepping.
+    if ((s.mapMode === 'latest' || !s.playing) && timer !== undefined) stop();
     render(s);
   });
   render(state);

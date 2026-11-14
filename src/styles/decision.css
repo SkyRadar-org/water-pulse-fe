@@ -10,8 +10,7 @@
 .map-mode button[aria-pressed='true'] { background: var(--brand); color: #fff; }
 .view-map > .sidebar, .view-map > .map-wrap { grid-row: 2; }
 .view-map > .timeline { grid-row: 3; }
-.view-map.latest-mode { grid-template-rows: auto minmax(0, 1fr); }
-.view-map.latest-mode > .timeline { display: none; }
+/* [Claude] The time slider stays visible in "latest" mode: ▶, a date or ←/→ switch to one acquisition. */
 .cp-label { margin: 16px 0 0; font-size: 12px; color: var(--ink-2); }
 .cp-latest { display: flex; align-items: baseline; gap: 14px; padding: 2px 0; }
 .cp-latest strong { font-size: 38px; line-height: 1.3; }
