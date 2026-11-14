@@ -44,6 +44,9 @@ export function addImageLayers(map: maplibregl.Map, scene: Scene): void {
   map.addLayer({ id: 'radar', type: 'raster', source: 'radar-image', paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0 } });
   map.addSource('water', { type: 'image', url: scene.waterPng, coordinates: coordsOf(scene.bounds) });
   map.addLayer({ id: 'water', type: 'raster', source: 'water', paint: { 'raster-opacity': 0.9, 'raster-fade-duration': 0 } });
+  // [Claude] SWOT comparison map (orange), drawn above our water layer; hidden when the scene has no SWOT pass nearby.
+  map.addSource('swot', { type: 'image', url: scene.swot?.png ?? scene.waterPng, coordinates: coordsOf(scene.bounds) });
+  map.addLayer({ id: 'swot', type: 'raster', source: 'swot', layout: { visibility: 'none' }, paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0 } });
 }
 
 export function setWaterScene(map: maplibregl.Map, scene: Scene): void {
@@ -51,6 +54,7 @@ export function setWaterScene(map: maplibregl.Map, scene: Scene): void {
   radar?.updateImage({ url: scene.radarJpg ?? scene.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg'), coordinates: coordsOf(scene.bounds) });
   const src = map.getSource('water') as maplibregl.ImageSource | undefined;
   src?.updateImage({ url: scene.waterPng, coordinates: coordsOf(scene.bounds) });
+  if (scene.swot) (map.getSource('swot') as maplibregl.ImageSource | undefined)?.updateImage({ url: scene.swot.png, coordinates: coordsOf(scene.bounds) });
 }
 
 export function setSummaryLayer(map: maplibregl.Map, layer: SummaryLayer | null): void {

@@ -6,6 +6,7 @@ import type {
   CommuneProps,
   Scene,
   SeriesPoint,
+  SwotPoint,
   SummaryLayer,
   Track,
   Validation,
@@ -33,9 +34,11 @@ function endpoint(name: string, params?: Record<string, string>): string {
       choropleth: '/api/choropleth',
     };
     if (name.startsWith('series:')) return `${base}/api/frontend/communes/${encodeURIComponent(name.slice(7))}/series`;
+    if (name.startsWith('swot:')) return `${base}/api/frontend/communes/${encodeURIComponent(name.slice(5))}/swot`;
     return `${base}${paths[name].replace('/api/', '/api/frontend/')}${q}`;
   }
   if (name.startsWith('series:')) return `${base}/series/${encodeURIComponent(name.slice(7))}.json`;
+  if (name.startsWith('swot:')) return `${base}/swot/${encodeURIComponent(name.slice(5))}.json`;
   if (name === 'choropleth') return `${base}/choropleth/${params!.date}_${params!.track}.json`;
   const files: Record<string, string> = {
     scenes: 'scenes.json',
@@ -68,7 +71,7 @@ function load<T>(fn: string, key: string, url: string): Promise<T> {
 
 export function getScenes(): Promise<Scene[]> {
   return load<Scene[]>('getScenes', 'scenes', endpoint('scenes')).then((list) =>
-    list.map((s) => ({ ...s, waterPng: resolveAsset(s.waterPng) })).sort((a, b) => a.date.localeCompare(b.date) || a.track.localeCompare(b.track)),
+    list.map((s) => ({ ...s, waterPng: resolveAsset(s.waterPng), swot: s.swot ? { ...s.swot, png: resolveAsset(s.swot.png) } : null })).sort((a, b) => a.date.localeCompare(b.date) || a.track.localeCompare(b.track)),
   );
 }
 
@@ -78,6 +81,11 @@ export function getCommunes(): Promise<CommuneCollection> {
 
 export function getCommuneSeries(osmId: string): Promise<SeriesPoint[]> {
   return load<SeriesPoint[]>('getCommuneSeries', `series:${osmId}`, endpoint(`series:${osmId}`));
+}
+
+/** [Claude] SWOT comparison points for a commune; [] when the data source has none (e.g. mock data). */
+export function getCommuneSwot(osmId: string): Promise<SwotPoint[]> {
+  return load<SwotPoint[]>('getCommuneSwot', `swot:${osmId}`, endpoint(`swot:${osmId}`)).catch(() => []);
 }
 
 export function getChoropleth(date: string, track: Track): Promise<Choropleth> {

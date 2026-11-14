@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { createCommuneChart, type CommuneChartHandle } from '../charts/communeChart.ts';
-import { getCommuneSeries, getCommunes } from '../data/dataSource.ts';
+import { getCommuneSeries, getCommuneSwot, getCommunes } from '../data/dataSource.ts';
 import type { CommuneProps, Scene, SeriesPoint, Track } from '../data/types.ts';
 import { hasAssessment, referenceScene } from '../data/observations.ts';
 import { downloadText, fmtDate, fmtPct } from '../format.ts';
@@ -68,7 +68,7 @@ export function mountCommunePanel(host: HTMLElement, scenes: Scene[]): void {
     host.classList.add('open');
     host.replaceChildren(h('div', { class: 'loading', text: T.panel.loading }));
     try {
-      const [collection, series] = await Promise.all([getCommunes(), getCommuneSeries(osmId)]);
+      const [collection, series, swot] = await Promise.all([getCommunes(), getCommuneSeries(osmId), getCommuneSwot(osmId)]);
       if (my !== token) return;
       const p = collection.features.find((f) => f.properties.osm_id === osmId)?.properties;
       if (!p) throw new Error(`Commune ${osmId} not found`);
@@ -124,7 +124,7 @@ export function mountCommunePanel(host: HTMLElement, scenes: Scene[]): void {
       );
       chart = createCommuneChart(canvas, series, maturityOf, state.selectedDate, (date, track) => {
         set({ mapMode: 'scene', selectedDate: date, selectedTrack: track, trackFilter: 'all', activeSummary: null, playing: false });
-      });
+      }, swot);
     } catch (err) {
       console.error(err);
       if (my === token) host.replaceChildren(h('div', { class: 'error-box', text: err instanceof Error ? err.message : T.app.loadError }));

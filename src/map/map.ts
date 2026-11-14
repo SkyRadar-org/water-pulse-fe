@@ -73,12 +73,14 @@ export function mountMap(container: HTMLElement): MapView {
     vis('basemap', s.layers.basemap);
     vis('radar', singleImage && s.layers.radar && !summaryOn);
     vis('water', singleImage && s.layers.water && !summaryOn);
+    vis('swot', singleImage && s.layers.swot && !summaryOn && !!sceneOf(s)?.swot);
     vis('summary', summaryOn);
     vis('provinces', s.layers.provinces);
     vis('province-labels', s.layers.provinces);
     communes?.setVisible(s.layers.communes);
     map.setPaintProperty('radar', 'raster-opacity', s.opacity.radar);
     if (map.getLayer('water')) map.setPaintProperty('water', 'raster-opacity', s.opacity.water);
+    if (map.getLayer('swot')) map.setPaintProperty('swot', 'raster-opacity', s.opacity.swot);
     communes?.setOpacity(s.opacity.communes);
   }
 
@@ -95,6 +97,7 @@ export function mountMap(container: HTMLElement): MapView {
     communes?.setChoropleth({});
     set({ radarMissing: false });
     setWaterScene(map, scene);
+    applyLook(s); // the SWOT layer depends on whether this acquisition has a SWOT pass nearby
     try {
       const values = await getChoropleth(scene.date, scene.track);
       if (token === requestToken) communes?.setChoropleth(values);

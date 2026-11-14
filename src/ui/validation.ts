@@ -1,8 +1,8 @@
 import { createAreaChart, createF1Chart } from '../charts/areaChart.ts';
 import { lang, T } from '../i18n.ts';
 import { getArea, getScenes, getValidation } from '../data/dataSource.ts';
-import type { AreaPoint, Scene, Validation, ValidationRow } from '../data/types.ts';
-import { fmt2, fmtShort } from '../format.ts';
+import type { AreaPoint, Scene, Validation, SwotValidationRow, ValidationRow } from '../data/types.ts';
+import { fmtPct, fmt2, fmtShort } from '../format.ts';
 import { h } from './dom.ts';
 
 function median(values: number[]): number {
@@ -36,6 +36,25 @@ function hlsTable(rows: ValidationRow[]): HTMLElement {
       h('td', { class: 'num', text: `${r.nisar_only_true_pct}%` }),
     ),
   );
+  return h('div', { class: 'ct-wrap' }, h('table', { class: 'ct vt' }, h('thead', {}, head1, head2), h('tbody', {}, ...body)));
+}
+
+/** [Claude] NISAR vs Sentinel-1, both scored against SWOT (Ka-band) on the same pixels. */
+function swotTable(rows: SwotValidationRow[]): HTMLElement {
+  const c = T.validation.swotCols;
+  const head1 = h('tr', {}, h('th', { rowspan: '2', text: c.date }), h('th', { rowspan: '2', text: c.nisar }), h('th', { rowspan: '2', text: c.water }),
+    h('th', { colspan: '2', class: 'grp', text: c.f1 }), h('th', { rowspan: '2', text: c.optical }));
+  const head2 = h('tr', {}, h('th', { class: 'sub', text: 'NISAR' }), h('th', { class: 'sub', text: 'S-1' }));
+  const cell = (a: number | null, b: number | null) => h('td', { class: `num ${a !== null && b !== null && a > b ? 'best' : ''}`, text: a === null ? '—' : fmt2(a) });
+  const body = rows.map((r) => {
+    const n = r.f1_nisar_same_px ?? r.f1_nisar;
+    return h('tr', {},
+      h('td', { text: fmtShort(r.swotDate) }),
+      h('td', { text: `${fmtShort(r.nisar.slice(0, 10))} · ${r.nisar.slice(11)}` }),
+      h('td', { class: 'num', text: `${fmtPct(r.swotWaterPct)} / ${fmtPct(r.nisarWaterPct)}` }),
+      cell(n, r.f1_s1), cell(r.f1_s1, n),
+      h('td', { class: 'num', text: r.f1_swot_vs_optical === null ? '—' : `${fmt2(r.f1_swot_vs_optical)} / ${fmt2(r.f1_nisar_vs_optical!)}` }));
+  });
   return h('div', { class: 'ct-wrap' }, h('table', { class: 'ct vt' }, h('thead', {}, head1, head2), h('tbody', {}, ...body)));
 }
 
@@ -80,6 +99,7 @@ export function mountValidation(host: HTMLElement): void {
       h('h3', { class: 'v-sub', text: V.hlsTitle }),
       h('p', { class: 'note', text: V.hlsNote }),
       hlsTable(v.vsHls),
+      ...(v.vsSwot?.length ? [h('h3', { class: 'v-sub', text: V.swotTitle }), h('p', { class: 'note', text: V.swotNote }), swotTable(v.vsSwot)] : []),
       h('h3', { class: 'v-sub', text: V.agreeTitle }),
       h(
         'div',

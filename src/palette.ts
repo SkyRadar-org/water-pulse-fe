@@ -15,3 +15,6 @@ export const STATUS_LABEL = (s: CommuneStatus): string => T.status[s].long;
 export const STATUS_SHORT = (s: CommuneStatus): string => T.status[s].short;
 export const STATUS_ICON = (s: CommuneStatus): string => T.status[s].icon;
 export const MATURITY_LABEL = (m: Maturity): string => T.maturity[m];
+
+/** [Claude] SWOT (Ka-band) comparison colour: pink, distinct from the NISAR water blue and the three track colours. */
+export const SWOT_COLOR = '#db2777';
