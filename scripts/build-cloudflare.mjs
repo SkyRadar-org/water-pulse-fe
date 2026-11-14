@@ -6,7 +6,8 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const repo = path.resolve(process.env.NISAR_REPO ?? path.join(root, '../skyradar-nisar'));
 const python = process.env.PYTHON ?? 'python3';
 function run(command, args, env = process.env) {
-  const result = spawnSync(command, args, { cwd: root, env, stdio: 'inherit' });
+  // npm is a .cmd shim on Windows and cannot be spawned without a shell.
+  const result = spawnSync(command, args, { cwd: root, env, stdio: 'inherit', shell: command === 'npm' && process.platform === 'win32' });
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
