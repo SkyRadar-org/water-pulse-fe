@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-14 — Keep the map frame stable during playback (Codex)
+
+- Reserve intrinsic space for map titles, asynchronous coverage notes, maturity labels and the timeline hint. Hidden size guides are excluded from the accessibility tree and reflow with the viewport; live text remains complete.
+- Switching from latest observations to playback, or between loading and fetched notes, no longer changes the map or timeline geometry. Before/after DOM measurements at1280×720 changed from roughly20/24px movement to0px.
+- User confirmed the local fix and explicitly approved merging it into main. TypeScript/Vite and10UX+4Worker tests passed before release.
+
 ## 2026-11-14 — Coverage-aware story and evidence (Codex, Gemini reviewed)
 
 - Use the latest acquisition covering at least 50% of each full OSM commune: 115 assessed communes in 33 high / 39 moderate / 43 low observed-water groups. Preserve the other 25 communes as insufficient observations.

@@ -1,4 +1,4 @@
-# Triển khai UX_PLAN — bản chờ duyệt production
+# Triển khai UX_PLAN — đã duyệt và merge main
 
 Ngày 14/11/2026, GMT+7. Nhánh: `codex/ux-implementation-20261114`, dựa trên frontend `4f59e90`.
 
@@ -14,4 +14,13 @@ Báo cáo, ảnh và gói Gemini nằm trong repo backend:
 
 Bản xem local: [localhost:8794](http://localhost:8794/?lang=vi), cần server local còn chạy.
 
-**Chưa PR/merge/deploy.** Workflow production checkout backend `main`; khi được duyệt, đưa backend/dữ liệu mới lên trước rồi frontend. Bản này cần dữ liệu 115 xã, không dùng snapshot 131 xã cũ.
+**Đã merge main và phát hành bản UX (`8e9daf8`), workflow43594663795 thành công.** Workflow production checkout backend `main`; khi được duyệt, đưa backend/dữ liệu mới lên trước rồi frontend. Bản này cần dữ liệu 115 xã, không dùng snapshot 131 xã cũ.
+
+
+## Sửa khung hình khi phát
+
+Người dùng báo khung bản đồ/thanh thời gian thay đổi kích thước, sau đó xác nhận đã hết lỗi và yêu cầu merge.
+Nguyên nhân: tiêu đề/chú thích khác độ dài, thông báo tải ngắn và dòng hướng dẫn timeline bị ẩn khi phát.
+Bản sửa dùng các vùng chữ giữ kích thước theo nội dung dài nhất, không cắt chữ hoặc ấn định chiều cao thiếu linh hoạt.
+Đo1280×720: trước sửa map top136,5→156px, timelineheight178,75→155,25px; sau sửa giữ nguyên ở cả hai trạng thái.
+BuildCloudflare và10UX+4Worker test qua. Bằng chứng chi tiết nằm trong thư mục QA của backend.

@@ -18,8 +18,22 @@ export async function mountMapContext(host: HTMLElement, scenes: Scene[]): Promi
   latest.addEventListener('click', () => set({ mapMode: 'latest', activeSummary: null, playing: false }));
   scene.addEventListener('click', () => set({ mapMode: 'scene', activeSummary: null, playing: false }));
   host.className = 'map-context';
-  host.append(h('div', { class: 'map-context-heading' }, title,
-    h('div', { class: 'map-mode', role: 'group', 'aria-label': T.map.modeLabel }, latest, scene)), note);
+  // Hidden copies reserve the intrinsic size of every title/note variant. They
+  // reflow with the viewport and text zoom, without clipping the live explanation.
+  const reserve = (tag: 'h1' | 'p', text: string) => h(tag, { class: 'layout-reserve', 'aria-hidden': 'true', text });
+  const titleVariants = new Set([T.map.latestTitle, ...scenes.flatMap(s => [
+    T.map.sceneTitle(fmtDate(s.date), s.track), T.story.compositeTitle(fmtDate(s.date)),
+  ])]);
+  const total = collection.features.length;
+  const noteVariants = new Set([
+    T.map.latestCoverage(assessed.length, total, fmtDate(dates[0] ?? null), fmtDate(dates.at(-1) ?? null)),
+    T.map.sceneCoverage(total, total), T.map.coverageLoading, T.app.loadError,
+    ...scenes.filter(s => s.composite).map(s => T.story.compositeNote(s.composite!.maxAgeDays) + ' ' + T.story.observedCommunes(total, total)),
+  ]);
+  host.append(h('div', { class: 'map-context-heading' },
+    h('div', { class: 'map-context-title stable-text-slot' }, ...[...titleVariants].map(t => reserve('h1', t)), title),
+    h('div', { class: 'map-mode', role: 'group', 'aria-label': T.map.modeLabel }, latest, scene)),
+    h('div', { class: 'map-context-note stable-text-slot' }, ...[...noteVariants].map(t => reserve('p', t)), note));
   let token = 0;
   async function render() {
     const my = ++token;

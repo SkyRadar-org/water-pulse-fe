@@ -44,3 +44,25 @@
   .map-context { padding: 8px 10px; }
   .optical-chart { height: 280px; }
 }
+
+/* Playback changes content inside these slots, never the map's surrounding rows. */
+.stable-text-slot { display: grid; min-width: 0; }
+.stable-text-slot > * { grid-area: 1 / 1; min-width: 0; }
+.layout-reserve { visibility: hidden; pointer-events: none; user-select: none; }
+.map-context-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+.map-context-note { font-variant-numeric: tabular-nums; }
+.tl-head { flex-wrap: nowrap; }
+.tl-now { display: grid; grid-template-columns: max-content minmax(0, 1fr); min-width: 0; flex: 1; }
+.tl-maturity-slot > .maturity { justify-self: start; }
+.tl-note-slot > .tl-summary-note,
+.tl-note-slot > .tl-latest-note { display: block; visibility: hidden; }
+.timeline.latest-mode .tl-note-slot > .tl-latest-note,
+.timeline.summary-mode .tl-note-slot > .tl-summary-note { visibility: visible; }
+.timeline.collapsed .tl-note-slot { display: none; }
+@media (max-width: 767px) {
+  .map-context-heading { grid-template-columns: minmax(0, 1fr); }
+  .tl-now { grid-template-columns: minmax(0, 1fr); }
+}
+@media (min-width: 768px) {
+  .timeline { padding-top: 6px; padding-bottom: 4px; }
+}

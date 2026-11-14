@@ -96,6 +96,9 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[], advanced?: HTM
   const dateEl = h('div', { class: 'tl-date' });
   const trackEl = h('span', { class: 'tl-track' });
   const maturityEl = h('span', { class: 'maturity', title: T.timeline.maturityHelp });
+  const maturitySlot = h('div', { class: 'tl-maturity-slot stable-text-slot' },
+    ...[T.story.mosaicValidated, T.story.mosaicProvisional, ...Object.values(MATURITY_LABEL)].map(text =>
+      h('span', { class: 'maturity layout-reserve', 'aria-hidden': 'true', text })), maturityEl);
   const infoEl = h('div', { class: 'tl-info' });
   const summaryNote = h('div', { class: 'tl-summary-note', text: T.timeline.summaryNote });
   const latestNote = h('div', { class: 'tl-latest-note', text: T.timeline.latestNote });
@@ -129,7 +132,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[], advanced?: HTM
     'div',
     { class: 'tl-head' },
     playBtn,
-    h('div', { class: 'tl-now' }, dateEl, h('div', { class: 'tl-meta' }, trackEl, maturityEl)),
+    h('div', { class: 'tl-now' }, dateEl, h('div', { class: 'tl-meta' }, trackEl, maturitySlot)),
     infoEl,
     h('div', { class: 'tl-spacer' }),
     ...(advanced ? [] : [viewSeg, seg]),
@@ -153,7 +156,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[], advanced?: HTM
     host.classList.add('collapsed');
     collapseBtn.textContent = '▴';
   }
-  host.append(head, summaryNote, latestNote, body);
+  host.append(head, h('div', { class: 'tl-note-slot stable-text-slot' }, summaryNote, latestNote), body);
 
   const dots = new Map<string, HTMLButtonElement>();
   const key = (s: { date: string; track: Track }) => `${s.date}|${s.track}`;
