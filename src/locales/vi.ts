@@ -175,7 +175,7 @@ export const vi: Strings = {
     lead: 'Chúng tôi đã đối chiếu bản đồ nước với những nguồn nào, và chỗ nào còn yếu.',
     plainTitle: 'Nói đơn giản',
     plain: [
-      'Bản đồ nước tìm thấy phần lớn lượng nước mà các bản đồ quang học độc lập (ảnh không mây) tìm thấy: NISAR đạt 47–82%, Sentinel-1 chỉ 35–64%, tính trên những ngày trời quang có thể so sánh.',
+      'Bản đồ nước tìm thấy phần lớn lượng nước mà các bản đồ quang học độc lập (ảnh không mây) tìm thấy: NISAR đạt 47–82%, Sentinel-1 chỉ 35–64%, tính trên những ngày trời quang có thể so sánh trong mùa lũ (tháng 8–11).',
       'NISAR nhìn thấy nước trên mặt ruộng cả khi có mây, nhưng không phân biệt được đó là lũ tự nhiên, xả lũ có kiểm soát hay bơm nước làm đất.',
       'Hãy dùng bản đồ để so sánh giữa các xã và các ngày. Các con số km² chỉ mang tính tham khảo.',
       'Đây không phải công cụ cảnh báo sớm: dữ liệu về sau mỗi lần vệ tinh bay qua 2–3 ngày.',
@@ -186,8 +186,8 @@ export const vi: Strings = {
     areaNote: (n) => `Đường biểu diễn diện tích xã có nước theo NISAR; chưa có tổng diện tích DSWx-S1 trên cùng vùng quan sát. Chấm đặc là ảnh đã kiểm định (từ 22/10), chấm rỗng là ảnh tạm thời. Mỗi quỹ đạo là một đường riêng. ${n}`,
     areaAxis: 'Diện tích nước, km²',
     track148: '(phía tây, ~37% vùng)',
-    hlsTitle: 'NISAR và Sentinel-1 so với bản đồ quang học độc lập (DSWx-HLS)',
-    hlsNote: 'OPERA DSWx-HLS, lệch ±2 ngày, chỉ tính điểm ảnh không mây. In đậm = bên tốt hơn. NISAR tìm được nhiều nước hơn (độ phủ, recall); Dữ liệu chưa cung cấp precision (—). F1 là điểm tổng hợp recall và precision.',
+    hlsTitle: 'NISAR và Sentinel-1 so với bản đồ quang học độc lập (DSWx-HLS), mùa lũ (tháng 8–11)',
+    hlsNote: 'OPERA DSWx-HLS, mùa lũ (tháng 8–11), lệch ±2 ngày, chỉ tính điểm ảnh không mây. In đậm = bên tốt hơn. NISAR tìm được nhiều nước hơn (độ phủ, recall); Dữ liệu chưa cung cấp precision (—). F1 là điểm tổng hợp recall và precision.',
     hlsCols: { date: 'Ngày', f1: 'F1', recall: 'Độ phủ (Recall)', precision: 'Độ chính xác (Precision)', only: 'Điểm chỉ NISAR thấy mà đúng là nước' },
     agreeTitle: 'Mức khớp với OPERA DSWx-S1',
     kpiMedian: 'F1 trung vị (25 lần đối chiếu)',
@@ -246,7 +246,7 @@ export const vi: Strings = {
     heroNumbers: [
       { big: 'Năm lũ thấp', text: '2026 là năm lũ thấp ở Đồng bằng sông Cửu Long.' },
       { big: '38/131', text: 'xã được đánh giá còn ngập trên ảnh gần nhất đủ phủ (từ 30% diện tích có nước).' },
-      { big: '47–82% so với 35–64%', text: 'Độ phủ phát hiện nước so với ảnh quang học độc lập: NISAR và Sentinel-1, qua 16 lần đối chiếu.' },
+      { big: '47–82% so với 35–64%', text: 'Độ phủ phát hiện nước so với ảnh quang học độc lập: NISAR và Sentinel-1, mùa lũ (tháng 8–11), qua 16 lần đối chiếu.' },
     ],
     questions: [
       { q: 'Ngập từ khi nào?', a: 'Ngày đầu tiên xã có từ 20% đất bị ngập nước.' },
@@ -259,6 +259,7 @@ export const vi: Strings = {
       'NISAR phát hiện nước trên mặt ruộng; không phân biệt được lũ tự nhiên, xả lũ có kiểm soát hay bơm nước làm đất.',
       'Lớp thực vật ngập nước đã được thử và bỏ (F1 ≈ 0,02): lúa đang lớn cũng làm kênh HH sáng lên.',
       'Tháng 6–7 mức khớp thấp (F1 ≈ 0,3) do ruộng còn ướt, mới làm đất.',
+      'Đầu mùa (tháng 6–7) NISAR còn báo thừa nước trên ruộng khô; công cụ dành cho mùa lũ và nước rút.',
       'Không phải công cụ cảnh báo sớm: dữ liệu về sau mỗi lần bay qua 2–3 ngày, và mỗi vị trí được chụp lại sau 3–6 ngày.',
     ],
     method:

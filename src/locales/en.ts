@@ -174,7 +174,7 @@ export const en = {
     lead: 'What we checked the water maps against, and where they are weak.',
     plainTitle: 'In plain words',
     plain: [
-      'The water maps find most of the water that independent optical (cloud-free) maps find: 47–82% for NISAR against 35–64% for Sentinel-1, on the clear-sky days that can be compared.',
+      'The water maps find most of the water that independent optical (cloud-free) maps find: 47–82% for NISAR against 35–64% for Sentinel-1, on the clear-sky days that can be compared in the flood season (Aug–Nov).',
       'NISAR sees water on the surface of the fields even through clouds, but it cannot say whether the flood is natural, a controlled release, or pumping for land preparation.',
       'Use the maps to compare communes and dates. Treat square-kilometre figures as indicative only.',
       'This is not an early-warning tool: data arrive 2–3 days after each satellite pass.',
@@ -185,8 +185,8 @@ export const en = {
     areaNote: (n: string): string => `Lines show NISAR observed commune area; comparable DSWx-S1 area totals are unavailable. Filled dots are validated images (22 Oct onward), hollow dots provisional. Each track is its own line. ${n}`,
     areaAxis: 'Water area, km²',
     track148: '(west ~37% of the area)',
-    hlsTitle: 'NISAR vs Sentinel-1 against independent optical maps (DSWx-HLS)',
-    hlsNote: 'OPERA DSWx-HLS, ±2 days, clear-sky pixels only. Bold = better of the two. NISAR finds more of the water (recall); Precision is not supplied in this dataset (—). F1 combines recall and precision.',
+    hlsTitle: 'NISAR vs Sentinel-1 against independent optical maps (DSWx-HLS), flood season (Aug–Nov)',
+    hlsNote: 'OPERA DSWx-HLS, flood season (Aug–Nov), ±2 days, clear-sky pixels only. Bold = better of the two. NISAR finds more of the water (recall); Precision is not supplied in this dataset (—). F1 combines recall and precision.',
     hlsCols: { date: 'Date', f1: 'F1', recall: 'Recall', precision: 'Precision', only: 'NISAR-only pixels that are water' },
     agreeTitle: 'Agreement with OPERA DSWx-S1',
     kpiMedian: 'Median F1 (25 comparisons)',
@@ -245,7 +245,7 @@ export const en = {
     heroNumbers: [
       { big: 'Low-flood year', text: '2026 was a low-flood year in the Mekong Delta.' },
       { big: '38 of 131', text: 'assessed communes still wet on the latest covering image (at least 30% water).' },
-      { big: '47–82% vs 35–64%', text: 'Water recall against independent optical maps: NISAR versus Sentinel-1, across 16 comparisons.' },
+      { big: '47–82% vs 35–64%', text: 'Water recall against independent optical maps: NISAR versus Sentinel-1, flood season (Aug–Nov), across 16 comparisons.' },
     ],
     questions: [
       { q: 'Since when is it flooded?', a: 'First date a commune reaches 20% of its land under water.' },
@@ -258,6 +258,7 @@ export const en = {
       'NISAR detects water on the field surface; it cannot tell natural flood, controlled flood release, or pumping for land preparation apart.',
       'Flooded-vegetation layer was tested and dropped (F1 ≈ 0.02): growing rice also brightens HH.',
       'June–July agreement is weak (F1 ≈ 0.3) due to wet, freshly prepared paddies.',
+      'Early season (Jun–Jul): the rule over-reports water on dry fields; the tool targets the flood and recession period.',
       'Not an early-warning tool: data arrive 2–3 days after each overpass, every 3–6 days per location.',
     ],
     method:
