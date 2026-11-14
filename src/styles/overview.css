@@ -212,23 +212,34 @@
 }
 
 .ov-card.is-active {
-  box-shadow: 0 0 0 2px #0f172a;
+  border-color: #0f172a;
+  box-shadow: 0 0 0 1px #0f172a;
+  background: #f8fafc;
 }
 
-.ov-card-high {
-  border-top: 4px solid #dc2626;
+.ov-card-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: 0;
+  background: #64748b;
 }
 
-.ov-card-medium {
-  border-top: 4px solid #d97706;
+.ov-card-high .ov-card-dot {
+  background: #dc2626;
 }
 
-.ov-card-low {
-  border-top: 4px solid #0284c7;
+.ov-card-medium .ov-card-dot {
+  background: #d97706;
+}
+
+.ov-card-low .ov-card-dot {
+  background: #15803d;
 }
 
 .ov-card-insufficient {
-  border-top: 4px solid #64748b;
   background: #f8fafc;
 }
 
@@ -414,7 +425,7 @@
 }
 
 .ov-pct-low {
-  color: #0369a1;
+  color: #15803d;
 }
 
 .ov-pct-group-tag,
@@ -470,7 +481,7 @@
 }
 
 .ov-bar-low {
-  background: #0284c7;
+  background: #15803d;
 }
 
 .ov-bar-insufficient {

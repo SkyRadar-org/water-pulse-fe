@@ -157,12 +157,6 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
   const heroSection = h(
     'section',
     { class: 'ov-hero', 'aria-labelledby': 'ov-main-title' },
-    h(
-      'div',
-      { class: 'ov-hero-top' },
-      h('span', { class: 'ov-audience-tag', text: T.overview.audienceBadge }),
-      h('span', { class: 'ov-mode-tag', text: T.overview.nonRealtimeBadge }),
-    ),
     h('h1', { id: 'ov-main-title', class: 'ov-title', text: T.overview.title }),
     h('p', { class: 'ov-lead', text: T.overview.lead }),
     h(
@@ -251,7 +245,7 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
         h(
           'div',
           { class: 'ov-card-head' },
-          h('span', { class: 'ov-card-title', text: def.title }),
+          h('span', { class: 'ov-card-title' }, h('i', { class: 'ov-card-dot', 'aria-hidden': 'true' }), def.title),
           h('span', { class: 'ov-card-badge', text: def.threshold }),
         ),
         h(
@@ -366,19 +360,6 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
     h('div', { class: 'ov-table-wrap' }, table),
     listFooter,
   );
-
-  const quickInput = h('input', { type: 'search', placeholder: T.overview.quickPlaceholder, 'aria-label': T.overview.quickFind });
-  const quickGo = h('button', { type: 'submit', class: 'btn ov-btn-primary', text: T.overview.quickGo });
-  const quickForm = h('form', { class: 'ov-quick-find' }, quickInput, quickGo);
-  quickForm.addEventListener('submit', ev => {
-    ev.preventDefault();
-    searchQuery = quickInput.value;
-    searchInput.value = searchQuery;
-    activeGroup = 'all'; selectedProvince = ''; groupSelect.value = 'all'; provinceSelect.value = '';
-    expanded = false; renderList();
-    listSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-  heroSection.append(quickForm);
 
   // 4. Data Caveats & 3-Step Guide Section
   const exAnLong =
@@ -650,7 +631,6 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
 
   searchInput.addEventListener('input', () => {
     searchQuery = searchInput.value;
-    quickInput.value = searchQuery;
     expanded = false;
     renderList();
   });
@@ -672,7 +652,6 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
     selectedProvince = '';
     searchQuery = '';
     searchInput.value = '';
-    quickInput.value = '';
     provinceSelect.value = '';
     groupSelect.value = 'all';
     expanded = false;

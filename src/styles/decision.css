@@ -32,8 +32,6 @@
 .ov-card-desc { font-size: 12px; }
 .ov-hero { box-shadow: none; }
 .ov-snapshot-banner { padding: 10px 12px; }
-.ov-quick-find { display: flex; gap: 8px; margin-top: 14px; }
-.ov-quick-find input { flex: 1; min-width: 0; border: 1px solid #94a3b8; border-radius: 8px; padding: 9px 12px; }
 .ov-inner { gap: 20px; }
 .ov-card { min-height: 170px; }
 .topbar { gap: 12px; }
@@ -52,8 +50,6 @@
   .ov-inner { gap: 18px; }
   .ov-title { font-size: 23px; }
   .ov-hero { padding: 16px; }
-  .ov-hero-top { margin-bottom: 6px; }
-  .ov-audience-tag { display: none; }
   .ov-lead { font-size: 13px; margin-bottom: 10px; }
   .ov-snapshot-banner { grid-template-columns: 1fr 1fr; padding: 8px; }
   .ov-snapshot-sub, .ov-hero-actions { display: none; }

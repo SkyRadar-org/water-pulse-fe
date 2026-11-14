@@ -3,10 +3,8 @@ export const enOverview = {
   overview: {
     loading: 'Loading commune flood overview…',
     loadError: 'Unable to load commune overview data.',
-    audienceBadge: 'For Irrigation & Cooperative Officers',
-    nonRealtimeBadge: 'Satellite Snapshot · Not Real-Time',
-    title: 'Which communes still hold standing water before the Winter–Spring crop?',
-    lead: 'Find communes that still had substantial water in the last observations, then prioritize local checks before winter–spring sowing.',
+    title: 'Water status by commune',
+    lead: 'Results from the latest NISAR radar image of each commune: which communes still hold substantial water and which lack data. Select a commune to open its image as evidence.',
     cautionLabel: 'Operational notice:',
     cautionBody:
       'Use the observations to prioritize field checks. Check soil conditions locally before deciding when to sow.',
@@ -21,9 +19,6 @@ export const enOverview = {
     snapshotCoverageSub: (insufficient: number, noObs: number, partial: number): string =>
       `${insufficient} insufficient coverage (${noObs} without observation, ${partial} partial <50%)`,
     ctaMapOverview: 'Open Latest Overview Map',
-    quickFind: 'Find a commune to inspect',
-    quickPlaceholder: 'Enter a commune, for example An Long…',
-    quickGo: 'View results',
     ctaValidation: 'View Data Reliability & Validation',
 
     cardsSectionTitle: 'Commune Breakdown by Latest Water Fraction & Coverage',
@@ -32,7 +27,7 @@ export const enOverview = {
     cardsGroupAria: 'Filter communes by water level or coverage status',
     cards: {
       unitCommunes: (total: number): string => `/ ${total} communes`,
-      clickToFilter: 'Click to filter list ↓',
+      clickToFilter: 'Click to filter the list',
       highTitle: 'High Standing Water',
       highThreshold: '≥ 30% water · Coverage ≥ 50%',
       highDesc: 'Prioritize a field check and compare with the local drainage plan.',
@@ -127,7 +122,7 @@ export const enOverview = {
 
     guide: {
       title: '3-Step Operational Guide',
-      lead: 'Quick workflow for irrigation and cooperative teams before the Winter–Spring season:',
+      lead: 'Quick workflow for irrigation and cooperative teams:',
       step1Title: 'Filter high-priority communes',
       step1Body:
         'Start with the ≥ 30% and 10% – < 30% cards or filter by your province to identify communes with substantial standing water.',
@@ -146,10 +141,8 @@ export const viOverview: typeof enOverview = {
   overview: {
     loading: 'Đang tải tổng quan ngập lũ cấp xã…',
     loadError: 'Không thể tải dữ liệu tổng quan cấp xã.',
-    audienceBadge: 'Dành cho Cán bộ Thủy lợi & HTX',
-    nonRealtimeBadge: 'Bộ ảnh mùa lũ 2026',
-    title: 'Xã nào còn nhiều nước trước vụ Đông Xuân?',
-    lead: 'Giúp cán bộ thủy lợi và HTX tìm các xã còn nhiều nước để ưu tiên kiểm tra, lên kế hoạch tiêu nước trước vụ Đông Xuân.',
+    title: 'Tình hình nước theo xã',
+    lead: 'Kết quả từ ảnh radar NISAR gần nhất của từng xã: xã nào còn nhiều nước, xã nào chưa đủ dữ liệu. Chọn xã để mở ảnh làm bằng chứng.',
     cautionLabel: 'Lưu ý vận hành:',
     cautionBody:
       'Dữ liệu dùng để ưu tiên kiểm tra thực địa và điều tiết tiêu nước; cần kiểm tra tình trạng đất tại ruộng trước khi quyết định xuống giống.',
@@ -164,9 +157,6 @@ export const viOverview: typeof enOverview = {
     snapshotCoverageSub: (insufficient: number, noObs: number, partial: number): string =>
       `${insufficient} xã chưa đủ độ phủ (${noObs} không có quan trắc, ${partial} chỉ phủ một phần <50%)`,
     ctaMapOverview: 'Xem bản đồ tổng quan',
-    quickFind: 'Tìm xã cần kiểm tra',
-    quickPlaceholder: 'Nhập tên xã, ví dụ An Long…',
-    quickGo: 'Xem kết quả',
     ctaValidation: 'Xem độ tin cậy',
 
     cardsSectionTitle: 'Kết quả từ ảnh gần nhất của từng xã',
@@ -175,7 +165,7 @@ export const viOverview: typeof enOverview = {
     cardsGroupAria: 'Lọc xã theo nhóm mức nước hoặc trạng thái độ phủ',
     cards: {
       unitCommunes: (total: number): string => `/ ${total} xã`,
-      clickToFilter: 'Bấm để lọc danh sách ↓',
+      clickToFilter: 'Bấm để lọc danh sách',
       highTitle: 'Còn nhiều nước',
       highThreshold: 'Từ 30% diện tích có nước',
       highDesc: 'Ưu tiên kiểm tra thực địa, đối chiếu kế hoạch tiêu nước tại địa phương.',

@@ -1,4 +1,5 @@
 import { viOverview } from './overview.ts';
+import { viReports } from './reports.ts';
 import type { Strings } from './en.ts';
 
 const months = ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'];
@@ -7,6 +8,7 @@ const two = (n: number): string => String(n).padStart(2, '0');
 
 export const vi: Strings = {
   ...viOverview,
+  ...viReports,
   htmlLang: 'vi',
   pageTitle: 'SkyRadar · NISAR Water Pulse',
   app: {
@@ -23,10 +25,12 @@ export const vi: Strings = {
     guideTip: 'Cách sử dụng bản đồ này',
     menu: 'Lớp bản đồ và chú giải',
     loadError: 'Không tải được dữ liệu.',
+    retry: 'Thử lại',
     langTip: 'Ngôn ngữ',
     sections: 'Các mục',
   },
-  tabs: { overview: 'Tổng quan', map: 'Bản đồ', communes: 'Danh sách xã', validation: 'Độ tin cậy', about: 'Giới thiệu' },
+  tabs: { overview: 'Tổng quan', map: 'Bản đồ', reports: 'Báo cáo thống kê', validation: 'Độ tin cậy', about: 'Giới thiệu' },
+  tabsShort: { reports: 'Báo cáo' },
   maturity: { provisional: 'Tạm thời (Provisional)', validated: 'Đã kiểm định (Validated)' },
   status: {
     receded: { long: 'Ít nước: dưới 10% diện tích', short: 'Ít nước', icon: '✓' },
@@ -78,8 +82,8 @@ export const vi: Strings = {
     modeLabel: 'Chế độ quan sát bản đồ',
     latestMode: 'Ảnh gần nhất của từng xã',
     sceneMode: 'Xem một lần chụp',
-    latestTitle: 'Xã nào còn nhiều nước trước vụ Đông Xuân?',
-    latestCoverage: (n, total, start, end) => `${n}/${total} xã có ảnh đủ phủ để đánh giá. Quan sát từ ${start} đến ${end}, mỗi xã có ngày riêng. Đây là bộ ảnh cuối mùa, không phải tình trạng trực tiếp hôm nay.`,
+    latestTitle: 'Mức nước theo xã · ảnh gần nhất',
+    latestCoverage: (n, total, start, end) => `${n}/${total} xã có ảnh đủ phủ để đánh giá. Quan sát từ ${start} đến ${end}, mỗi xã có ngày riêng. Đây là số liệu từ ảnh vệ tinh, không phải tình trạng trực tiếp hôm nay.`,
     sceneTitle: (date, track) => `Quan sát ngày ${date} · quỹ đạo ${track}`,
     coverageLoading: 'Đang kiểm tra vùng có ảnh…',
     sceneCoverage: (n, total) => `Ảnh này có quan sát của ${n}/${total} xã. Xã màu xám chưa có quan sát trong ảnh này, không có nghĩa là đã khô. Chọn xã để tìm ảnh gần nhất của xã đó.`,
@@ -153,24 +157,6 @@ export const vi: Strings = {
       `Diện tích ngập lớn nhất ≈ ${km2 ?? "—"} km² trên ${valid ?? "—"} km² đất. ${areaNote} Dải màu cam: mùa xuống giống Đông Xuân, 1/11 – 31/12, An Giang. Chấm đặc là ảnh đã kiểm định, chấm rỗng là ảnh tạm thời; bấm vào chấm để xem ảnh ngày đó.`,
   },
 
-  table: {
-    title: 'Danh sách xã',
-    lead: 'Thống kê mỗi xã dùng quỹ đạo của ảnh gần nhất phủ ít nhất nửa xã. Tình trạng dựa trên lượng nước còn lại, tách biệt với ngày nước xuống dưới nửa đỉnh. Bấm vào một dòng để xem xã đó trên bản đồ.',
-    search: 'Tìm tên xã…',
-    searchAria: 'Tìm xã theo tên',
-    provinceAria: 'Lọc theo tỉnh',
-    statusAria: 'Lọc theo tình trạng',
-    allProvinces: 'Tất cả các tỉnh',
-    allStatuses: 'Tất cả tình trạng',
-    count: (n, total) => `${n}/${total} xã`,
-    export: 'Xuất CSV',
-    cols: { name: 'Xã', province: 'Tỉnh', peak_pct: 'Đỉnh ngập (%)', peak_date: 'Ngày đỉnh', first_flood_date: 'Bắt đầu ngập', recession_date: 'Nước rút', last_pct: 'Ảnh cuối (%)', last_date: 'Ngày quan sát', status: 'Tình trạng' },
-    notYet: 'Chưa rút',
-    empty: 'Không có xã nào phù hợp bộ lọc.',
-    row: (name, status) => `${name}, ${status}. Mở trên bản đồ`,
-    loading: 'Đang tải danh sách xã…',
-  },
-
   validation: {
     title: 'Mức độ tin cậy và giới hạn (Validation & limits)',
     lead: 'Chúng tôi đã đối chiếu bản đồ nước với những nguồn nào, và chỗ nào còn yếu.',
@@ -237,7 +223,7 @@ export const vi: Strings = {
       { t: 'Đọc kết quả và việc cần kiểm tra', d: 'Xem tỷ lệ nước, ngày chụp và độ phủ. Chưa đủ ảnh phủ không có nghĩa là xã đã khô.' },
       { t: 'Mở ảnh làm bằng chứng', d: 'Bấm «Xem ảnh ngày…» để đến đúng lần chụp của xã. Mở diễn biến cả mùa khi cần đối chiếu xu thế.' },
     ],
-    tip: 'Kết quả giúp ưu tiên kiểm tra tại địa phương trước vụ Đông Xuân. Ngày ảnh và điều kiện thực tế cần được đối chiếu trước khi quyết định.',
+    tip: 'Kết quả giúp ưu tiên kiểm tra tại địa phương và lên kế hoạch tiêu nước, xuống giống. Ngày ảnh và điều kiện thực tế cần được đối chiếu trước khi quyết định.',
     close: 'Đã hiểu',
   },
 

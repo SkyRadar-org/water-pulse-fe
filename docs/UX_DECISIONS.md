@@ -4,8 +4,8 @@ Nguồn: chỉ đạo người dùng ngày 14/11/2026 (GMT+7): dữ liệu chỗ
 
 ## Tiêu chí thực thi
 
-1. Bắt đầu từ công việc: cán bộ thủy lợi và HTX cần tìm xã còn nhiều nước trước vụ Đông Xuân để ưu tiên kiểm tra, đối chiếu kế hoạch tiêu nước.
-2. Đưa kết quả lên trước: tổng quan mặc định hiển thị các nhóm xã, ngày quan sát và ô tìm xã. Radar, quỹ đạo và thanh thời gian thuộc bước xem bằng chứng.
+1. Bắt đầu từ công việc: cán bộ thủy lợi và HTX cần tìm xã còn nhiều nước để ưu tiên kiểm tra, đối chiếu kế hoạch tiêu nước. Ứng dụng phục vụ theo từng thời kỳ quan trắc, không chỉ riêng vụ Đông Xuân (cập nhật 14/11/2026: bỏ câu hỏi "Xã nào còn nhiều nước trước vụ Đông Xuân?" khỏi Tổng quan và Bản đồ).
+2. Đưa kết quả lên trước: tổng quan mặc định hiển thị các nhóm xã, ngày quan sát và danh sách xã có ô tìm kiếm. Radar, quỹ đạo và thanh thời gian thuộc bước xem bằng chứng. Phân tích theo thời kỳ, so sánh tỉnh và xuất tệp nằm ở tab Báo cáo thống kê, không lặp lại tổng quan.
 3. Việc tiếp theo rõ ràng: chọn nhóm → chọn xã → đọc kết quả → mở đúng ảnh. Ngày và độ phủ luôn đi cùng số liệu. Tỷ lệ nước thấp không chứng nhận ruộng đủ điều kiện xuống giống.
 4. Trung thực về thời gian: chế độ tổng quan dùng quan sát gần nhất riêng của từng xã, có ngày riêng. Chế độ một lần chụp chỉ dùng một ảnh thật. Không ghép pixel giữa các quỹ đạo hoặc nội suy số liệu cho ngày không có ảnh.
 5. Thiếu ảnh không có nghĩa đã khô: tổng quan tách chín xã chưa đủ phủ khỏi đánh giá. Sáu xã không có quan trắc và ba xã chỉ phủ một phần được giải thích riêng. Nút mở ảnh chỉ xuất hiện khi có ảnh khớp ngày và quỹ đạo.

@@ -9,6 +9,7 @@ import './styles/pages.css';
 import './styles/ux.css';
 import './styles/overview.css';
 import './styles/decision.css';
+import './styles/reports.css';
 import { DATA_MODE } from './config.ts';
 import { getScenes, getSummaryLayers } from './data/dataSource.ts';
 import { lang, switchLang, T, type Lang } from './i18n.ts';
@@ -16,16 +17,19 @@ import { mountMap } from './map/map.ts';
 import { set, state, subscribe, type Tab } from './state.ts';
 import { mountAbout } from './ui/about.ts';
 import { mountCommunePanel } from './ui/communePanel.ts';
-import { mountCommuneTable } from './ui/communeTable.ts';
 import { h } from './ui/dom.ts';
 import { openGuide } from './ui/guide.ts';
+import { icon } from './ui/icons.ts';
 import { mountOverview } from './ui/overview.ts';
 import { mountMapContext } from './ui/mapContext.ts';
+import { mountReports } from './ui/reports.ts';
 import { mountSidebar } from './ui/sidebar.ts';
 import { mountTimeline } from './ui/timeline.ts';
 import { mountValidation } from './ui/validation.ts';
 
-const TABS: Tab[] = ['overview', 'map', 'communes', 'validation', 'about'];
+const TABS: Tab[] = ['overview', 'map', 'reports', 'validation', 'about'];
+/** Old bookmarks keep working after the commune list became the report tab. */
+const LEGACY_HASH: Record<string, Tab> = { communes: 'reports' };
 
 const LOGO = `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#1d4ed8"/><path d="M5 18c3-4 6-4 9 0s6 4 9 0 3-2 4-1" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M5 12c3-4 6-4 9 0s6 4 9 0 3-2 4-1" stroke="#93c5fd" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
 
@@ -33,11 +37,17 @@ function buildShell(root: HTMLElement) {
   const brand = h('div', { class: 'brand' });
   brand.innerHTML = `${LOGO}<span>${T.app.brand}<small>${T.app.brandBy}</small></span>`;
 
-  const menuBtn = h('button', { class: 'tab menu-btn', type: 'button', 'aria-label': T.app.menu, title: T.app.menu }, '☰');
+  const menuBtn = h('button', { class: 'tab menu-btn', type: 'button', 'aria-label': T.app.menu, title: T.app.menu }, icon('menu', 20));
 
   const tabs = h('nav', { class: 'tabs', role: 'tablist', 'aria-label': T.app.sections });
   for (const id of TABS) {
-    const b = h('button', { class: 'tab', role: 'tab', 'data-tab': id, text: T.tabs[id] });
+    const short = T.tabsShort[id];
+    const b = h(
+      'button',
+      { class: 'tab', role: 'tab', 'data-tab': id, 'aria-label': short ? T.tabs[id] : undefined },
+      short ? h('span', { class: 'tab-long', text: T.tabs[id] }) : T.tabs[id],
+      short ? h('span', { class: 'tab-short', text: short, 'aria-hidden': 'true' }) : null,
+    );
     b.addEventListener('click', () => {
       location.hash = id;
     });
@@ -75,7 +85,7 @@ function buildShell(root: HTMLElement) {
   const views: Record<Tab, HTMLElement> = {
     overview: h('section', { class: 'view', id: 'view-overview' }),
     map: h('section', { class: 'view view-map', id: 'view-map' }),
-    communes: h('section', { class: 'view', id: 'view-communes' }),
+    reports: h('section', { class: 'view', id: 'view-reports' }),
     validation: h('section', { class: 'view', id: 'view-validation' }),
     about: h('section', { class: 'view', id: 'view-about' }),
   };
@@ -91,7 +101,9 @@ function buildShell(root: HTMLElement) {
 }
 
 function tabFromHash(): Tab {
-  const id = location.hash.replace('#', '') as Tab;
+  const raw = location.hash.replace('#', '');
+  const id = (LEGACY_HASH[raw] ?? raw) as Tab;
+  if (LEGACY_HASH[raw]) history.replaceState(null, '', `#${id}`);
   return TABS.includes(id) ? id : 'overview';
 }
 
@@ -146,7 +158,7 @@ function main() {
   set({ tab: tabFromHash() });
   render();
 
-  mountCommuneTable(shell.views.communes);
+  mountReports(shell.views.reports);
   mountOverview(shell.views.overview);
   mountValidation(shell.views.validation);
   mountAbout(shell.views.about);

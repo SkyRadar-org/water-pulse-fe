@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-14 — Period-neutral copy and statistical report tab
+
+- Overview and map no longer frame the app around the Đông Xuân crop: the headings now describe water status by commune for any observation period. Removed the eyebrow pills and the duplicate hero search (the list search remains); cards use a colour dot instead of a thick top stripe; "low water" is green everywhere, matching the map legend.
+- "Danh sách xã" becomes **Báo cáo thống kê / Reports** (`#reports`, old `#communes` links redirect). Period (whole dataset, month, custom range), province and orbit filters drive KPIs, communes per water level per acquisition (click to open the image), a monthly flood calendar, flood durations, a province comparison and a sortable commune table. Orbits are never merged.
+- Exports: three CSVs (province, per-acquisition, per-commune), chart PNGs and a print/PDF layout. None duplicate the overview, which stays a latest-observation snapshot.
+- Drawn SVG icons replace the ☰ / ✕ glyphs; short tab label on narrow screens.
+- Added `tests/reportStats.test.mjs` (4 tests on the exported real data). Backend aggregation requests for the report are in `docs/BE_REQUESTS_REPORTS.md`.
+
 ## 2026-11-14 — Purpose-first flood overview and explicit observation coverage (Codex, Gemini reviewed)
 
 - Start with the user's commune-level question, latest observation dates and next field check. Move radar/orbit controls behind an explicit evidence view.

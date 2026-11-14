@@ -1,4 +1,5 @@
 import { enOverview } from './overview.ts';
+import { enReports } from './reports.ts';
 import type { CommuneProps, CommuneStatus, Maturity } from '../data/types.ts';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -6,6 +7,7 @@ const areaNote = 'Areas refer to observed commune coverage; absolute km² are in
 
 export const en = {
   ...enOverview,
+  ...enReports,
   htmlLang: 'en',
   pageTitle: 'SkyRadar · NISAR Water Pulse',
   app: {
@@ -22,10 +24,13 @@ export const en = {
     guideTip: 'How to use this map',
     menu: 'Layers and legend',
     loadError: 'Could not load data.',
+    retry: 'Try again',
     langTip: 'Language',
     sections: 'Sections',
   },
-  tabs: { overview: 'Overview', map: 'Map', communes: 'Communes', validation: 'Validation', about: 'About' },
+  tabs: { overview: 'Overview', map: 'Map', reports: 'Reports', validation: 'Validation', about: 'About' },
+  /** Narrow-screen labels; tabs without an entry keep their full label. */
+  tabsShort: { reports: 'Reports' } as Partial<Record<'overview' | 'map' | 'reports' | 'validation' | 'about', string>>,
   maturity: { provisional: 'Provisional', validated: 'Validated' } as Record<Maturity, string>,
   status: {
     receded: { long: 'Low water: below 10%', short: 'Low water', icon: '✓' },
@@ -77,8 +82,8 @@ export const en = {
     modeLabel: 'Map observation mode',
     latestMode: 'Latest per commune',
     sceneMode: 'One satellite image',
-    latestTitle: 'Where does water remain before winter–spring sowing?',
-    latestCoverage: (n: number, total: number, start: string, end: string) => `${n}/${total} communes have sufficient coverage. Observations: ${start} – ${end}, with a separate date for each commune. This is an end-of-season snapshot, not live conditions.`,
+    latestTitle: 'Water by commune · latest observation',
+    latestCoverage: (n: number, total: number, start: string, end: string) => `${n}/${total} communes have sufficient coverage. Observations: ${start} – ${end}, with a separate date for each commune. These are satellite observations, not live conditions.`,
     sceneTitle: (date: string, track: string) => `Observed on ${date} · orbit ${track}`,
     coverageLoading: 'Checking image coverage…',
     sceneCoverage: (n: number, total: number) => `This image contains observations for ${n}/${total} communes. Grey communes have no observation in this image; that does not mean they are dry. Select a commune to find its latest observation.`,
@@ -152,24 +157,6 @@ export const en = {
       `Peak flooded area ≈ ${km2 ?? "—"} km² of ${valid ?? "—"} km² of land. ${areaNote} Shaded band: Đông Xuân (winter-spring) sowing window, 1 Nov – 31 Dec, An Giang. Filled dots are validated images, hollow dots provisional; click a dot to jump to that image.`,
   },
 
-  table: {
-    title: 'Communes',
-    lead: 'Commune summaries use the track of the latest image covering at least half the commune. Status describes water remaining, not the half-peak date. Click a row to see it on the map.',
-    search: 'Search commune…',
-    searchAria: 'Search commune by name',
-    provinceAria: 'Filter by province',
-    statusAria: 'Filter by status',
-    allProvinces: 'All provinces',
-    allStatuses: 'All statuses',
-    count: (n: number, total: number): string => `${n} of ${total} communes`,
-    export: 'Export CSV',
-    cols: { name: 'Commune', province: 'Province', peak_pct: 'Peak %', peak_date: 'Peak date', first_flood_date: 'First flooded', recession_date: 'Drained', last_pct: 'Last %', last_date: 'Observed on', status: 'Status' },
-    notYet: 'Not yet',
-    empty: 'No commune matches these filters.',
-    row: (name: string, status: string): string => `${name}, ${status}. Open on map`,
-    loading: 'Loading communes…',
-  },
-
   validation: {
     title: 'How reliable is this? (Validation & limits)',
     lead: 'What we checked the water maps against, and where they are weak.',
@@ -236,7 +223,7 @@ export const en = {
       { t: 'Read the result and next check', d: 'Check water fraction, date and image coverage. Insufficient observations do not establish dry conditions.' },
       { t: 'Open the image as evidence', d: 'Choose View the image from… to open the correct acquisition. Expand seasonal history when you need to compare observations.' },
     ],
-    tip: 'Use the results to prioritize local checks before winter–spring sowing. Compare observation dates with field conditions before deciding.',
+    tip: 'Use the results to prioritize local checks and plan drainage or sowing. Compare observation dates with field conditions before deciding.',
     close: 'Got it',
   },
 

@@ -1,6 +1,6 @@
 import type { SummaryLayer, Track } from './data/types.ts';
 
-export type Tab = 'overview' | 'map' | 'communes' | 'validation' | 'about';
+export type Tab = 'overview' | 'map' | 'reports' | 'validation' | 'about';
 export type TrackFilter = 'all' | Track;
 export type SummaryId = SummaryLayer['id'] | null;
 

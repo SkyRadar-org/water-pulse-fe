@@ -1,4 +1,7 @@
 import {
+  BarController,
+  BarElement,
+  CategoryScale,
   Chart,
   Filler,
   Legend,
@@ -17,7 +20,7 @@ import { lang } from '../i18n.ts';
 export const chartAdapters = lang === 'vi' ? { date: { locale: vi } } : {};
 export const MONTH_FORMAT = lang === 'vi' ? "'Th'M" : 'MMM';
 
-Chart.register(LineController, LineElement, PointElement, LinearScale, TimeScale, Tooltip, Legend, Filler);
+Chart.register(LineController, LineElement, PointElement, LinearScale, TimeScale, Tooltip, Legend, Filler, BarController, BarElement, CategoryScale);
 
 Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif";
 Chart.defaults.font.size = 12;

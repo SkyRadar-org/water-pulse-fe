@@ -174,6 +174,10 @@ a {
   display: none;
 }
 
+.tab-short {
+  display: none;
+}
+
 .menu-btn {
   align-self: center;
 }
@@ -381,6 +385,12 @@ a {
     padding: 0 8px;
     font-size: 13px;
   }
+  .tab-long {
+    display: none;
+  }
+  .tab-short {
+    display: inline;
+  }
   .menu-btn:not([hidden]) {
     display: inline-flex !important;
   }
@@ -414,6 +424,9 @@ a {
   .topbar .tab {
     padding: 0 6px;
     font-size: 12.5px;
+  }
+  .topbar .tabs {
+    gap: 0;
   }
   .topbar .menu-btn {
     height: auto;

@@ -86,6 +86,13 @@ Switching language reloads the page and keeps the selected date, commune, layers
 Written for non-technical users: plain-language wording, a 3-step guide (header "Guide" button), a "Find a commune" box,
 a one-paragraph plain summary for every commune, status labels with icons, and technical details folded away on the Validation tab.
 
+The **Reports** tab (`#reports`; the old `#communes` link redirects) is period-based: pick a whole dataset, a month or a
+custom date range, a province and an orbit. It shows key figures, communes per water level in each acquisition (click a
+column to open that image), a monthly flood calendar, flood durations, a province comparison and a sortable commune table.
+Exports: province summary, per-acquisition counts and per-commune details as CSV (UTF-8 with BOM, opens in Excel),
+each chart as PNG, and a print / save-as-PDF layout. It is computed in the browser from the per-acquisition choropleth
+endpoints; backend aggregation requests are listed in [docs/BE_REQUESTS_REPORTS.md](docs/BE_REQUESTS_REPORTS.md).
+
 ## Rules the UI follows
 
 - No temporal interpolation: the slider only has real acquisition dates and charts draw straight lines between real points.
@@ -102,10 +109,10 @@ src/state.ts           tiny store: state, set(), subscribe()
 src/i18n.ts            language detection, `T` (current strings), switchLang()
 src/locales/           en.ts, vi.ts (all user-facing text)
 src/config.ts          DATA_MODE, bases, map defaults, basemap
-src/data/              types.ts, dataSource.ts
+src/data/              types.ts, dataSource.ts, observations.ts, reportStats.ts (period report math)
 src/map/               map.ts (orchestration), layers.ts, communesLayer.ts, gibs.ts
-src/ui/                timeline, sidebar, communePanel, communeTable, validation, about, hero
-src/charts/            communeChart.ts, areaChart.ts
+src/ui/                overview, timeline, sidebar, communePanel, reports, validation, about, icons
+src/charts/            communeChart.ts, areaChart.ts, reportCharts.ts
 public/geo/            province / national boundary / Hoàng Sa–Trường Sa labels (from skyradar-web)
 public/mock/           generated demo data
 scripts/make-mock.mjs  demo data generator

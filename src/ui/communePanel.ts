@@ -8,6 +8,7 @@ import { T } from '../i18n.ts';
 import { STATUS_ICON, STATUS_LABEL } from '../palette.ts';
 import { set, state, subscribe } from '../state.ts';
 import { h } from './dom.ts';
+import { icon } from './icons.ts';
 
 export const slug = (s: string): string =>
   s
@@ -72,7 +73,7 @@ export function mountCommunePanel(host: HTMLElement, scenes: Scene[]): void {
       const p = collection.features.find((f) => f.properties.osm_id === osmId)?.properties;
       if (!p) throw new Error(`Commune ${osmId} not found`);
 
-      const closeBtn = h('button', { class: 'cp-close', type: 'button', 'aria-label': T.panel.close, title: T.panel.close }, '✕');
+      const closeBtn = h('button', { class: 'cp-close', type: 'button', 'aria-label': T.panel.close, title: T.panel.close }, icon('close', 18));
       closeBtn.addEventListener('click', close);
       const csvBtn = h('button', { class: 'btn', type: 'button', text: T.panel.download });
       csvBtn.addEventListener('click', () => csvOf(p, series));
