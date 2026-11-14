@@ -1,6 +1,6 @@
-import { getCommunes, getScenes } from '../data/dataSource.ts';
+import { getCommunes } from '../data/dataSource.ts';
 import type { CommuneProps, SummaryLayer } from '../data/types.ts';
-import { fmtDate, fold } from '../format.ts';
+import { fold } from '../format.ts';
 import { T } from '../i18n.ts';
 import { CHORO_COLORS, CHORO_LABELS, NO_DATA_COLOR } from '../palette.ts';
 import { set, state, subscribe, type LayerToggles, type Opacities, type State } from '../state.ts';
@@ -11,7 +11,6 @@ type RowKey = keyof LayerToggles;
 const ROWS: { key: RowKey; opacity?: keyof Opacities }[] = [
   { key: 'radar', opacity: 'radar' },
   { key: 'water', opacity: 'water' },
-  { key: 'swot', opacity: 'swot' },
   { key: 'communes', opacity: 'communes' },
   { key: 'provinces' },
   { key: 'basemap' },
@@ -70,7 +69,7 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
   const layerSection = h('section', { class: 'sb-sec' }, h('h3', { text: T.sidebar.layers }));
   const toggles = new Map<RowKey, HTMLInputElement>();
   const sceneControls: HTMLElement[] = [];
-  const proOnly: HTMLElement[] = []; // hidden in the simple view (radar, SWOT and commune fills)
+  const proOnly: HTMLElement[] = []; // hidden in the simple view (radar and commune fills)
   for (const row of ROWS) {
     const id = `layer-${row.key}`;
     const text = T.sidebar.rows[row.key];
@@ -79,21 +78,8 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
     toggles.set(row.key, input);
     const rowEl = h('div', { class: 'sb-row' }, input, h('label', { for: id }, h('b', { text: text.label }), h('small', { text: text.hint })));
     layerSection.append(rowEl);
-    if (row.key === 'radar' || row.key === 'water' || row.key === 'swot') sceneControls.push(rowEl);
-    if (row.key === 'radar' || row.key === 'swot' || row.key === 'communes') proOnly.push(rowEl);
-    if (row.key === 'swot') {
-      // [Claude] Which SWOT pass is shown for the selected acquisition (or that there is none within 2 days).
-      const status = h('small', { class: 'sb-swot-status' });
-      rowEl.querySelector('label')?.append(status);
-      getScenes().then((scenes) => {
-        const show = (s: State) => {
-          const sc = scenes.find((x) => x.date === s.selectedDate && x.track === s.selectedTrack);
-          status.textContent = sc?.swot ? T.sidebar.swotStatus(fmtDate(sc.swot.date), sc.swot.daysApart) : T.sidebar.swotNone;
-        };
-        subscribe(show);
-        show(state);
-      }).catch(() => undefined);
-    }
+    if (row.key === 'radar' || row.key === 'water') sceneControls.push(rowEl);
+    if (row.key === 'radar' || row.key === 'communes') proOnly.push(rowEl);
     if (row.opacity) {
       const slider = h('input', { type: 'range', min: '0', max: '100', step: '5', class: 'sb-range', 'aria-label': `${text.label}: ${T.sidebar.opacity}` });
       slider.addEventListener('input', () => set({ opacity: { ...state.opacity, [row.opacity!]: Number(slider.value) / 100 } }));
@@ -101,8 +87,8 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
       slider.value = String(Math.round(state.opacity[row.opacity] * 100));
       const sliderEl = h('div', { class: 'sb-slider' }, h('span', { text: T.sidebar.opacity }), slider);
       layerSection.append(sliderEl);
-      if (row.key === 'radar' || row.key === 'water' || row.key === 'swot') sceneControls.push(sliderEl);
-      if (row.key === 'radar' || row.key === 'swot' || row.key === 'communes') proOnly.push(sliderEl);
+      if (row.key === 'radar' || row.key === 'water') sceneControls.push(sliderEl);
+      if (row.key === 'radar' || row.key === 'communes') proOnly.push(sliderEl);
     }
   }
 

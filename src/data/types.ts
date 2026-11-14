@@ -9,8 +9,6 @@ export interface Scene {
   bounds: Bounds;
   waterPng: string; // 0 dry = transparent, 1 open water = blue, 3 permanent water = grey
   radarJpg?: string; // processed radar image on the same grid as waterPng
-  /** [Claude] Nearest SWOT (NASA/CNES Ka-band) water map within 2 days, same bounds; comparison source. */
-  swot?: { date: string; png: string; daysApart: number } | null;
   /** Blended playback frame: latest valid observation per pixel from any track (see backend composite.py). Absent in mock data. */
   composite?: { png: string; simplePng: string; radar: string; maxAgeDays: number; observedPct: number; sources: { date: string; track: Track; share_pct: number }[] } | null;
   gibsDate?: string; // GIBS tile date, defaults to date
@@ -93,13 +91,6 @@ export interface CommuneCollection {
   features: CommuneFeature[];
 }
 
-/** [Claude] SWOT (Ka-band) water share of a commune on a SWOT date. */
-export interface SwotPoint {
-  date: string;
-  water_pct: number;
-  water_km2: number;
-  valid_km2: number;
-}
 
 /** [Claude] NISAR and Sentinel-1 DSWx scored against SWOT on the same pixels (nearest NISAR acquisition, <= 2 days). */
 export interface SwotValidationRow {

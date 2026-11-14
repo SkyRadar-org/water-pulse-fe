@@ -1,8 +1,8 @@
 import type { Chart as ChartType, Plugin } from 'chart.js';
-import type { Maturity, SeriesPoint, SwotPoint, Track } from '../data/types.ts';
+import type { Maturity, SeriesPoint, Track } from '../data/types.ts';
 import { fmtDate } from '../format.ts';
 import { T } from '../i18n.ts';
-import { MATURITY_LABEL, SWOT_COLOR, TRACK_COLORS } from '../palette.ts';
+import { MATURITY_LABEL, TRACK_COLORS } from '../palette.ts';
 import { Chart, chartAdapters, MONTH_FORMAT } from './register.ts';
 
 const TRACKS: Track[] = ['047D', '083A', '148D'];
@@ -20,7 +20,6 @@ export function createCommuneChart(
   maturityOf: (date: string, track: Track) => Maturity | undefined,
   selectedDate: string,
   onPick: (date: string, track: Track) => void,
-  swot: SwotPoint[] = [],
 ): CommuneChartHandle {
   let selected = selectedDate;
 
@@ -76,25 +75,10 @@ export function createCommuneChart(
       pointBorderWidth: 2,
     };
   }).filter((d) => d.data.length > 0);
-  // [Claude] SWOT (Ka-band) points for side-by-side comparison; no line, not clickable (no NISAR image behind them).
-  const swotData = [...swot].sort((a, b) => a.date.localeCompare(b.date));
-  const swotSet = swotData.length ? [{
-    label: T.panel.swotLegend,
-    data: swotData.map((p) => ({ x: Date.parse(p.date), y: p.water_pct, p: { ...p, track: 'SWOT' } })),
-    borderColor: SWOT_COLOR,
-    backgroundColor: SWOT_COLOR,
-    showLine: false,
-    pointStyle: 'rectRot' as const,
-    pointRadius: 5,
-    pointHoverRadius: 7,
-    pointBackgroundColor: SWOT_COLOR,
-    pointBorderColor: SWOT_COLOR,
-    pointBorderWidth: 1,
-  }] : [];
 
   const chart = new Chart(canvas, {
     type: 'line',
-    data: { datasets: [...datasets, ...swotSet] as typeof datasets },
+    data: { datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -118,11 +102,10 @@ export function createCommuneChart(
           callbacks: {
             title: (items) => {
               const p = (items[0].raw as { p: SeriesPoint }).p;
-              return `${fmtDate(p.date)} · ${p.track === ('SWOT' as Track) ? T.panel.swotShort : p.track}`;
+              return `${fmtDate(p.date)} · ${p.track}`;
             },
             label: (item) => {
               const p = (item.raw as { p: SeriesPoint }).p;
-              if (p.track === ('SWOT' as Track)) return T.panel.swotTip(p.water_pct, p.water_km2, p.valid_km2);
               const m = maturityOf(p.date, p.track);
               return [T.panel.tipLine(p.water_pct, p.water_km2, p.valid_km2), m ? MATURITY_LABEL(m) : ''];
             },
@@ -133,7 +116,6 @@ export function createCommuneChart(
         const el = elements[0];
         if (!el) return;
         const p = (ch.data.datasets[el.datasetIndex].data[el.index] as unknown as { p: SeriesPoint }).p;
-        if (p.track === ('SWOT' as Track)) return;
         onPick(p.date, p.track);
       },
       onHover: (e, elements) => {

@@ -139,21 +139,14 @@ export interface SceneImages {
   water: CrossfadeImage;
 }
 
-/** Adds the team's radar + water layers (cross-fading) and the SWOT comparison layer. */
+/** Adds the team's radar + water layers (cross-fading). */
 export function addImageLayers(map: maplibregl.Map, scene: Scene, mode: ViewMode, onRadarError: () => void): SceneImages {
   // [Codex] Use the team's aligned local image instead of inconsistent GIBS tiles.
   const urls = sceneImageUrls(scene, mode);
   const coords = coordsOf(scene.bounds);
   const radar = new CrossfadeImage(map, 'radar', 'radar-image', urls.radar, coords, 0.85, onRadarError);
   const water = new CrossfadeImage(map, 'water', 'water', urls.water, coords, 0.9);
-  // [Claude] SWOT comparison map (orange), drawn above our water layer; hidden when the scene has no SWOT pass nearby.
-  map.addSource('swot', { type: 'image', url: scene.swot?.png ?? scene.waterPng, coordinates: coords });
-  map.addLayer({ id: 'swot', type: 'raster', source: 'swot', layout: { visibility: 'none' }, paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0 } });
   return { radar, water };
-}
-
-export function setSwotScene(map: maplibregl.Map, scene: Scene): void {
-  if (scene.swot) (map.getSource('swot') as maplibregl.ImageSource | undefined)?.updateImage({ url: scene.swot.png, coordinates: coordsOf(scene.bounds) });
 }
 
 export function setSummaryLayer(map: maplibregl.Map, layer: SummaryLayer | null): void {

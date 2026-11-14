@@ -50,12 +50,9 @@ export const vi: Strings = {
     findNone: 'Không có xã nào tên như vậy',
     layers: 'Lớp bản đồ',
     opacity: 'Độ đậm',
-    swotStatus: (date, days) => `Lượt SWOT ${date}${days ? ` (cách ${days} ngày)` : ' (cùng ngày)'}`,
-    swotNone: 'Không có lượt SWOT nào trong ±2 ngày quanh ảnh này',
     rows: {
       radar: { label: 'Ảnh radar (NISAR)', hint: 'Ảnh đã xử lý, cùng ngày và lưới với lớp nước' },
       water: { label: 'Vùng có nước (Water map)', hint: 'Nơi phân tích NISAR phát hiện có nước' },
-      swot: { label: 'So sánh: nước theo SWOT (hồng)', hint: 'Radar băng Ka độc lập của NASA/CNES, lượt quét gần nhất trong ±2 ngày' },
       communes: { label: 'Xã', hint: 'Theo ảnh gần nhất của xã hoặc một lần chụp, tùy chế độ' },
       provinces: { label: 'Tỉnh', hint: 'Ranh giới và tên tỉnh' },
       basemap: { label: 'Bản đồ nền', hint: '© Esri · © OpenStreetMap contributors' },
@@ -152,9 +149,6 @@ export const vi: Strings = {
     yAxis: 'Nước, % diện tích đất',
     sowing: ['Mùa', 'xuống giống'],
     tipLine: (pct, km2, valid) => `${pct}% nước · ${km2 ?? "—"} km² trên ${valid ?? "—"} km²`,
-    swotLegend: 'SWOT (băng Ka, để so sánh)',
-    swotShort: 'SWOT',
-    swotTip: (pct, km2, valid) => `SWOT: ${pct}% nước · ${km2} km² trên ${valid} km² quan sát`,
     track: (t) => `Quỹ đạo ${t}`,
     noObservations: 'Chưa có dữ liệu quan sát cho xã này.',
     summary: (p, f) => {

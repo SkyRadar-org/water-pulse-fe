@@ -50,12 +50,9 @@ export const en = {
     findNone: 'No commune with that name',
     layers: 'Map layers',
     opacity: 'Opacity',
-    swotStatus: (date: string, days: number): string => `SWOT pass ${date}${days ? ` (${days} day${days === 1 ? '' : 's'} apart)` : ' (same day)'}`,
-    swotNone: 'No SWOT pass within 2 days of this image',
     rows: {
       radar: { label: 'Radar image (NISAR)', hint: 'Processed local radar image aligned to the water layer' },
       water: { label: 'Water detected', hint: 'Where our NISAR analysis finds water' },
-      swot: { label: 'Compare: SWOT water (pink)', hint: 'Independent NASA/CNES Ka-band radar, nearest pass within 2 days' },
       communes: { label: 'Communes', hint: 'Latest per commune or the selected image, depending on the mode' },
       provinces: { label: 'Provinces', hint: 'Boundaries and names' },
       basemap: { label: 'Base map', hint: '© Esri · © OpenStreetMap contributors' },
@@ -152,9 +149,6 @@ export const en = {
     yAxis: 'Water, % of land',
     sowing: ['Sowing', 'window'],
     tipLine: (pct: number, km2: number, valid: number): string => `${pct}% water · ${km2 ?? "—"} km² of ${valid ?? "—"} km²`,
-    swotLegend: 'SWOT (Ka-band, comparison)',
-    swotShort: 'SWOT',
-    swotTip: (pct: number, km2: number, valid: number): string => `SWOT: ${pct}% water · ${km2} km² of ${valid} km² observed`,
     track: (t: string): string => `Track ${t}`,
     noObservations: 'No observations are available for this commune.',
     summary: (p: CommuneProps, f: { first: string; peak: string; last: string; rec: string }): string => {

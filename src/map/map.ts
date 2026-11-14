@@ -7,7 +7,7 @@ import type { CommuneCollection, Scene, SummaryLayer } from '../data/types.ts';
 import { latestValues } from '../data/observations.ts';
 import { set, state, subscribe, type State } from '../state.ts';
 import { addCommunes, type CommunesLayer } from './communesLayer.ts';
-import { addGeoLayers, addImageLayers, baseStyle, sceneImageUrls, setSummaryLayer, setSwotScene, warmImage, type SceneImages } from './layers.ts';
+import { addGeoLayers, addImageLayers, baseStyle, sceneImageUrls, setSummaryLayer, warmImage, type SceneImages } from './layers.ts';
 
 export interface MapView {
   map: maplibregl.Map;
@@ -75,14 +75,12 @@ export function mountMap(container: HTMLElement): MapView {
     vis('basemap', s.layers.basemap);
     images?.radar.setVisible(singleImage && s.layers.radar && !summaryOn && !simple);
     images?.water.setVisible(singleImage && s.layers.water && !summaryOn);
-    vis('swot', singleImage && s.layers.swot && !summaryOn && !simple && !!sceneOf(s)?.swot);
     vis('summary', summaryOn);
     vis('provinces', s.layers.provinces);
     vis('province-labels', s.layers.provinces);
     communes?.setVisible(s.layers.communes);
     images?.radar.setOpacity(s.opacity.radar);
     images?.water.setOpacity(s.opacity.water);
-    if (map.getLayer('swot')) map.setPaintProperty('swot', 'raster-opacity', s.opacity.swot);
     // The simple view is one colour: commune fills stay clickable but transparent (outlines remain).
     communes?.setOpacity(simple && singleImage ? 0 : s.opacity.communes);
   }
@@ -101,8 +99,6 @@ export function mountMap(container: HTMLElement): MapView {
     const urls = sceneImageUrls(scene, s.viewMode);
     void images?.radar.show(urls.radar, s.cut);
     void images?.water.show(urls.water, s.cut);
-    setSwotScene(map, scene);
-    applyLook(s); // the SWOT layer depends on whether this acquisition has a SWOT pass nearby
     try {
       const mosaic = scene.composite ? await getCompositeChoropleth(scene.date, scene.track) : null;
       if (token !== requestToken) return;

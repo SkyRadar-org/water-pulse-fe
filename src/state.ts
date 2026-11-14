@@ -12,14 +12,12 @@ export interface LayerToggles {
   water: boolean;
   communes: boolean;
   provinces: boolean;
-  swot: boolean;
 }
 
 export interface Opacities {
   radar: number;
   water: number;
   communes: number;
-  swot: number;
 }
 
 export interface State {
@@ -61,8 +59,8 @@ export const state: State = {
   selectedCommune: null,
   flyNonce: 0,
   activeSummary: null,
-  layers: { basemap: true, radar: true, water: true, communes: true, provinces: true, swot: false },
-  opacity: { radar: 0.85, water: 0.9, communes: 0.6, swot: 0.85 },
+  layers: { basemap: true, radar: true, water: true, communes: true, provinces: true },
+  opacity: { radar: 0.85, water: 0.9, communes: 0.6 },
   playing: false,
   viewMode: 'pro',
   cut: false,
