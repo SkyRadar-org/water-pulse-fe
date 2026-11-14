@@ -39,6 +39,15 @@ The tested output has 333 files, largest file about 2.7 MB. Each build checks th
 baseline Pages limits. Binary images are assets, not embedded in the Worker bundle. Worker reads precomputed JSON
 through `env.ASSETS`; it performs no satellite processing.
 
+## Automatic deploy
+
+`.github/workflows/deploy.yml` publishes production on every push to `main`: it checks out this repository and
+`skyradar-nisar@main` side by side, builds, runs the Worker and UX tests, deploys with `--branch main` and checks
+`/health` on `nisar-flood.skyradar.vn`. It reads the `CLOUDFLARE_API_TOKEN` repository secret and the
+`CLOUDFLARE_ACCOUNT_ID` repository variable. A dataset change in `skyradar-nisar` does not trigger it by itself:
+start the workflow by hand (Actions → Run workflow) or send a `data-updated` repository dispatch.
+The manual steps below remain valid for a deploy from a local machine.
+
 ## Publish to the team's account
 
 Authenticate Wrangler with the team's Cloudflare account, or securely provide `CLOUDFLARE_API_TOKEN` and

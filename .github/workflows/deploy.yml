@@ -1,0 +1,85 @@
+name: Deploy to Cloudflare Pages
+
+# Every push to main builds, tests and publishes production (nisar-flood.skyradar.vn).
+# The build needs the sibling skyradar-nisar checkout for the dataset and the Pages exporter,
+# so both repositories are checked out side by side, as docs/CLOUDFLARE.md describes.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Lets skyradar-nisar ask for a redeploy when the dataset changes.
+  repository_dispatch:
+    types: [data-updated]
+
+permissions:
+  contents: read
+
+# Never run two production deploys at once; a newer push waits for the running one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out frontend
+        uses: actions/checkout@v4
+        with:
+          path: water-pulse-fe
+
+      - name: Check out dataset and exporter
+        uses: actions/checkout@v4
+        with:
+          repository: SkyRadar-org/skyradar-nisar
+          ref: main
+          path: skyradar-nisar
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: water-pulse-fe/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: skyradar-nisar/water-pulse-be/requirements.txt
+
+      - name: Install backend requirements
+        run: pip install -r skyradar-nisar/water-pulse-be/requirements.txt
+
+      - name: Install frontend dependencies
+        working-directory: water-pulse-fe
+        run: npm ci
+
+      - name: Build Pages artifact
+        working-directory: water-pulse-fe
+        env:
+          PYTHON: python
+        run: npm run build:cloudflare
+
+      - name: Test
+        working-directory: water-pulse-fe
+        run: |
+          npm run test:cloudflare
+          npm run test:ux
+
+      - name: Deploy to production
+        working-directory: water-pulse-fe
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Missing CLOUDFLARE_API_TOKEN secret or CLOUDFLARE_ACCOUNT_ID variable; nothing was deployed."
+            exit 1
+          fi
+          npm run deploy:cloudflare -- --branch main --commit-hash "$GITHUB_SHA" --commit-dirty=true
+
+      - name: Verify production
+        run: |
+          sleep 10
+          curl --fail --silent --show-error --max-time 30 https://nisar-flood.skyradar.vn/health

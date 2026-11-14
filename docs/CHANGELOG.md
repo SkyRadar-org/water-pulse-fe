@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-14 — Automatic production deploy from main (Claude)
+
+- `.github/workflows/deploy.yml`: every push to `main` checks out this repo and `skyradar-nisar@main` side by side, runs `build:cloudflare`, `test:cloudflare` and `test:ux`, then publishes to Pages project `nisar-flood` (production) and checks `/health` on the real hostname. A failed build or test deploys nothing.
+- Needs repository secret `CLOUDFLARE_API_TOKEN` (Account → Cloudflare Pages → Edit) and variable `CLOUDFLARE_ACCOUNT_ID`. Can also be started by hand (Actions → Run workflow) or by a `data-updated` repository dispatch.
+- Pushing to `main` now changes production: use a branch and a pull request for work that is not ready.
+
 ## 2026-11-14 — Period-neutral copy and statistical report tab
 
 - Overview and map no longer frame the app around the Đông Xuân crop: the headings now describe water status by commune for any observation period. Removed the eyebrow pills and the duplicate hero search (the list search remains); cards use a colour dot instead of a thick top stripe; "low water" is green everywhere, matching the map legend.
