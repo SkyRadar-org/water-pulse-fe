@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { computeReport, floodDuration, monthsBetween, sceneKey } from '../src/data/reportStats.ts';
+import { computeReport, computeTrend, floodDuration, monthsBetween, sceneKey } from '../src/data/reportStats.ts';
 
 const read = async name => JSON.parse(await readFile(new URL('../dist/api-data/' + name, import.meta.url), 'utf8'));
 const communes = (await read('communes.json')).features.map(f => f.properties);
@@ -52,4 +52,16 @@ test('flood duration counts still-wet communes up to their last image as a minim
   assert.deepEqual(floodDuration(base), { days: 90, ongoing: true });
   assert.deepEqual(floodDuration({ ...base, first_flood_date: null }), { days: null, ongoing: false });
   assert.deepEqual(monthsBetween('2026-11-20', '2027-01-05'), ['2026-11', '2026-12', '2027-01']);
+});
+
+test('season trend compares the latest image only with its own orbit and never merges orbits', () => {
+  const t = computeTrend(computeReport(communes, scenes, choro, all));
+  assert.ok(t.points.length > 0);
+  for (const p of t.points) assert.ok(p.share >= 0 && p.share <= 100 && p.observed >= 10);
+  assert.equal(t.latestTrackPeak.track, t.latest.track);
+  assert.ok(t.peak.share >= t.latestTrackPeak.share);
+  assert.equal(t.direction, 'falling');
+  // A single orbit with too few images in the period yields no trend instead of a misleading one.
+  const none = computeTrend(computeReport(communes, scenes, choro, { ...all, from: '2026-06-01', to: '2026-06-02' }));
+  assert.equal(none.direction, 'none');
 });

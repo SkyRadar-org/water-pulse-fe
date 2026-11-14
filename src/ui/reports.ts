@@ -1,8 +1,8 @@
 import Papa from 'papaparse';
 import type { Chart } from 'chart.js';
-import { createDurationChart, createMonthChart, createProvinceChart, createSceneChart, monthLabel, monthShort } from '../charts/reportCharts.ts';
+import { createDurationChart, createMonthChart, createProvinceChart, createSceneChart, createTrendChart, monthLabel, monthName, monthShort } from '../charts/reportCharts.ts';
 import { getChoropleth, getCommunes, getScenes } from '../data/dataSource.ts';
-import { computeReport, DURATION_BINS, sceneKey, type CommuneStat, type Report, type ReportFilter } from '../data/reportStats.ts';
+import { computeReport, DURATION_BINS, sceneKey, type CommuneStat, type Report, type ReportFilter, computeTrend } from '../data/reportStats.ts';
 import type { Choropleth, CommuneProps, Scene, Track } from '../data/types.ts';
 import { downloadText, fmtDate, fmtNum, fmtPct, fmtShort, fold } from '../format.ts';
 import { T } from '../i18n.ts';
@@ -503,13 +503,47 @@ function build(root: HTMLElement, all: CommuneProps[], scenes: Scene[], choro: M
       ),
     );
 
-    content.replaceChildren(kpis, sceneB.section, h('div', { class: 'rp-grid2' }, monthB.section, durB.section), provB.section, tableSection);
+    // ---------- plain-language trend first; per-image detail goes into a collapsed section ----------
+    const trend = computeTrend(report);
+    const pct = (v: number) => fmtPct(Math.round(v));
+    const phase = (cls: string, mark: string, title: string, body: string, extra?: string) =>
+      h('div', { class: `rp-phase ${cls}` }, h('span', { class: 'rp-phase-mark', 'aria-hidden': 'true', text: mark }), h('div', {}, h('h3', { text: title }), h('p', { text: body }), extra ? h('p', { class: 'rp-phase-extra', text: extra }) : null));
+    const phases = h('div', { class: 'rp-phases' });
+    if (trend.peak && trend.latest && trend.latestTrackPeak) {
+      phases.append(
+        phase('rise', '↑', R.phaseRiseTitle, trend.onsetMonth ? R.phaseRise(monthName(trend.onsetMonth.month), trend.onsetMonth.onset) : R.phaseNone),
+        phase('peak', '▲', R.phasePeakTitle, R.phasePeak(fmtDate(trend.peak.date), pct(trend.peak.share), trend.peak.track)),
+        phase('fall', '↓', R.phaseFallTitle, trend.recessionMonth ? R.phaseFall(monthName(trend.recessionMonth.month), trend.recessionMonth.recession) : R.phaseNone, R.phaseStill(trend.stillWet)),
+        phase(`now ${trend.direction}`, '●', R.phaseNowTitle, R.phaseNow(trend.direction, fmtDate(trend.latest.date), trend.latest.track, pct(trend.latest.share), pct(trend.latestTrackPeak.share))),
+      );
+    }
+    const trendB = chartBlock({ title: R.trendTitle, note: R.trendNote, aria: R.trendAria, height: 300, file: 'xu-huong', cls: 'rp-trend' });
+    const trendHead = trendB.section.querySelector('.rp-block-head')!;
+    trendHead.after(h('p', { class: `rp-headline ${trend.direction}`, text: R.trendHeadline[trend.direction] }), h('p', { class: 'rp-lead-sm', text: R.trendLead }), phases);
 
+    const takeaway = (text: string) => h('p', { class: 'rp-takeaway' }, h('b', { text: `${R.takeaway}: ` }), text);
+    if (trend.onsetMonth) monthB.section.querySelector('.rp-block-head')!.after(takeaway(R.monthsTake(monthName(trend.onsetMonth.month), trend.recessionMonth ? monthName(trend.recessionMonth.month) : null)));
+    const topBin = DURATION_BINS.reduce((a, b) => (report.duration[b].done + report.duration[b].ongoing > report.duration[a].done + report.duration[a].ongoing ? b : a));
+    const topBinN = report.duration[topBin].done + report.duration[topBin].ongoing;
+    if (topBinN) durB.section.querySelector('.rp-block-head')!.after(takeaway(R.durationTake(R.durationBins[topBin], topBinN, trend.stillWet)));
+    const topProv = report.provinces.filter((p) => p.observed >= 3).reduce<(typeof report.provinces)[number] | null>((a, p) => (!a || p.high / p.observed > a.high / a.observed ? p : a), null);
+    if (topProv && report.provinces.length > 1) provB.section.querySelector('.rp-block-head')!.after(takeaway(R.provinceTake(topProv.province, pct((topProv.high / topProv.observed) * 100))));
+
+    const details = h('details', { class: 'rp-details' }, h('summary', { text: R.detailsTitle }), sceneB.section);
+    details.addEventListener('toggle', () => requestAnimationFrame(resizeAll));
+    content.replaceChildren(trendB.section, kpis, h('div', { class: 'rp-grid2' }, monthB.section, durB.section), provB.section, details, tableSection);
+
+    const tc = trend.points.length ? createTrendChart(trendB.canvas, trend, (d, tr) => openScene(d, tr)) : null;
+    if (!tc) trendB.section.querySelector('.rp-chart')?.remove();
     const sc = createSceneChart(sceneB.canvas, report.scenes, (s) => openScene(s.date, s.track));
     const mc = createMonthChart(monthB.canvas, report.months, monthShort);
     const dc = createDurationChart(durB.canvas, report.duration);
     const pc = createProvinceChart(provB.canvas, report.provinces);
     charts = [sc, mc, dc, pc];
+    if (tc) {
+      charts.push(tc as unknown as Chart);
+      bindPng(trendB.png, tc as unknown as Chart, trendB.file);
+    } else trendB.png.remove();
     bindPng(sceneB.png, sc, sceneB.file);
     bindPng(monthB.png, mc, monthB.file);
     bindPng(durB.png, dc, durB.file);

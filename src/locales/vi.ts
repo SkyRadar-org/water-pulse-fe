@@ -10,8 +10,8 @@ export const vi: Strings = {
   ...viOverview,
   ...viReports,
   story: {
-    title: 'NISAR theo dõi nước mặt qua mùa lũ, tổng hợp theo từng xã.',
-    lead: 'Xem nơi còn nhiều nước, kiểm tra ngày quan trắc và mở ảnh làm bằng chứng.',
+    title: 'NISAR theo dõi nước trên đồng ruộng Đồng bằng sông Cửu Long qua mùa lũ, tổng hợp theo từng xã.',
+    lead: 'Thí điểm ở Tứ giác Long Xuyên và Đồng Tháp Mười. Xem nơi còn nhiều nước, kiểm tra ngày quan trắc và mở ảnh làm bằng chứng.',
     high: 'xã nhiều nước / xã đủ phủ đánh giá',
     optical: 'F1 cao hơn Sentinel-1 · đối chiếu quang học, tháng 8–11',
     scenes: 'lần chụp NISAR thực tế',
@@ -68,6 +68,7 @@ export const vi: Strings = {
   date: (y, m, d) => `${two(d)}/${two(m)}/${y}`,
   dateShort: (m, d) => `${two(d)}/${two(m)}`,
   areaNote,
+  pending: { label: 'CHƯA TRIỂN KHAI', sub: 'Phần còn lại của ĐBSCL · chưa có dữ liệu NISAR' },
   country: 'CAMPUCHIA',
 
   sidebar: {
@@ -229,6 +230,8 @@ export const vi: Strings = {
   },
 
   about: {
+    title: 'Về NISAR Water Pulse',
+    intro: 'Công cụ giúp cán bộ thủy lợi, nông nghiệp và hợp tác xã ở Đồng bằng sông Cửu Long biết ruộng của từng xã còn ngập hay đã rút, để chuẩn bị xuống giống vụ Đông Xuân. Dữ liệu là ảnh radar băng L của vệ tinh NISAR (NASA–ISRO), nhìn xuyên mây nên vẫn chụp được giữa mùa mưa. Bản hiện tại thí điểm 140 xã ở Tứ giác Long Xuyên và Đồng Tháp Mười; các vùng còn lại của đồng bằng chưa triển khai.',
     answersTitle: 'Ứng dụng trả lời những câu hỏi nào',
     answersLead: 'Với từng xã ở Tứ giác Long Xuyên và Đồng Tháp Mười (An Giang, Đồng Tháp), qua 33 lần chụp NISAR trên ba quỹ đạo từ 17/6 đến 3/11/2026:',
     readTitle: 'Cách đọc bản đồ',

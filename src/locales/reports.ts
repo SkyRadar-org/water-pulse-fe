@@ -46,6 +46,42 @@ export const enReports = {
     kpiBusiestSub: (date: string, track: string): string => `${date} · orbit ${track}`,
     kpiNone: 'None',
 
+    trendTitle: 'Flood season at a glance',
+    trendHeadline: {
+      falling: 'The flood has peaked and water is going down.',
+      steady: 'Water is close to its peak and not yet clearly going down.',
+      rising: 'Water is still rising in the latest images.',
+      none: 'Too few images in this selection to show a trend. Widen the period or choose “All orbits”.',
+    } as Record<'falling' | 'steady' | 'rising' | 'none', string>,
+    trendLead: 'Share of communes with a lot of water (≥ 30% of the observed land) in each image, over time.',
+    trendRise: 'Water rising',
+    trendFall: 'Water going down',
+    trendPeakMark: (d: string): string => `Peak ${d}`,
+    trendAxis: 'Communes with a lot of water',
+    trendTip: (pct: string, high: number, obs: number): string => `${pct}% of the communes in this image (${high} of ${obs}) had ≥ 30% water`,
+    trendNote: 'One line per orbit: each orbit sees different communes, so lines are never mixed. One point = one image. Click a point to open that image on the map.',
+    trendAria: 'Line chart: share of observed communes with at least 30% water in each image, one line per orbit',
+    phaseRiseTitle: 'Water rising',
+    phaseRise: (month: string, n: number): string => `Most communes started flooding in ${month} (${n} communes).`,
+    phasePeakTitle: 'Peak',
+    phasePeak: (date: string, pct: string, track: string): string => `${date}: ${pct} of communes in the image had a lot of water (orbit ${track}).`,
+    phaseFallTitle: 'Water going down',
+    phaseFall: (month: string, n: number): string => `Most communes fell below half of their peak in ${month} (${n} communes).`,
+    phaseNowTitle: 'Latest image',
+    phaseNow: (dir: 'falling' | 'steady' | 'rising' | 'none', date: string, track: string, pct: string, peak: string): string =>
+      dir === 'falling'
+        ? `${date} (orbit ${track}): ${pct}, down from ${peak} at this orbit's peak.`
+        : dir === 'rising'
+          ? `${date} (orbit ${track}): ${pct}, the highest so far for this orbit.`
+          : `${date} (orbit ${track}): ${pct}, about the same as this orbit's peak (${peak}).`,
+    phaseStill: (n: number): string => `${n} communes were still wet at their last image.`,
+    phaseNone: 'No month stands out.',
+    detailsTitle: 'Details per image (for specialists)',
+    takeaway: 'In short',
+    monthsTake: (onset: string, recession: string | null): string =>
+      recession ? `Flooding mostly starts in ${onset}; water mostly goes down in ${recession}.` : `Flooding mostly starts in ${onset}; no clear recession month yet.`,
+    durationTake: (bin: string, n: number, still: number): string => `Most common: flooded for ${bin} (${n} communes). ${still} communes were still wet at their last image.`,
+    provinceTake: (prov: string, pct: string): string => `${prov} has the largest share of communes that reached a lot of water (${pct}).`,
     scenesTitle: 'Communes by water level in each acquisition',
     scenesNote: 'Each column is one acquisition. Orbits cover different communes, so column heights differ; grey shows communes outside that swath. Values include partially covered communes. Click a column to open that image on the map.',
     scenesAria: 'Stacked columns: number of communes per water level for each acquisition',
@@ -152,6 +188,42 @@ export const viReports: typeof enReports = {
     kpiBusiestSub: (date, track) => `${date} · quỹ đạo ${track}`,
     kpiNone: 'Không có',
 
+    trendTitle: 'Mùa lũ nhìn nhanh',
+    trendHeadline: {
+      falling: 'Lũ đã qua đỉnh, nước đang rút.',
+      steady: 'Nước vẫn ở gần mức đỉnh, chưa rút rõ.',
+      rising: 'Nước vẫn đang lên ở các ảnh mới nhất.',
+      none: 'Chưa đủ ảnh trong phạm vi đã chọn để thấy xu hướng. Hãy chọn thời kỳ rộng hơn hoặc “Tất cả quỹ đạo”.',
+    },
+    trendLead: 'Tỷ lệ xã còn nhiều nước (từ 30% phần đất quan sát được) ở mỗi lần chụp, theo thời gian.',
+    trendRise: 'Nước lên',
+    trendFall: 'Nước rút',
+    trendPeakMark: (d) => `Đỉnh ${d}`,
+    trendAxis: 'Xã còn nhiều nước',
+    trendTip: (pct, high, obs) => `${pct}% số xã trong ảnh (${high}/${obs} xã) có từ 30% nước`,
+    trendNote: 'Mỗi quỹ đạo một đường: mỗi quỹ đạo nhìn thấy những xã khác nhau nên không gộp. Mỗi điểm là một lần chụp. Bấm vào điểm để mở ảnh đó trên bản đồ.',
+    trendAria: 'Biểu đồ đường: tỷ lệ xã có từ 30% nước trong mỗi lần chụp, mỗi quỹ đạo một đường',
+    phaseRiseTitle: 'Nước lên',
+    phaseRise: (month, n) => `Nhiều xã bắt đầu ngập nhất vào ${month} (${n} xã).`,
+    phasePeakTitle: 'Đỉnh lũ',
+    phasePeak: (date, pct, track) => `${date}: ${pct} số xã trong ảnh còn nhiều nước (quỹ đạo ${track}).`,
+    phaseFallTitle: 'Nước rút',
+    phaseFall: (month, n) => `Nhiều xã rút xuống dưới nửa mức đỉnh nhất vào ${month} (${n} xã).`,
+    phaseNowTitle: 'Ảnh mới nhất',
+    phaseNow: (dir, date, track, pct, peak) =>
+      dir === 'falling'
+        ? `${date} (quỹ đạo ${track}): ${pct}, giảm từ ${peak} lúc đỉnh của quỹ đạo này.`
+        : dir === 'rising'
+          ? `${date} (quỹ đạo ${track}): ${pct}, cao nhất từ đầu mùa của quỹ đạo này.`
+          : `${date} (quỹ đạo ${track}): ${pct}, gần bằng mức đỉnh của quỹ đạo này (${peak}).`,
+    phaseStill: (n) => `${n} xã vẫn còn nước ở ảnh cuối của xã.`,
+    phaseNone: 'Không có tháng nào nổi bật.',
+    detailsTitle: 'Chi tiết từng lần chụp (cho người cần số liệu kỹ)',
+    takeaway: 'Tóm lại',
+    monthsTake: (onset, recession) =>
+      recession ? `Nước chủ yếu bắt đầu lên vào ${onset} và rút nhiều nhất vào ${recession}.` : `Nước chủ yếu bắt đầu lên vào ${onset}; chưa có tháng rút rõ rệt.`,
+    durationTake: (bin, n, still) => `Phổ biến nhất: ngập ${bin} (${n} xã). ${still} xã vẫn còn nước ở ảnh cuối.`,
+    provinceTake: (prov, pct) => `${prov} có tỷ lệ xã từng nhiều nước cao nhất (${pct}).`,
     scenesTitle: 'Số xã theo mức nước ở từng lần chụp',
     scenesNote: 'Mỗi cột là một lần chụp. Mỗi quỹ đạo phủ những xã khác nhau nên chiều cao cột khác nhau; phần xám là xã nằm ngoài vệt quét. Có tính cả xã chỉ được phủ một phần. Bấm vào cột để mở ảnh đó trên bản đồ.',
     scenesAria: 'Cột chồng: số xã theo mức nước ở từng lần chụp',

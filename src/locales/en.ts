@@ -9,8 +9,8 @@ export const en = {
   ...enOverview,
   ...enReports,
   story: {
-    title: 'NISAR follows surface water through the flood season, commune by commune.',
-    lead: 'See where water remains, check the observation date, then inspect the evidence.',
+    title: 'NISAR follows water on the fields of the Mekong Delta through the flood season, commune by commune.',
+    lead: 'Pilot area: the Long Xuyên Quadrangle and the Plain of Reeds. See where water remains, check the observation date, then inspect the evidence.',
     high: 'high-water / assessed communes',
     optical: 'higher F1 vs Sentinel-1 · optical comparisons, Aug–Nov',
     scenes: 'real NISAR acquisitions',
@@ -68,6 +68,7 @@ export const en = {
   date: (y: number, m: number, d: number): string => `${String(d).padStart(2, '0')} ${months[m - 1]} ${y}`,
   dateShort: (m: number, d: number): string => `${String(d).padStart(2, '0')} ${months[m - 1]}`,
   areaNote,
+  pending: { label: 'NOT COVERED YET', sub: 'Rest of the Mekong Delta · NISAR data not deployed' },
   country: 'CAMBODIA',
 
   sidebar: {
@@ -229,6 +230,8 @@ export const en = {
   },
 
   about: {
+    title: 'About NISAR Water Pulse',
+    intro: 'A tool that helps irrigation and agriculture officers and cooperatives in the Mekong Delta see whether each commune\'s fields are still flooded or have drained, ahead of the winter–spring rice sowing. It uses L-band radar images from the NISAR satellite (NASA–ISRO), which see through clouds and keep working in the rainy season. This version is a pilot over 140 communes in the Long Xuyên Quadrangle and the Plain of Reeds; the rest of the delta is not covered yet.',
     answersTitle: 'What the app answers',
     answersLead: 'For every commune of the Long Xuyên Quadrangle and the Plain of Reeds (An Giang, Đồng Tháp), across 33 NISAR acquisitions on three tracks from 17 Jun to 3 Nov 2026:',
     readTitle: 'How to read the map',

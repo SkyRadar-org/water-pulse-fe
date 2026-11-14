@@ -119,6 +119,7 @@ const GEO_URLS = {
   provinces: '/geo/vn-provinces.v1.geojson',
   boundary: '/geo/vn-boundary.v1.geojson',
   islands: '/geo/vn-islands-labels.v1.geojson',
+  pending: '/geo/mekong-pending.v1.geojson',
 } as const;
 
 /** Static GeoJSON overlays shipped with the app (province lines, national boundary, archipelago labels). */

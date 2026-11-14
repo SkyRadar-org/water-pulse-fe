@@ -738,3 +738,128 @@
     font-size: 11px;
   }
 }
+
+/* ---------- plain-language trend (top of the report) ---------- */
+.rp-trend {
+  border-color: #c7d7f5;
+  box-shadow: var(--shadow);
+}
+
+.rp-trend h2 {
+  font-size: 19px;
+}
+
+.rp-headline {
+  margin: 6px 0 2px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--brand);
+}
+
+.rp-headline.falling { color: #0f766e; }
+.rp-headline.rising { color: #b91c1c; }
+
+.rp-lead-sm {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.rp-phases {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.rp-phase {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.rp-phase h3 {
+  margin: 0 0 2px;
+  font-size: 14px;
+}
+
+.rp-phase p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.rp-phase .rp-phase-extra {
+  margin-top: 4px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.rp-phase-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--brand-2);
+}
+
+.rp-phase.peak .rp-phase-mark { background: var(--brand); }
+.rp-phase.fall .rp-phase-mark { background: #0d9488; }
+.rp-phase.now { background: #fff; border-color: #94a3b8; }
+.rp-phase.now .rp-phase-mark { background: #475569; }
+.rp-phase.now.falling .rp-phase-mark { background: #0d9488; }
+.rp-phase.now.rising .rp-phase-mark { background: #dc2626; }
+
+.rp-takeaway {
+  margin: 6px 0 4px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--brand-2);
+  background: #f1f6ff;
+  border-radius: 0 8px 8px 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.rp-details {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.rp-details > summary {
+  cursor: pointer;
+  padding: 14px 20px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.rp-details > .rp-block {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 12px 12px;
+}
+
+@media (max-width: 980px) {
+  .rp-phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .rp-phases { grid-template-columns: 1fr; }
+  .rp-headline { font-size: 19px; }
+}
+
+@media print {
+  .rp-details { border: 0; }
+  .rp-details > summary { display: none; }
+}

@@ -44,7 +44,8 @@ export function mountAbout(host: HTMLElement): void {
     h(
       'div',
       { class: 'page-inner' },
-      heroBlock(),
+      // The figures hero lives on the Overview tab; About explains the project instead of repeating it.
+      h('header', { class: 'about-head' }, h('h1', { text: A.title }), h('p', { class: 'lead', text: A.intro })),
       h('h2', { text: A.answersTitle }),
       h('p', { class: 'lead', text: A.answersLead }),
       h('div', { class: 'about-grid' }, ...T.content.questions.map((q) => h('div', { class: 'card' }, h('h3', { text: q.q }), h('p', { text: q.a })))),

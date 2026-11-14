@@ -172,9 +172,58 @@ function labelCollection(): GeoJSON.FeatureCollection {
   };
 }
 
+/** Diagonal hatch drawn once into an image so the "not covered yet" area reads as a placeholder, not as data. */
+function hatchImage(): ImageData {
+  const n = 16;
+  const c = document.createElement('canvas');
+  c.width = c.height = n;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = 'rgba(148, 163, 184, 0.14)';
+  ctx.fillRect(0, 0, n, n);
+  ctx.strokeStyle = 'rgba(100, 116, 139, 0.45)';
+  ctx.lineWidth = 1.5;
+  for (const o of [-n, 0, n]) {
+    ctx.beginPath();
+    ctx.moveTo(o, n);
+    ctx.lineTo(o + n, 0);
+    ctx.stroke();
+  }
+  return ctx.getImageData(0, 0, n, n);
+}
+
+/** Rest of the Mekong Delta: hatched and labelled "not covered yet" so the empty map does not read as "dry". */
+function addPendingArea(map: maplibregl.Map, data: GeoJSON.FeatureCollection): void {
+  if (!map.hasImage('pending-hatch')) map.addImage('pending-hatch', hatchImage());
+  map.addSource('pending', { type: 'geojson', data });
+  map.addLayer({ id: 'pending-fill', type: 'fill', source: 'pending', filter: ['==', ['get', 'kind'], 'pending-area'], paint: { 'fill-pattern': 'pending-hatch', 'fill-opacity': 0.9 } });
+  map.addLayer({
+    id: 'pending-line',
+    type: 'line',
+    source: 'pending',
+    filter: ['==', ['get', 'kind'], 'pending-area'],
+    paint: { 'line-color': '#64748b', 'line-width': 1, 'line-dasharray': [2, 2], 'line-opacity': 0.7 },
+  });
+  map.addLayer({
+    id: 'pending-label',
+    type: 'symbol',
+    source: 'pending',
+    filter: ['==', ['get', 'kind'], 'pending-label'],
+    layout: {
+      'text-field': ['format', T.pending.label, { 'font-scale': 1.15 }, '\n', {}, T.pending.sub, { 'font-scale': 0.85 }],
+      'text-font': FONT,
+      'text-size': ['interpolate', ['linear'], ['zoom'], 6, 11, 9, 15],
+      'text-letter-spacing': 0.06,
+      'text-max-width': 11,
+      'text-allow-overlap': true,
+    },
+    paint: { 'text-color': '#334155', 'text-halo-color': '#ffffff', 'text-halo-width': 2.5 },
+  });
+}
+
 /** Province lines, national boundary, province labels, AOI frame and Hoàng Sa / Trường Sa labels. */
 export async function addGeoLayers(map: maplibregl.Map): Promise<void> {
-  const [provinces, boundary, islands] = await Promise.all([getGeo('provinces'), getGeo('boundary'), getGeo('islands')]);
+  const [provinces, boundary, islands, pending] = await Promise.all([getGeo('provinces'), getGeo('boundary'), getGeo('islands'), getGeo('pending').catch(() => null)]);
+  if (pending) addPendingArea(map, pending);
 
   map.addSource('provinces', { type: 'geojson', data: provinces });
   map.addSource('boundary', { type: 'geojson', data: boundary });

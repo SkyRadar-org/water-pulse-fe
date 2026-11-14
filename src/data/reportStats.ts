@@ -225,3 +225,54 @@ export function computeReport(all: CommuneProps[], scenes: Scene[], choro: Map<s
     },
   };
 }
+
+/** Scenes that saw fewer communes than this are too partial to show as a trend point. */
+export const TREND_MIN_OBSERVED = 10;
+
+export interface TrendPoint {
+  date: string;
+  track: Track;
+  /** Share (%) of the communes observed in this image that had ≥ 30% water. */
+  share: number;
+  high: number;
+  observed: number;
+}
+
+export interface Trend {
+  points: TrendPoint[];
+  peak: TrendPoint | null;
+  latest: TrendPoint | null;
+  /** Highest point of the latest image's own orbit: the fair comparison for "is it receding?". */
+  latestTrackPeak: TrendPoint | null;
+  direction: 'rising' | 'falling' | 'steady' | 'none';
+  onsetMonth: MonthStat | null;
+  recessionMonth: MonthStat | null;
+  stillWet: number;
+}
+
+/** Plain-language season trend. Orbits stay separate: "falling" compares the latest image with its own orbit's peak. */
+export function computeTrend(r: Report): Trend {
+  const points: TrendPoint[] = r.scenes
+    .filter((s) => s.observed >= TREND_MIN_OBSERVED)
+    .map((s) => ({ date: s.date, track: s.track, share: (s.high / s.observed) * 100, high: s.high, observed: s.observed }));
+  const top = (list: TrendPoint[]) => list.reduce<TrendPoint | null>((a, p) => (!a || p.share > a.share ? p : a), null);
+  const peak = top(points);
+  const latest = points.at(-1) ?? null;
+  const latestTrackPeak = latest ? top(points.filter((p) => p.track === latest.track)) : null;
+  let direction: Trend['direction'] = 'none';
+  if (latest && latestTrackPeak) {
+    const drop = latestTrackPeak.share - latest.share;
+    direction = latest === latestTrackPeak ? 'rising' : drop >= 5 ? 'falling' : 'steady';
+  }
+  const busiest = (k: 'onset' | 'recession') => r.months.reduce<MonthStat | null>((a, m) => (m[k] > 0 && (!a || m[k] > a[k]) ? m : a), null);
+  return {
+    points,
+    peak,
+    latest,
+    latestTrackPeak,
+    direction,
+    onsetMonth: busiest('onset'),
+    recessionMonth: busiest('recession'),
+    stillWet: r.communes.filter((c) => c.floodOngoing).length,
+  };
+}

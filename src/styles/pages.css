@@ -176,3 +176,22 @@
     padding: 18px;
   }
 }
+
+.about-head {
+  margin: 8px 0 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.about-head h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  line-height: 1.25;
+  color: var(--brand);
+}
+
+.about-head .lead {
+  max-width: 75ch;
+  font-size: 16px;
+  line-height: 1.6;
+}

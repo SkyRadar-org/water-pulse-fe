@@ -1,8 +1,11 @@
 import type { Plugin } from 'chart.js';
-import { DURATION_BINS, type MonthStat, type ProvinceStat, type Report, type SceneStat } from '../data/reportStats.ts';
+import { DURATION_BINS, type MonthStat, type ProvinceStat, type Report, type SceneStat, type Trend } from '../data/reportStats.ts';
+import type { Track } from '../data/types.ts';
+import { TRACK_COLORS } from '../palette.ts';
+import { toMs } from '../format.ts';
 import { fmtNum, fmtShort } from '../format.ts';
 import { lang, T } from '../i18n.ts';
-import { Chart } from './register.ts';
+import { Chart, chartAdapters, MONTH_FORMAT } from './register.ts';
 
 export const REPORT_COLORS = {
   high: '#dc2626',
@@ -22,6 +25,9 @@ export const monthLabel = (ym: string): string => {
   const s = MONTH_LABEL.format(new Date(`${ym}-01T00:00:00Z`));
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
+/** Month name without the year, for sentences: "tháng 9" / "September". */
+export const monthName = (ym: string): string =>
+  lang === 'vi' ? `tháng ${Number(ym.slice(5, 7))}` : new Intl.DateTimeFormat('en-GB', { month: 'long', timeZone: 'UTC' }).format(new Date(`${ym}-01T00:00:00Z`));
 /** Compact axis label: "Th8" / "Aug". */
 export const monthShort = (ym: string): string => (lang === 'vi' ? `Th${Number(ym.slice(5, 7))}` : T.months[Number(ym.slice(5, 7)) - 1]);
 
@@ -194,6 +200,105 @@ export function createProvinceChart(canvas: HTMLCanvasElement, provinces: Provin
               const k = series[i.datasetIndex].key;
               return `${i.dataset.label}: ${fmtNum(p[k])} (${fmtNum(Math.round(share(p, k)))}%)`;
             },
+          },
+        },
+      },
+    },
+  });
+}
+
+/** Shades "water rising" before the peak and "water receding" after it, with a dashed peak marker. */
+function phaseBands(peakDate: string, labels: { rise: string; fall: string; peak: string }): Plugin<'line'> {
+  return {
+    id: 'rpPhaseBands',
+    beforeDatasetsDraw: (chart) => {
+      const { ctx, chartArea: a, scales } = chart;
+      const x = scales.x.getPixelForValue(toMs(peakDate));
+      if (!Number.isFinite(x)) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(37, 99, 235, 0.06)';
+      ctx.fillRect(a.left, a.top, Math.max(0, x - a.left), a.bottom - a.top);
+      ctx.fillStyle = 'rgba(13, 148, 136, 0.07)';
+      ctx.fillRect(x, a.top, Math.max(0, a.right - x), a.bottom - a.top);
+      ctx.strokeStyle = '#0f2a4a';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(x, a.top);
+      ctx.lineTo(x, a.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '600 12px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = '#1d4ed8';
+      ctx.textAlign = 'left';
+      if (x - a.left > 90) ctx.fillText(labels.rise, a.left + 8, a.top + 6);
+      ctx.fillStyle = '#0f766e';
+      ctx.textAlign = 'right';
+      if (a.right - x > 90) ctx.fillText(labels.fall, a.right - 8, a.top + 6);
+      ctx.fillStyle = '#0f2a4a';
+      ctx.textAlign = x > a.right - 60 ? 'right' : 'left';
+      ctx.fillText(labels.peak, x + (x > a.right - 60 ? -6 : 6), a.top + 24);
+      ctx.restore();
+    },
+  };
+}
+
+/** One smooth line per orbit: share of observed communes that still had a lot of water. Orbits are never merged. */
+export function createTrendChart(canvas: HTMLCanvasElement, trend: Trend, onPick: (date: string, track: SceneStat['track']) => void): Chart<'line'> {
+  const R = T.reports;
+  const tracks = (['047D', '083A', '148D'] as Track[]).filter((t) => trend.points.some((p) => p.track === t));
+  const plugins: Plugin<'line'>[] = [whiteBg as unknown as Plugin<'line'>];
+  if (trend.peak) plugins.push(phaseBands(trend.peak.date, { rise: R.trendRise, fall: R.trendFall, peak: R.trendPeakMark(fmtShort(trend.peak.date)) }));
+  const datasets = tracks.map((t) => {
+    const pts = trend.points.filter((p) => p.track === t);
+    return {
+      label: R.trackOption(t),
+      data: pts.map((p) => ({ x: toMs(p.date), y: Math.round(p.share * 10) / 10 })),
+      borderColor: TRACK_COLORS[t],
+      backgroundColor: TRACK_COLORS[t],
+      borderWidth: 3,
+      tension: 0.35,
+      pointRadius: 3.5,
+      pointHoverRadius: 6,
+      spanGaps: true,
+      _pts: pts,
+    };
+  });
+  return new Chart(canvas, {
+    type: 'line',
+    plugins,
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: 'nearest', intersect: false },
+      onClick: (_ev, els) => {
+        if (!els.length) return;
+        const p = (datasets[els[0].datasetIndex]._pts)[els[0].index];
+        onPick(p.date, p.track);
+      },
+      onHover: (ev, els) => {
+        const t = ev.native?.target as HTMLElement | undefined;
+        if (t) t.style.cursor = els.length ? 'pointer' : 'default';
+      },
+      scales: {
+        x: { type: 'time', adapters: chartAdapters, time: { unit: 'month', displayFormats: { month: MONTH_FORMAT } }, grid: { display: false } },
+        y: { min: 0, max: 100, grid: { color: GRID }, ticks: { stepSize: 25, callback: (v) => `${v}%` }, title: { display: true, text: R.trendAxis } },
+      },
+      plugins: {
+        legend,
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const p = datasets[items[0].datasetIndex]._pts[items[0].dataIndex];
+              return R.sceneLabel(fmtShort(p.date), p.track);
+            },
+            label: (i) => {
+              const p = datasets[i.datasetIndex]._pts[i.dataIndex];
+              return R.trendTip(fmtNum(Math.round(p.share)), p.high, p.observed);
+            },
+            footer: () => R.openScene,
           },
         },
       },
