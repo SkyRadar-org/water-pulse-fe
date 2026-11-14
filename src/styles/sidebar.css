@@ -1,0 +1,150 @@
+.sidebar {
+  grid-column: 1;
+  grid-row: 1;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  padding: 4px 14px 16px;
+  z-index: 12;
+}
+
+.sb-sec {
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sb-sec:last-of-type {
+  border-bottom: 0;
+}
+
+.sb-sec h3 {
+  margin: 0 0 8px;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+}
+
+.sb-sec h4 {
+  margin: 10px 0 6px;
+  font-size: 12.5px;
+}
+
+.sb-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 6px 0;
+}
+
+.sb-row input {
+  margin-top: 3px;
+  flex: none;
+}
+
+.sb-row label {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.sb-row small {
+  color: var(--ink-2);
+  font-size: 11.5px;
+}
+
+.sb-slider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -2px 0 8px 24px;
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.sb-range {
+  flex: 1;
+  accent-color: var(--brand-2);
+}
+
+.sb-leg {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12.5px;
+}
+
+.sb-leg li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 3px 0;
+}
+
+.sw {
+  flex: none;
+  width: 22px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(15, 23, 42, 0.25);
+}
+
+.sb-note {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+/* map overlays */
+.map-note {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 251, 235, 0.96);
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  z-index: 5;
+  display: none;
+  box-shadow: var(--shadow);
+}
+
+.map-note.show {
+  display: block;
+}
+
+.commune-tip .maplibregl-popup-content {
+  padding: 5px 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.ctrl-fit {
+  font-size: 20px;
+  line-height: 1;
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(300px, 86vw);
+    grid-column: 1;
+    transform: translateX(-102%);
+    transition: transform 0.2s;
+    box-shadow: var(--shadow);
+    z-index: 20;
+  }
+  .sidebar.open {
+    transform: none;
+  }
+  .view-map.active {
+    position: absolute;
+  }
+}

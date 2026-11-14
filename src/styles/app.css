@@ -1,0 +1,428 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--surface-2);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-2);
+  outline-offset: 2px;
+}
+
+a {
+  color: var(--brand-2);
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ---------- Header ---------- */
+.topbar {
+  flex: none;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 16px;
+  background: var(--brand);
+  color: #fff;
+  z-index: 30;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.brand svg {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+
+.brand small {
+  font-weight: 500;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  height: 100%;
+}
+
+.tab {
+  background: none;
+  border: 0;
+  padding: 0 14px;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.75);
+  border-bottom: 3px solid transparent;
+  font-weight: 600;
+}
+
+.tab:hover {
+  color: #fff;
+}
+
+.tab[aria-selected='true'] {
+  color: #fff;
+  border-bottom-color: #60a5fa;
+}
+
+.topbar .spacer {
+  flex: 1;
+}
+
+.topbar .badge {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  white-space: nowrap;
+}
+
+.topbar .badge-demo {
+  background: #f59e0b;
+  color: #1f1300;
+  font-weight: 700;
+}
+
+.hdr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 0;
+  color: #fff;
+  border-radius: 999px;
+  padding: 5px 12px 5px 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hdr-btn:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.hdr-btn .q {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--brand);
+  font-weight: 800;
+}
+
+.lang {
+  display: inline-flex;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lang button {
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 4px 9px;
+  font-weight: 700;
+  font-size: 12.5px;
+}
+
+.lang button[aria-pressed='true'] {
+  background: #fff;
+  color: var(--brand);
+}
+
+.b-short {
+  display: none;
+}
+
+.menu-btn {
+  align-self: center;
+}
+
+.menu-btn,
+.menu-btn[hidden] {
+  display: none !important;
+}
+
+/* ---------- Workspace ---------- */
+.workspace {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.view {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+.view-map.active {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: 1fr auto;
+}
+
+.map-wrap {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+}
+
+.page {
+  height: 100%;
+  overflow: auto;
+  padding: 24px;
+}
+
+.page-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.page h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.page .lead {
+  margin: 0 0 18px;
+  color: var(--ink-2);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  flex: none;
+  min-height: var(--footer-h);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 16px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  z-index: 30;
+}
+
+.footer span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footer button {
+  flex: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--brand-2);
+  text-decoration: underline;
+}
+
+/* ---------- Status chips ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.chip.receded {
+  background: var(--status-receded);
+}
+.chip.not_receded {
+  background: var(--status-not);
+}
+.chip.uncertain {
+  background: var(--status-uncertain);
+}
+.chip.no_flood {
+  background: var(--status-none);
+}
+
+.maturity {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.maturity.provisional {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.maturity.validated {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.loading,
+.error-box {
+  padding: 24px;
+  color: var(--ink-2);
+}
+
+.error-box {
+  color: var(--status-not);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1280px) {
+  .badge-event {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  :root {
+    --sidebar-w: 240px;
+    --panel-w: 340px;
+  }
+}
+
+@media (max-width: 767px) {
+  .topbar {
+    gap: 8px;
+    padding: 4px 8px 0;
+    flex-wrap: wrap;
+    height: auto;
+  }
+  .topbar .tabs {
+    order: 10;
+    width: 100%;
+    height: 40px;
+    overflow-x: auto;
+  }
+  .tab {
+    white-space: nowrap;
+  }
+  .brand small,
+  .topbar .badge:not(.badge-demo) {
+    display: none;
+  }
+  .tab {
+    padding: 0 8px;
+    font-size: 13px;
+  }
+  .menu-btn:not([hidden]) {
+    display: inline-flex !important;
+  }
+  .view-map.active {
+    grid-template-columns: 1fr;
+  }
+  .map-wrap {
+    grid-column: 1;
+  }
+  .page {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  .brand span {
+    display: none;
+  }
+  .hdr-btn-text {
+    display: none;
+  }
+  .hdr-btn {
+    padding: 4px;
+  }
+  .lang button {
+    padding: 4px 6px;
+  }
+  .topbar {
+    gap: 4px;
+  }
+  .topbar .tab {
+    padding: 0 6px;
+    font-size: 12.5px;
+  }
+  .topbar .menu-btn {
+    height: auto;
+    padding: 6px 8px;
+  }
+  .b-long {
+    display: none;
+  }
+  .b-short {
+    display: inline;
+  }
+}

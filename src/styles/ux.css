@@ -1,0 +1,158 @@
+/* Friendly-UX additions: guide, hints, plain-language blocks */
+
+.sb-find {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--surface);
+}
+
+.sb-find-msg {
+  margin: 4px 0 0;
+  min-height: 1em;
+}
+
+.map-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 44px;
+  transform: translateX(-50%);
+  background: rgba(15, 42, 74, 0.92);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  z-index: 5;
+  display: none;
+  pointer-events: none;
+  max-width: calc(100% - 32px);
+  text-align: center;
+}
+
+.map-hint.show {
+  display: block;
+}
+
+.cp-plain {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: #eff6ff;
+  border-left: 4px solid var(--brand-2);
+  border-radius: 6px;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.chip {
+  font-size: 13px;
+  padding: 4px 11px;
+}
+
+.v-plain {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.v-plain .v-list li {
+  font-size: 15px;
+}
+
+.v-details > summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 2px 0;
+}
+
+.v-details[open] > summary {
+  margin-bottom: 12px;
+}
+
+.hero-links {
+  display: inline-flex;
+  gap: 16px;
+}
+
+.hero-actions .link {
+  font-size: 14px;
+}
+
+.guide-card {
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 24px;
+  max-width: 620px;
+  width: 100%;
+  max-height: 94vh;
+  overflow: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.guide-card h2 {
+  margin: 0 0 14px;
+  font-size: 21px;
+}
+
+.guide-steps {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.guide-steps li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin: 14px 0;
+}
+
+.guide-steps b {
+  font-size: 16px;
+}
+
+.guide-steps p {
+  margin: 2px 0 0;
+  color: var(--ink-2);
+}
+
+.guide-n {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand-2);
+  color: #fff;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary.solid {
+  background: var(--brand-2);
+  color: #fff;
+}
+
+.btn-primary.solid:hover {
+  background: #1e40af;
+}
+
+.tl-legend-note {
+  flex-basis: 100%;
+  margin-left: 0 !important;
+  font-size: 12.5px;
+}
+
+@media (max-width: 767px) {
+  .tl-legend-note {
+    display: block !important;
+  }
+  .map-hint {
+    bottom: 12px;
+    font-size: 13px;
+  }
+}
