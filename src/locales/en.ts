@@ -1,9 +1,11 @@
+import { enOverview } from './overview.ts';
 import type { CommuneProps, CommuneStatus, Maturity } from '../data/types.ts';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const areaNote = 'Areas refer to observed commune coverage; absolute km² are indicative. Permanent water is excluded.';
 
 export const en = {
+  ...enOverview,
   htmlLang: 'en',
   pageTitle: 'SkyRadar · NISAR Water Pulse',
   app: {
@@ -23,12 +25,12 @@ export const en = {
     langTip: 'Language',
     sections: 'Sections',
   },
-  tabs: { map: 'Map', communes: 'Communes', validation: 'Validation', about: 'About' },
+  tabs: { overview: 'Overview', map: 'Map', communes: 'Communes', validation: 'Validation', about: 'About' },
   maturity: { provisional: 'Provisional', validated: 'Validated' } as Record<Maturity, string>,
   status: {
-    receded: { long: 'Ready: below 10% water', short: 'Ready', icon: '✓' },
+    receded: { long: 'Low water: below 10%', short: 'Low water', icon: '✓' },
     not_receded: { long: 'Still wet (≥30% water)', short: 'Still wet', icon: '!' },
-    uncertain: { long: 'Draining or insufficient coverage', short: 'Draining / unknown', icon: '?' },
+    uncertain: { long: '10–30% water or insufficient coverage', short: 'Moderate / unknown', icon: '?' },
     no_flood: { long: 'No significant flooding', short: 'No flooding', icon: '–' },
   } as Record<CommuneStatus, { long: string; short: string; icon: string }>,
   months,
@@ -44,9 +46,9 @@ export const en = {
     layers: 'Map layers',
     opacity: 'Opacity',
     rows: {
-      radar: { label: 'Radar image (NISAR)', hint: 'Satellite radar picture from NASA' },
+      radar: { label: 'Radar image (NISAR)', hint: 'Processed local radar image aligned to the water layer' },
       water: { label: 'Water detected', hint: 'Where our NISAR analysis finds water' },
-      communes: { label: 'Communes', hint: 'Colour = share of land under water' },
+      communes: { label: 'Communes', hint: 'Latest per commune or the selected image, depending on the mode' },
       provinces: { label: 'Provinces', hint: 'Boundaries and names' },
       basemap: { label: 'Base map', hint: '© Esri · © OpenStreetMap contributors' },
     },
@@ -72,8 +74,17 @@ export const en = {
   },
 
   map: {
+    modeLabel: 'Map observation mode',
+    latestMode: 'Latest per commune',
+    sceneMode: 'One satellite image',
+    latestTitle: 'Where does water remain before winter–spring sowing?',
+    latestCoverage: (n: number, total: number, start: string, end: string) => `${n}/${total} communes have sufficient coverage. Observations: ${start} – ${end}, with a separate date for each commune. This is an end-of-season snapshot, not live conditions.`,
+    sceneTitle: (date: string, track: string) => `Observed on ${date} · orbit ${track}`,
+    coverageLoading: 'Checking image coverage…',
+    sceneCoverage: (n: number, total: number) => `This image contains observations for ${n}/${total} communes. Grey communes have no observation in this image; that does not mean they are dry. Select a commune to find its latest observation.`,
+    latestTip: (name: string, pct: number | undefined, date: string) => `${name} · ${pct === undefined ? 'Insufficient image coverage to assess' : `${pct}% water · observed ${date}`}`,
     fitTip: 'Zoom to study area',
-    radarMissing: 'Radar preview may be missing for this date',
+    radarMissing: 'The radar image could not load. Commune data remains available.',
     hint: 'Click a commune on the map to see its details',
     tip: (name: string, pct: number | undefined): string => `${name} · ${pct === undefined ? 'no data for this image' : `${Math.round(pct)}% water`}`,
   },
@@ -100,6 +111,15 @@ export const en = {
   },
 
   panel: {
+    noObservationAction: 'No observation is available in this dataset. Check locally; this does not establish dry conditions.',
+    partialAction: 'Only part of this commune was observed. The percentage applies to that observed area; it is insufficient for a commune-wide assessment.',
+    partialEvidence: 'Partial observation; insufficient for a commune-wide assessment',
+    history: 'View seasonal history and evidence',
+    latestEvidence: 'Latest assessment for this commune',
+    observationNote: 'Each commune has its own observation date. These are not live conditions.',
+    outsideScene: 'This image has no observation for this commune. This panel shows the latest available assessment; missing coverage is not a dry observation.',
+    inScene: (pct: string, date: string) => `Selected image: ${pct} water on ${date}. The commune summary below uses its latest assessment.`,
+    viewReference: (date: string) => `View the image from ${date}`,
     region: 'Commune details',
     close: 'Close commune panel',
     loading: 'Loading commune…',
@@ -107,7 +127,7 @@ export const en = {
     first: 'First flooded',
     firstHint: '20% of land or more under water',
     peak: 'Peak',
-    drained: 'Water drained',
+    drained: 'Below half the peak',
     notYet: 'Not yet',
     asOfLast: 'as of the last image',
     belowHalf: 'fell below half of the peak',
@@ -118,13 +138,13 @@ export const en = {
     tipLine: (pct: number, km2: number, valid: number): string => `${pct}% water · ${km2 ?? "—"} km² of ${valid ?? "—"} km²`,
     track: (t: string): string => `Track ${t}`,
     noObservations: 'No observations are available for this commune.',
-    summary: (p: CommuneProps, f: { first: string; peak: string; last: string; rec: string; recBeforeSowing: boolean }): string => {
+    summary: (p: CommuneProps, f: { first: string; peak: string; last: string; rec: string }): string => {
       if (p.status === 'no_flood') return `${p.name} had no significant flooding this season (highest ${p.peak_pct}% of land under water, on ${f.peak}).`;
       let s = `${p.name} first passed 20% under water on ${f.first}, peaked at ${p.peak_pct}% on ${f.peak}, and at the last image (${f.last}) it stood at ${p.last_pct}%. `;
       if (p.coverage_sufficient === false) s += 'Coverage is insufficient for a sowing assessment.';
-      else if (p.status === 'not_receded') s += 'At least 30% water remains on the latest image covering half the commune; sowing may be delayed.';
+      else if (p.status === 'not_receded') s += 'At least 30% water remains on the latest image covering half the commune; compare with field conditions before planning sowing.';
       else if (p.status === 'receded') s += 'Water covers less than 10% on the latest image covering half the commune.';
-      else s += 'Water covers 10–30% on the latest covering image; drainage is still in progress.';
+      else s += 'Water covers 10–30% on the latest covering image; compare further observations on the same orbit before judging the trend.';
       return s;
     },
     note: (km2: number | null, valid: number | null): string =>
@@ -142,7 +162,7 @@ export const en = {
     allStatuses: 'All statuses',
     count: (n: number, total: number): string => `${n} of ${total} communes`,
     export: 'Export CSV',
-    cols: { name: 'Commune', province: 'Province', peak_pct: 'Peak %', peak_date: 'Peak date', first_flood_date: 'First flooded', recession_date: 'Drained', last_pct: 'Last %', status: 'Status' },
+    cols: { name: 'Commune', province: 'Province', peak_pct: 'Peak %', peak_date: 'Peak date', first_flood_date: 'First flooded', recession_date: 'Drained', last_pct: 'Last %', last_date: 'Observed on', status: 'Status' },
     notYet: 'Not yet',
     empty: 'No commune matches these filters.',
     row: (name: string, status: string): string => `${name}, ${status}. Open on map`,
@@ -211,11 +231,11 @@ export const en = {
   guide: {
     title: 'How to use this map in 3 steps',
     steps: [
-      { t: 'Choose a date', d: 'Click a dot on the time bar at the bottom, or press ▶ to watch the flood change through the season.' },
-      { t: 'Click a commune', d: 'Click a commune on the map, or type its name in "Find a commune", to see its details.' },
-      { t: 'Read the result', d: 'The darker the blue, the more of the commune is under water. A red label "Still flooded after 1 Nov" means sowing may be late.' },
+      { t: 'Find a commune or choose a group', d: 'Start in Overview and enter a commune name or select the high-water group. Each observation has its own date.' },
+      { t: 'Read the result and next check', d: 'Check water fraction, date and image coverage. Insufficient observations do not establish dry conditions.' },
+      { t: 'Open the image as evidence', d: 'Choose View the image from… to open the correct acquisition. Expand seasonal history when you need to compare observations.' },
     ],
-    tip: 'Tip: use the Layers panel to switch layers, and "Whole-season summary" to see the entire season on one map.',
+    tip: 'Use the results to prioritize local checks before winter–spring sowing. Compare observation dates with field conditions before deciding.',
     close: 'Got it',
   },
 

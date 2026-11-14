@@ -1,6 +1,6 @@
 import type { SummaryLayer, Track } from './data/types.ts';
 
-export type Tab = 'map' | 'communes' | 'validation' | 'about';
+export type Tab = 'overview' | 'map' | 'communes' | 'validation' | 'about';
 export type TrackFilter = 'all' | Track;
 export type SummaryId = SummaryLayer['id'] | null;
 
@@ -20,6 +20,7 @@ export interface Opacities {
 
 export interface State {
   tab: Tab;
+  mapMode: 'latest' | 'scene';
   trackFilter: TrackFilter;
   selectedDate: string;
   selectedTrack: Track;
@@ -45,14 +46,15 @@ function restoredSnapshot(): Partial<State> {
 }
 
 export const state: State = {
-  tab: 'map',
+  tab: 'overview',
+  mapMode: 'latest',
   trackFilter: 'all',
-  selectedDate: '2026-09-21',
-  selectedTrack: '047D',
+  selectedDate: '',
+  selectedTrack: '148D',
   selectedCommune: null,
   flyNonce: 0,
   activeSummary: null,
-  layers: { basemap: true, radar: true, water: true, communes: true, provinces: true },
+  layers: { basemap: true, radar: false, water: true, communes: true, provinces: true },
   opacity: { radar: 0.85, water: 0.9, communes: 0.6 },
   playing: false,
   radarMissing: false,

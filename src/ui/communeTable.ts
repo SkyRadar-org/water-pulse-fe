@@ -7,7 +7,7 @@ import { STATUS_ICON, STATUS_LABEL, STATUS_SHORT } from '../palette.ts';
 import { set, state } from '../state.ts';
 import { h } from './dom.ts';
 
-type SortKey = 'name' | 'province' | 'peak_pct' | 'peak_date' | 'first_flood_date' | 'recession_date' | 'last_pct' | 'status';
+type SortKey = 'name' | 'province' | 'peak_pct' | 'peak_date' | 'first_flood_date' | 'recession_date' | 'last_pct' | 'last_date' | 'status';
 
 const COLUMNS: { key: SortKey; numeric?: boolean }[] = [
   { key: 'name' },
@@ -17,6 +17,7 @@ const COLUMNS: { key: SortKey; numeric?: boolean }[] = [
   { key: 'first_flood_date' },
   { key: 'recession_date' },
   { key: 'last_pct', numeric: true },
+  { key: 'last_date' },
   { key: 'status' },
 ];
 
@@ -102,7 +103,7 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
   }
 
   function open(c: CommuneProps) {
-    set({ tab: 'map', selectedCommune: c.osm_id, flyNonce: state.flyNonce + 1 });
+    set({ tab: 'map', mapMode: 'latest', activeSummary: null, playing: false, selectedCommune: c.osm_id, flyNonce: state.flyNonce + 1 });
     location.hash = 'map';
   }
 
@@ -122,6 +123,7 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
           h('td', { text: c.first_flood_date ? fmtDate(c.first_flood_date) : '—' }),
           h('td', { text: c.recession_date ? fmtDate(c.recession_date) : c.last_pct === null || c.status === 'no_flood' ? '—' : T.table.notYet }),
           h('td', { class: 'num', text: fmtPct(c.last_pct) }),
+          h('td', { text: fmtDate(c.last_date) }),
           h('td', {}, h('span', { class: `chip ${c.status}`, text: `${STATUS_ICON(c.status)} ${STATUS_SHORT(c.status)}`, title: STATUS_LABEL(c.status) })),
         );
         tr.addEventListener('click', () => open(c));

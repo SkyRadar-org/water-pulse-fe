@@ -3,10 +3,10 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { AOI, MAP_CENTER, MAP_ZOOM } from '../config.ts';
 import { getChoropleth, getCommunes, getScenes, getSummaryLayers } from '../data/dataSource.ts';
 import { T } from '../i18n.ts';
-import type { Scene, SummaryLayer } from '../data/types.ts';
+import type { CommuneCollection, Scene, SummaryLayer } from '../data/types.ts';
+import { latestValues } from '../data/observations.ts';
 import { set, state, subscribe, type State } from '../state.ts';
 import { addCommunes, type CommunesLayer } from './communesLayer.ts';
-import { gibsTiles } from './gibs.ts';
 import { addGeoLayers, addImageLayers, baseStyle, setSummaryLayer, setWaterScene } from './layers.ts';
 
 export interface MapView {
@@ -19,7 +19,7 @@ export function mountMap(container: HTMLElement): MapView {
   maplibregl.setWorkerUrl(workerUrl);
   const map = new maplibregl.Map({
     container,
-    style: baseStyle(state.selectedDate),
+    style: baseStyle(),
     center: MAP_CENTER,
     zoom: MAP_ZOOM,
     minZoom: 3,
@@ -57,6 +57,7 @@ export function mountMap(container: HTMLElement): MapView {
   let scenes: Scene[] = [];
   let summaries: SummaryLayer[] = [];
   let communes: CommunesLayer | null = null;
+  let collection: CommuneCollection | null = null;
   let ready = false;
   let requestToken = 0;
 
@@ -67,10 +68,11 @@ export function mountMap(container: HTMLElement): MapView {
   }
 
   function applyLook(s: State) {
-    const summaryOn = s.activeSummary !== null;
+    const summaryOn = s.mapMode === 'scene' && s.activeSummary !== null;
+    const singleImage = s.mapMode === 'scene';
     vis('basemap', s.layers.basemap);
-    vis('radar', s.layers.radar && !summaryOn);
-    vis('water', s.layers.water && !summaryOn);
+    vis('radar', singleImage && s.layers.radar && !summaryOn);
+    vis('water', singleImage && s.layers.water && !summaryOn);
     vis('summary', summaryOn);
     vis('provinces', s.layers.provinces);
     vis('province-labels', s.layers.provinces);
@@ -81,12 +83,16 @@ export function mountMap(container: HTMLElement): MapView {
   }
 
   async function applyScene(s: State) {
+    const token = ++requestToken;
+    communes?.setMode(s.mapMode);
+    if (s.mapMode === 'latest' && collection) {
+      communes?.setChoropleth(latestValues(collection));
+      return;
+    }
     const scene = sceneOf(s);
     if (!scene) return;
-    const token = ++requestToken;
-    gibsLoaded = 0;
-    gibsErrors = 0;
-    (map.getSource('gibs') as maplibregl.RasterTileSource).setTiles(gibsTiles(scene.gibsDate ?? scene.date));
+    // Clear the previous acquisition while the next JSON is loading.
+    communes?.setChoropleth({});
     set({ radarMissing: false });
     setWaterScene(map, scene);
     try {
@@ -102,20 +108,21 @@ export function mountMap(container: HTMLElement): MapView {
     setSummaryLayer(map, layer);
   }
 
-  // GIBS answers with an error for dates it does not serve; only warn when no tile at all could be loaded.
-  let gibsLoaded = 0;
-  let gibsErrors = 0;
-  map.on('sourcedata', (e) => {
-    const ev = e as unknown as { sourceId?: string; tile?: { state?: string } };
-    if (ev.sourceId === 'gibs' && ev.tile?.state === 'loaded') gibsLoaded++;
-  });
+  function flyToCommune(id: string) {
+    const b = communes?.bounds(id);
+    if (!b) return;
+    map.resize();
+    const mobile = window.innerWidth < 768;
+    map.fitBounds(b, {
+      padding: { top: mobile ? 16 : 60, bottom: mobile ? Math.round(container.clientHeight * 0.62) + 8 : 40, left: mobile ? 16 : 40, right: mobile ? 16 : 480 },
+      maxZoom: 11,
+      duration: 700,
+    });
+  }
+
   map.on('error', (e) => {
     const err = e as unknown as { sourceId?: string };
-    if (err.sourceId === 'gibs') gibsErrors++;
-  });
-  map.on('idle', () => {
-    const missing = gibsErrors > 0 && gibsLoaded === 0;
-    if (missing !== state.radarMissing) set({ radarMissing: missing });
+    if (err.sourceId === 'radar-image') set({ radarMissing: true });
   });
 
   map.on('load', async () => {
@@ -124,6 +131,7 @@ export function mountMap(container: HTMLElement): MapView {
       const first = sceneOf(state) ?? scenes[0];
       addImageLayers(map, first);
       const data = await getCommunes();
+      collection = data;
       communes = addCommunes(map, data, { onSelect: (osmId) => set({ selectedCommune: osmId }) });
       await addGeoLayers(map);
       ready = true;
@@ -131,10 +139,7 @@ export function mountMap(container: HTMLElement): MapView {
       if (state.activeSummary) applySummary(state);
       if (state.selectedCommune) communes.setSelected(state.selectedCommune);
       await applyScene(state);
-      scenes.forEach((sc) => {
-        const img = new Image();
-        img.src = sc.waterPng; // warm the cache so Play does not flicker
-      });
+      if (state.tab === 'map' && state.selectedCommune && state.flyNonce > 0) flyToCommune(state.selectedCommune);
     } catch (err) {
       console.error(err);
     }
@@ -143,22 +148,14 @@ export function mountMap(container: HTMLElement): MapView {
   subscribe((s, prev) => {
     if (s.tab === 'map' && prev.tab !== 'map') map.resize();
     if (!ready) return;
-    if (s.selectedDate !== prev.selectedDate || s.selectedTrack !== prev.selectedTrack) void applyScene(s);
-    if (s.layers !== prev.layers || s.opacity !== prev.opacity || s.activeSummary !== prev.activeSummary) {
+    if (s.selectedDate !== prev.selectedDate || s.selectedTrack !== prev.selectedTrack || s.mapMode !== prev.mapMode) void applyScene(s);
+    if (s.layers !== prev.layers || s.opacity !== prev.opacity || s.activeSummary !== prev.activeSummary || s.mapMode !== prev.mapMode) {
       if (s.activeSummary !== prev.activeSummary) applySummary(s);
       applyLook(s);
     }
     if (s.selectedCommune !== prev.selectedCommune) communes?.setSelected(s.selectedCommune);
     if (s.flyNonce !== prev.flyNonce && s.selectedCommune) {
-      const b = communes?.bounds(s.selectedCommune);
-      if (b) {
-        const mobile = window.innerWidth < 768;
-        map.fitBounds(b, {
-          padding: { top: 60, bottom: mobile ? Math.round(window.innerHeight * 0.55) : 40, left: 40, right: mobile ? 40 : 480 },
-          maxZoom: 11,
-          duration: 1200,
-        });
-      }
+      flyToCommune(s.selectedCommune);
     }
   });
 

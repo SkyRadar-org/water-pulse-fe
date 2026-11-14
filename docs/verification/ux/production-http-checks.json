@@ -1,0 +1,89 @@
+{
+  "verified_at": "2026-11-14T11:16:58.991059+07:00",
+  "host": "https://nisar-flood.skyradar.vn",
+  "assessment_groups": [
+    38,
+    40,
+    53,
+    9
+  ],
+  "assessed": 131,
+  "communes": 140,
+  "scenes": 33,
+  "an_long": {
+    "pct": 51.7,
+    "date": "2026-10-29",
+    "track": "083A",
+    "absent_in_2026_11_03": true
+  },
+  "production_bundle_matches_local": true,
+  "script": "/assets/index-DSUorx-j.js",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 910
+    },
+    {
+      "path": "/health",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 42
+    },
+    {
+      "path": "/api/frontend/scenes",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 8804
+    },
+    {
+      "path": "/api/frontend/communes",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 253509
+    },
+    {
+      "path": "/api/frontend/choropleth?date=2026-11-03&track=148D",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 775
+    },
+    {
+      "path": "/api/frontend/communes/15581562/series",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 1968
+    },
+    {
+      "path": "/api/frontend/validation",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 4375
+    },
+    {
+      "path": "/api/unknown",
+      "status": 404,
+      "content_type": "application/json",
+      "bytes": 22
+    },
+    {
+      "path": "/static/radar/2026-10-29_083A.jpg",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "bytes": 566089
+    },
+    {
+      "path": "/static/water/2026-10-29_083A.png",
+      "status": 200,
+      "content_type": "image/png",
+      "bytes": 418467
+    },
+    {
+      "path": "/assets/index-DSUorx-j.js",
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8",
+      "bytes": 1294736
+    }
+  ]
+}

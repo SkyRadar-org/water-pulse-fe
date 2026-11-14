@@ -1,12 +1,14 @@
 import * as maplibregl from 'maplibre-gl';
 import type { Choropleth, CommuneCollection } from '../data/types.ts';
 import { T } from '../i18n.ts';
+import { fmtDate } from '../format.ts';
 import { CHORO_COLORS, NO_DATA_COLOR } from '../palette.ts';
 
 const SRC = 'communes';
 
 export interface CommunesLayer {
   setChoropleth(values: Choropleth): void;
+  setMode(mode: 'latest' | 'scene'): void;
   setSelected(osmId: string | null): void;
   setOpacity(v: number): void;
   setVisible(v: boolean): void;
@@ -54,6 +56,7 @@ export function addCommunes(
   const values: Choropleth = {};
   let hovered: string | null = null;
   let selected: string | null = null;
+  let mode: 'latest' | 'scene' = 'latest';
 
   const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10, className: 'commune-tip' });
 
@@ -76,7 +79,9 @@ export function addCommunes(
     const v = values[id];
     const props = geoms.get(id)?.properties;
     const el = document.createElement('div');
-    el.textContent = T.map.tip(props?.name ?? id, v);
+    el.textContent = mode === 'latest'
+      ? T.map.latestTip(props?.name ?? id, v, fmtDate(props?.last_date ?? null))
+      : T.map.tip(props?.name ?? id, v);
     popup.setLngLat(e.lngLat).setDOMContent(el).addTo(map);
     map.getCanvas().style.cursor = 'pointer';
   });
@@ -87,6 +92,13 @@ export function addCommunes(
   });
 
   return {
+    setMode(next) {
+      mode = next;
+      clearHover();
+      map.setPaintProperty('communes-fill', 'fill-color', next === 'latest'
+        ? ['step', pct, NO_DATA_COLOR, 0, '#15803d', 10, '#d97706', 30, '#dc2626']
+        : ['step', pct, NO_DATA_COLOR, 0, CHORO_COLORS[0], 20, CHORO_COLORS[1], 40, CHORO_COLORS[2], 60, CHORO_COLORS[3], 80, CHORO_COLORS[4]]);
+    },
     setChoropleth(next) {
       for (const id of geoms.keys()) {
         const v = next[id];

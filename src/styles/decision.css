@@ -1,0 +1,77 @@
+/* [Codex] Decision first; acquisition controls stay behind a deliberate mode change. */
+[hidden] { display: none !important; }
+.view-map.active { grid-template-rows: auto minmax(0, 1fr) auto; }
+.map-context { grid-column: 1 / -1; grid-row: 1; background: #fff; border-bottom: 1px solid var(--line); padding: 12px 18px; }
+.map-context-heading { display: flex; gap: 16px; justify-content: space-between; align-items: center; }
+.map-context h1 { font-size: 19px; margin: 0; line-height: 1.3; }
+.map-context p { margin: 6px 0 0; color: var(--ink-2); font-size: 12px; max-width: 1100px; }
+.map-mode { display: flex; flex: none; background: #eef2f6; padding: 3px; border-radius: 8px; }
+.map-mode button { border: 0; background: transparent; padding: 7px 12px; font-size: 12px; border-radius: 6px; min-height: 36px; }
+.map-mode button[aria-pressed='true'] { background: var(--brand); color: #fff; }
+.view-map > .sidebar, .view-map > .map-wrap { grid-row: 2; }
+.view-map > .timeline { grid-row: 3; }
+.view-map.latest-mode { grid-template-rows: auto minmax(0, 1fr); }
+.view-map.latest-mode > .timeline { display: none; }
+.cp-label { margin: 16px 0 0; font-size: 12px; color: var(--ink-2); }
+.cp-latest { display: flex; align-items: baseline; gap: 14px; padding: 2px 0; }
+.cp-latest strong { font-size: 38px; line-height: 1.3; }
+.cp-latest span { font-size: 14px; }
+.cp-next { margin: 10px 0; padding: 12px; background: #eff6ff; border-radius: 8px; font-weight: 600; }
+.cp-evidence { font-size: 12px; padding: 10px 0; color: var(--ink-2); }
+.cp-history { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 12px; }
+.cp-history summary, .ov-explanation summary { cursor: pointer; font-weight: 600; }
+.cp-history .cp-stats { margin-top: 12px; }
+.cp-view-image { width: 100%; min-height: 40px; }
+.ov-footnote { margin: 0; max-width: 900px; }
+.ov-explanation { background: white; padding: 14px; border: 1px solid var(--line); border-radius: 8px; }
+.ov-explanation .ov-bottom-grid { margin-top: 18px; }
+.ov-cards-grid { gap: 12px; }
+.ov-card { padding: 14px; }
+.ov-card-title { font-size: 14px; }
+.ov-card-badge { font-size: 11px; }
+.ov-card-number { font-size: 34px; }
+.ov-card-desc { font-size: 12px; }
+.ov-hero { box-shadow: none; }
+.ov-snapshot-banner { padding: 10px 12px; }
+.ov-quick-find { display: flex; gap: 8px; margin-top: 14px; }
+.ov-quick-find input { flex: 1; min-width: 0; border: 1px solid #94a3b8; border-radius: 8px; padding: 9px 12px; }
+.ov-inner { gap: 20px; }
+.ov-card { min-height: 170px; }
+.topbar { gap: 12px; }
+@media (max-width: 1150px) {
+  .brand small { display: none; }
+  .tab { padding: 0 10px; }
+  .map-context-heading { flex-wrap: wrap; gap: 8px; }
+}
+@media (max-width: 767px) {
+  .map-context { padding: 10px; }
+  .map-context h1 { font-size: 16px; }
+  .map-mode { width: 100%; }
+  .map-mode button { flex: 1; padding: 6px; }
+  .map-context p { font-size: 11px; }
+  .view-map > .sidebar { grid-row: 2; }
+  .ov-inner { gap: 18px; }
+  .ov-title { font-size: 23px; }
+  .ov-hero { padding: 16px; }
+  .ov-hero-top { margin-bottom: 6px; }
+  .ov-audience-tag { display: none; }
+  .ov-lead { font-size: 13px; margin-bottom: 10px; }
+  .ov-snapshot-banner { grid-template-columns: 1fr 1fr; padding: 8px; }
+  .ov-snapshot-sub, .ov-hero-actions { display: none; }
+  .ov-snapshot-k { display: block; font-size: 10px; text-transform: none; line-height: 1.25; }
+  .ov-snapshot-v { font-size: 13px; }
+  .ov-section-sub { font-size: 12px; }
+  .ov-section-title { font-size: 18px; }
+  .ov-snapshot-banner { gap: 10px; }
+  .ov-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ov-card-head { flex-wrap: wrap; }
+  .ov-card-title { font-size: 13px; }
+  .ov-card-desc, .ov-card-action { display: none; }
+  .ov-card-number { font-size: 30px; }
+  .ov-card { min-height: 125px; }
+  .ov-table th:nth-child(2), .ov-table td:nth-child(2), .ov-table th:nth-child(5), .ov-table td:nth-child(5) { display: none; }
+  .ov-table { min-width: 0; }
+  .ov-table th, .ov-table td { padding: 10px 6px; font-size: 12px; }
+  .ov-row-btn { font-size: 12px; white-space: normal; }
+  .ov-track-tag { display: none; }
+}

@@ -7,6 +7,8 @@ import './styles/panel.css';
 import './styles/table.css';
 import './styles/pages.css';
 import './styles/ux.css';
+import './styles/overview.css';
+import './styles/decision.css';
 import { DATA_MODE } from './config.ts';
 import { getScenes, getSummaryLayers } from './data/dataSource.ts';
 import { lang, switchLang, T, type Lang } from './i18n.ts';
@@ -17,12 +19,13 @@ import { mountCommunePanel } from './ui/communePanel.ts';
 import { mountCommuneTable } from './ui/communeTable.ts';
 import { h } from './ui/dom.ts';
 import { openGuide } from './ui/guide.ts';
-import { maybeShowHero } from './ui/hero.ts';
+import { mountOverview } from './ui/overview.ts';
+import { mountMapContext } from './ui/mapContext.ts';
 import { mountSidebar } from './ui/sidebar.ts';
 import { mountTimeline } from './ui/timeline.ts';
 import { mountValidation } from './ui/validation.ts';
 
-const TABS: Tab[] = ['map', 'communes', 'validation', 'about'];
+const TABS: Tab[] = ['overview', 'map', 'communes', 'validation', 'about'];
 
 const LOGO = `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#1d4ed8"/><path d="M5 18c3-4 6-4 9 0s6 4 9 0 3-2 4-1" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M5 12c3-4 6-4 9 0s6 4 9 0 3-2 4-1" stroke="#93c5fd" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
 
@@ -51,6 +54,7 @@ function buildShell(root: HTMLElement) {
       if (l === lang) return;
       switchLang(l, {
         selectedDate: state.selectedDate,
+        mapMode: state.mapMode,
         selectedTrack: state.selectedTrack,
         selectedCommune: state.selectedCommune,
         trackFilter: state.trackFilter,
@@ -69,6 +73,7 @@ function buildShell(root: HTMLElement) {
   const header = h('header', { class: 'topbar' }, brand, tabs, h('div', { class: 'spacer' }), menuBtn, modeBadge, guideBtn, langBox, h('span', { class: 'badge badge-event', text: T.app.event }));
 
   const views: Record<Tab, HTMLElement> = {
+    overview: h('section', { class: 'view', id: 'view-overview' }),
     map: h('section', { class: 'view view-map', id: 'view-map' }),
     communes: h('section', { class: 'view', id: 'view-communes' }),
     validation: h('section', { class: 'view', id: 'view-validation' }),
@@ -87,14 +92,19 @@ function buildShell(root: HTMLElement) {
 
 function tabFromHash(): Tab {
   const id = location.hash.replace('#', '') as Tab;
-  return TABS.includes(id) ? id : 'map';
+  return TABS.includes(id) ? id : 'overview';
 }
 
 async function buildMapView(view: HTMLElement, menuBtn: HTMLElement) {
   const [scenes, summaries] = await Promise.all([getScenes(), getSummaryLayers()]);
+  if (!scenes.some(s => s.date === state.selectedDate && s.track === state.selectedTrack)) {
+    const latest = [...scenes].sort((a, b) => a.date.localeCompare(b.date)).at(-1);
+    if (latest) set({ selectedDate: latest.date, selectedTrack: latest.track });
+  }
   if (state.activeSummary && !summaries.some((l) => l.id === state.activeSummary)) set({ activeSummary: null });
 
   const sidebar = h('aside', { 'aria-label': T.app.menu });
+  const context = h('section');
   const mapEl = h('div', { id: 'map' });
   const note = h('div', { class: 'map-note', role: 'status', text: T.map.radarMissing });
   const hint = h('div', { class: 'map-hint', text: T.map.hint });
@@ -102,18 +112,20 @@ async function buildMapView(view: HTMLElement, menuBtn: HTMLElement) {
   const timeline = h('div', { 'aria-label': T.timeline.region });
   const panel = h('aside', {});
   mapWrap.append(panel);
-  view.append(sidebar, mapWrap, timeline);
+  view.append(context, sidebar, mapWrap, timeline);
 
   mountSidebar(sidebar, summaries);
   mountTimeline(timeline, scenes);
   mountCommunePanel(panel, scenes);
   mountMap(mapEl);
+  await mountMapContext(context, scenes);
 
   menuBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
   mapWrap.addEventListener('pointerdown', () => sidebar.classList.remove('open'));
 
   const sync = () => {
-    note.classList.toggle('show', state.radarMissing && state.layers.radar && state.activeSummary === null);
+    view.classList.toggle('latest-mode', state.mapMode === 'latest');
+    note.classList.toggle('show', state.mapMode === 'scene' && state.radarMissing && state.layers.radar && state.activeSummary === null);
     hint.classList.toggle('show', state.selectedCommune === null);
   };
   subscribe(sync);
@@ -135,11 +147,11 @@ function main() {
   render();
 
   mountCommuneTable(shell.views.communes);
+  mountOverview(shell.views.overview);
   mountValidation(shell.views.validation);
   mountAbout(shell.views.about);
 
   buildMapView(shell.views.map, shell.menuBtn)
-    .then(maybeShowHero)
     .catch((err: unknown) => {
       console.error(err);
       shell.views.map.replaceChildren(h('div', { class: 'error-box', text: `${T.app.loadError} ${err instanceof Error ? err.message : ''}` }));

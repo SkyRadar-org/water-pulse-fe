@@ -49,7 +49,8 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
       findMsg.textContent = '';
       return;
     }
-    const hit = communes.find((c) => fold(c.name) === q) ?? communes.find((c) => fold(c.name).startsWith(q));
+    const matches = communes.filter(c => fold(c.name).includes(q));
+    const hit = communes.find((c) => fold(c.name) === q || fold(c.name).replace(/^(xa|phuong|thi tran)\s+/, '') === q) ?? (matches.length === 1 ? matches[0] : undefined);
     if (!hit) {
       findMsg.textContent = T.sidebar.findNone;
       return;
@@ -67,19 +68,24 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
   // ---- layers ----
   const layerSection = h('section', { class: 'sb-sec' }, h('h3', { text: T.sidebar.layers }));
   const toggles = new Map<RowKey, HTMLInputElement>();
+  const sceneControls: HTMLElement[] = [];
   for (const row of ROWS) {
     const id = `layer-${row.key}`;
     const text = T.sidebar.rows[row.key];
     const input = h('input', { type: 'checkbox', id });
     input.addEventListener('change', () => set({ layers: { ...state.layers, [row.key]: input.checked } }));
     toggles.set(row.key, input);
-    layerSection.append(h('div', { class: 'sb-row' }, input, h('label', { for: id }, h('b', { text: text.label }), h('small', { text: text.hint }))));
+    const rowEl = h('div', { class: 'sb-row' }, input, h('label', { for: id }, h('b', { text: text.label }), h('small', { text: text.hint })));
+    layerSection.append(rowEl);
+    if (row.key === 'radar' || row.key === 'water') sceneControls.push(rowEl);
     if (row.opacity) {
       const slider = h('input', { type: 'range', min: '0', max: '100', step: '5', class: 'sb-range', 'aria-label': `${text.label}: ${T.sidebar.opacity}` });
       slider.addEventListener('input', () => set({ opacity: { ...state.opacity, [row.opacity!]: Number(slider.value) / 100 } }));
       slider.dataset.opacity = row.opacity;
       slider.value = String(Math.round(state.opacity[row.opacity] * 100));
-      layerSection.append(h('div', { class: 'sb-slider' }, h('span', { text: T.sidebar.opacity }), slider));
+      const sliderEl = h('div', { class: 'sb-slider' }, h('span', { text: T.sidebar.opacity }), slider);
+      layerSection.append(sliderEl);
+      if (row.key === 'radar' || row.key === 'water') sceneControls.push(sliderEl);
     }
   }
 
@@ -113,6 +119,16 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
       legend.append(h('h4', { text: t.title }), h('ul', { class: 'sb-leg' }, ...t.legend.map((l) => swatch(l.color, l.label))));
       return;
     }
+    if (s.mapMode === 'latest') {
+      legend.append(h('h4', { text: T.map.latestMode }),
+        h('ul', { class: 'sb-leg' },
+          swatch('#dc2626', T.overview.cards.highTitle + ' · ≥30%'),
+          swatch('#d97706', T.overview.cards.mediumTitle + ' · 10–<30%'),
+          swatch('#15803d', T.overview.cards.lowTitle + ' · <10%'),
+          swatch(NO_DATA_COLOR, T.overview.cards.insufficientTitle)),
+        h('p', { class: 'note', text: T.panel.observationNote }));
+      return;
+    }
     legend.append(
       h('h4', { text: T.sidebar.legend.share }),
       h('ul', { class: 'sb-leg' }, ...CHORO_COLORS.map((c, i) => swatch(c, CHORO_LABELS[i])), swatch(NO_DATA_COLOR, T.sidebar.legend.noData)),
@@ -123,11 +139,14 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
   }
 
   let lastSummary: string | null | undefined;
+  let lastMode: string | undefined;
   function sync(s: State) {
+    sceneControls.forEach(el => el.hidden = s.mapMode !== 'scene');
     for (const [k, el] of toggles) el.checked = s.layers[k];
     for (const r of radios) r.el.checked = r.id === s.activeSummary;
-    if (lastSummary !== s.activeSummary) {
+    if (lastSummary !== s.activeSummary || lastMode !== s.mapMode) {
       lastSummary = s.activeSummary;
+      lastMode = s.mapMode;
       renderLegend(s);
     }
   }

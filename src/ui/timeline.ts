@@ -21,7 +21,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   const current = (s: State) => all.find((x) => same(x, { date: s.selectedDate, track: s.selectedTrack }));
 
   function select(scene: Scene) {
-    set({ selectedDate: scene.date, selectedTrack: scene.track });
+    set({ selectedDate: scene.date, selectedTrack: scene.track, mapMode: 'scene' });
   }
 
   function setFilter(f: TrackFilter) {
@@ -102,6 +102,10 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   );
   const body = h('div', { class: 'tl-body' }, axis, legend);
   host.classList.add('timeline');
+  if (window.innerWidth < 768) {
+    host.classList.add('collapsed');
+    collapseBtn.textContent = '▴';
+  }
   host.append(head, summaryNote, body);
 
   const dots = new Map<string, HTMLButtonElement>();
@@ -192,7 +196,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     window.dispatchEvent(new Event('resize'));
   });
   document.addEventListener('keydown', (ev) => {
-    if (state.tab !== 'map' || state.activeSummary) return;
+    if (state.tab !== 'map' || state.mapMode !== 'scene' || state.activeSummary) return;
     const t = ev.target as HTMLElement;
     if (/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName) && (t as HTMLInputElement).type !== 'checkbox' && (t as HTMLInputElement).type !== 'radio') return;
     if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') {
@@ -230,6 +234,9 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     playhead.style.left = `${xPct(scene.date)}%`;
   }
 
-  subscribe((s) => render(s));
+  subscribe((s) => {
+    if (s.mapMode === 'latest' && s.playing) stop();
+    render(s);
+  });
   render(state);
 }

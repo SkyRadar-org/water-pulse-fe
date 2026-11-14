@@ -1,3 +1,4 @@
+import { viOverview } from './overview.ts';
 import type { Strings } from './en.ts';
 
 const months = ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'];
@@ -5,6 +6,7 @@ const areaNote = 'Diện tích tính trên phần xã có ảnh quan sát, đã 
 const two = (n: number): string => String(n).padStart(2, '0');
 
 export const vi: Strings = {
+  ...viOverview,
   htmlLang: 'vi',
   pageTitle: 'SkyRadar · NISAR Water Pulse',
   app: {
@@ -24,12 +26,12 @@ export const vi: Strings = {
     langTip: 'Ngôn ngữ',
     sections: 'Các mục',
   },
-  tabs: { map: 'Bản đồ', communes: 'Danh sách xã', validation: 'Độ tin cậy', about: 'Giới thiệu' },
+  tabs: { overview: 'Tổng quan', map: 'Bản đồ', communes: 'Danh sách xã', validation: 'Độ tin cậy', about: 'Giới thiệu' },
   maturity: { provisional: 'Tạm thời (Provisional)', validated: 'Đã kiểm định (Validated)' },
   status: {
-    receded: { long: 'Sẵn sàng: dưới 10% diện tích có nước', short: 'Sẵn sàng', icon: '✓' },
+    receded: { long: 'Ít nước: dưới 10% diện tích', short: 'Ít nước', icon: '✓' },
     not_receded: { long: 'Còn ngập (≥30% diện tích có nước)', short: 'Còn ngập', icon: '!' },
-    uncertain: { long: 'Đang rút hoặc chưa đủ ảnh phủ', short: 'Đang rút / chưa rõ', icon: '?' },
+    uncertain: { long: 'Còn 10–30% nước hoặc chưa đủ ảnh phủ', short: 'Còn nước / chưa rõ', icon: '?' },
     no_flood: { long: 'Không ngập đáng kể', short: 'Không ngập', icon: '–' },
   },
   months,
@@ -45,9 +47,9 @@ export const vi: Strings = {
     layers: 'Lớp bản đồ',
     opacity: 'Độ đậm',
     rows: {
-      radar: { label: 'Ảnh radar (NISAR)', hint: 'Ảnh radar vệ tinh của NASA' },
+      radar: { label: 'Ảnh radar (NISAR)', hint: 'Ảnh đã xử lý, cùng ngày và lưới với lớp nước' },
       water: { label: 'Vùng có nước (Water map)', hint: 'Nơi phân tích NISAR phát hiện có nước' },
-      communes: { label: 'Xã', hint: 'Màu = tỷ lệ đất bị ngập nước' },
+      communes: { label: 'Xã', hint: 'Theo ảnh gần nhất của xã hoặc một lần chụp, tùy chế độ' },
       provinces: { label: 'Tỉnh', hint: 'Ranh giới và tên tỉnh' },
       basemap: { label: 'Bản đồ nền', hint: '© Esri · © OpenStreetMap contributors' },
     },
@@ -73,8 +75,17 @@ export const vi: Strings = {
   },
 
   map: {
+    modeLabel: 'Chế độ quan sát bản đồ',
+    latestMode: 'Ảnh gần nhất của từng xã',
+    sceneMode: 'Xem một lần chụp',
+    latestTitle: 'Xã nào còn nhiều nước trước vụ Đông Xuân?',
+    latestCoverage: (n, total, start, end) => `${n}/${total} xã có ảnh đủ phủ để đánh giá. Quan sát từ ${start} đến ${end}, mỗi xã có ngày riêng. Đây là bộ ảnh cuối mùa, không phải tình trạng trực tiếp hôm nay.`,
+    sceneTitle: (date, track) => `Quan sát ngày ${date} · quỹ đạo ${track}`,
+    coverageLoading: 'Đang kiểm tra vùng có ảnh…',
+    sceneCoverage: (n, total) => `Ảnh này có quan sát của ${n}/${total} xã. Xã màu xám chưa có quan sát trong ảnh này, không có nghĩa là đã khô. Chọn xã để tìm ảnh gần nhất của xã đó.`,
+    latestTip: (name, pct, date) => `${name} · ${pct === undefined ? 'Chưa đủ ảnh phủ để đánh giá' : `${pct}% nước · quan sát ${date}`}`,
     fitTip: 'Thu về vùng nghiên cứu',
-    radarMissing: 'Có thể chưa có ảnh radar cho ngày này',
+    radarMissing: 'Chưa tải được ảnh radar. Số liệu theo xã vẫn có thể xem được.',
     hint: 'Bấm vào một xã trên bản đồ để xem chi tiết',
     tip: (name, pct) => `${name} · ${pct === undefined ? 'không có dữ liệu cho ảnh này' : `${Math.round(pct)}% nước`}`,
   },
@@ -101,6 +112,15 @@ export const vi: Strings = {
   },
 
   panel: {
+    noObservationAction: 'Bộ ảnh này chưa có quan sát của xã. Cần kiểm tra tại địa phương; không suy ra xã đã khô.',
+    partialAction: 'Ảnh mới quan sát một phần xã. Tỷ lệ nước chỉ tính trên phần có ảnh, chưa đủ để đánh giá toàn xã.',
+    partialEvidence: 'Quan sát một phần, chưa đủ đánh giá toàn xã',
+    history: 'Xem diễn biến cả mùa và bằng chứng',
+    latestEvidence: 'Đánh giá gần nhất của xã này',
+    observationNote: 'Số liệu gắn với ngày quan sát riêng của xã, không phải tình trạng trực tiếp hôm nay.',
+    outsideScene: 'Ảnh đang chọn chưa có quan sát của xã này. Số liệu trong bảng này là đánh giá gần nhất có sẵn; thiếu ảnh phủ không có nghĩa là đã khô.',
+    inScene: (pct, date) => `Ảnh đang chọn: ${pct} nước vào ${date}. Phần tổng kết dùng đánh giá gần nhất của xã.`,
+    viewReference: (date) => `Xem ảnh ngày ${date}`,
     region: 'Chi tiết xã',
     close: 'Đóng bảng chi tiết xã',
     loading: 'Đang tải thông tin xã…',
@@ -108,7 +128,7 @@ export const vi: Strings = {
     first: 'Bắt đầu ngập',
     firstHint: 'từ 20% đất có nước trở lên',
     peak: 'Đỉnh ngập',
-    drained: 'Nước rút',
+    drained: 'Giảm dưới nửa đỉnh',
     notYet: 'Chưa rút',
     asOfLast: 'tính đến ảnh cuối',
     belowHalf: 'xuống dưới nửa mức đỉnh',
@@ -123,9 +143,9 @@ export const vi: Strings = {
       if (p.status === 'no_flood') return `${p.name} không ngập đáng kể trong mùa này (cao nhất ${p.peak_pct}% đất có nước, vào ${f.peak}).`;
       let s = `${p.name} bắt đầu ngập (từ 20% đất có nước) vào ${f.first}, ngập cao nhất ${p.peak_pct}% vào ${f.peak}, và ở ảnh cuối (${f.last}) còn ${p.last_pct}%. `;
       if (p.coverage_sufficient === false) s += 'Chưa có ảnh phủ đủ diện tích để đánh giá xuống giống.';
-      else if (p.status === 'not_receded') s += 'Ảnh gần nhất phủ ít nhất nửa xã còn từ 30% diện tích có nước; việc xuống giống có thể bị muộn.';
+      else if (p.status === 'not_receded') s += 'Ảnh gần nhất phủ ít nhất nửa xã còn từ 30% diện tích có nước; cần đối chiếu thực địa trước khi lên kế hoạch xuống giống.';
       else if (p.status === 'receded') s += 'Ảnh gần nhất phủ ít nhất nửa xã có dưới 10% diện tích còn nước.';
-      else s += 'Ảnh gần nhất đủ phủ còn 10–30% diện tích có nước; nước đang rút.';
+      else s += 'Ảnh gần nhất đủ phủ còn 10–30% diện tích có nước; cần đối chiếu thêm chuỗi ảnh để đánh giá xu thế.';
       return s;
     },
     note: (km2, valid) =>
@@ -143,7 +163,7 @@ export const vi: Strings = {
     allStatuses: 'Tất cả tình trạng',
     count: (n, total) => `${n}/${total} xã`,
     export: 'Xuất CSV',
-    cols: { name: 'Xã', province: 'Tỉnh', peak_pct: 'Đỉnh ngập (%)', peak_date: 'Ngày đỉnh', first_flood_date: 'Bắt đầu ngập', recession_date: 'Nước rút', last_pct: 'Ảnh cuối (%)', status: 'Tình trạng' },
+    cols: { name: 'Xã', province: 'Tỉnh', peak_pct: 'Đỉnh ngập (%)', peak_date: 'Ngày đỉnh', first_flood_date: 'Bắt đầu ngập', recession_date: 'Nước rút', last_pct: 'Ảnh cuối (%)', last_date: 'Ngày quan sát', status: 'Tình trạng' },
     notYet: 'Chưa rút',
     empty: 'Không có xã nào phù hợp bộ lọc.',
     row: (name, status) => `${name}, ${status}. Mở trên bản đồ`,
@@ -212,11 +232,11 @@ export const vi: Strings = {
   guide: {
     title: 'Dùng bản đồ này trong 3 bước',
     steps: [
-      { t: 'Chọn ngày muốn xem', d: 'Bấm vào một chấm trên thanh thời gian ở phía dưới, hoặc bấm ▶ để xem nước lũ thay đổi theo mùa.' },
-      { t: 'Bấm vào một xã', d: 'Bấm vào xã trên bản đồ, hoặc gõ tên xã vào ô «Tìm xã», để xem chi tiết.' },
-      { t: 'Đọc kết quả', d: 'Màu xanh càng đậm thì xã càng ngập nhiều. Nhãn đỏ «Còn ngập sau 1/11» nghĩa là việc xuống giống có thể bị muộn.' },
+      { t: 'Tìm xã hoặc chọn nhóm cần kiểm tra', d: 'Mở Tổng quan, nhập tên xã hoặc chọn nhóm còn nhiều nước. Mỗi số liệu đều có ngày quan sát riêng.' },
+      { t: 'Đọc kết quả và việc cần kiểm tra', d: 'Xem tỷ lệ nước, ngày chụp và độ phủ. Chưa đủ ảnh phủ không có nghĩa là xã đã khô.' },
+      { t: 'Mở ảnh làm bằng chứng', d: 'Bấm «Xem ảnh ngày…» để đến đúng lần chụp của xã. Mở diễn biến cả mùa khi cần đối chiếu xu thế.' },
     ],
-    tip: 'Mẹo: dùng bảng «Lớp bản đồ» để bật/tắt các lớp, và «Tổng kết cả mùa lũ» để xem cả mùa trên một bản đồ.',
+    tip: 'Kết quả giúp ưu tiên kiểm tra tại địa phương trước vụ Đông Xuân. Ngày ảnh và điều kiện thực tế cần được đối chiếu trước khi quyết định.',
     close: 'Đã hiểu',
   },
 

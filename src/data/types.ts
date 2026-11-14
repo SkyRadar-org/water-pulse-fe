@@ -8,6 +8,7 @@ export interface Scene {
   maturity: Maturity;
   bounds: Bounds;
   waterPng: string; // 0 dry = transparent, 1 open water = blue, 3 permanent water = grey
+  radarJpg?: string; // processed radar image on the same grid as waterPng
   gibsDate?: string; // GIBS tile date, defaults to date
 }
 

@@ -11,7 +11,8 @@
     "build:cloudflare": "node scripts/build-cloudflare.mjs",
     "dev:cloudflare": "wrangler pages dev dist --port 8788",
     "deploy:cloudflare": "wrangler pages deploy dist --project-name nisar-flood",
-    "test:cloudflare": "node --test tests/cloudflare-worker.test.mjs"
+    "test:cloudflare": "node --test tests/cloudflare-worker.test.mjs",
+    "test:ux": "node --experimental-strip-types --test tests/observations.test.mjs"
   },
   "dependencies": {
     "chart.js": "^4.6.1",

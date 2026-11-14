@@ -3,12 +3,11 @@ import { AOI, BASEMAP } from '../config.ts';
 import { getGeo } from '../data/dataSource.ts';
 import { T } from '../i18n.ts';
 import type { Bounds, Scene, SummaryLayer } from '../data/types.ts';
-import { GIBS_MAX_ZOOM, gibsTiles } from './gibs.ts';
 import { PROVINCE_LABELS } from './provinceLabels.ts';
 
 const FONT = ['Noto Sans Regular'];
 
-export function baseStyle(initialDate: string): maplibregl.StyleSpecification {
+export function baseStyle(): maplibregl.StyleSpecification {
   return {
     version: 8,
     glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
@@ -20,18 +19,10 @@ export function baseStyle(initialDate: string): maplibregl.StyleSpecification {
         maxzoom: BASEMAP.maxzoom,
         attribution: BASEMAP.attribution,
       },
-      gibs: {
-        type: 'raster',
-        tiles: gibsTiles(initialDate),
-        tileSize: 256,
-        maxzoom: GIBS_MAX_ZOOM,
-        attribution: '<a href="https://earthdata.nasa.gov/gibs" target="_blank" rel="noopener">NASA GIBS</a> · NISAR (NASA/JPL/ISRO)',
-      },
     },
     layers: [
       { id: 'bg', type: 'background', paint: { 'background-color': '#cfdde8' } },
       { id: 'basemap', type: 'raster', source: 'basemap' },
-      { id: 'radar', type: 'raster', source: 'gibs', paint: { 'raster-opacity': 0.85 } },
     ],
   };
 }
@@ -48,11 +39,16 @@ export function coordsOf(b: Bounds): [[number, number], [number, number], [numbe
 
 /** Adds the team's water layer (per scene) and the season summary layer. */
 export function addImageLayers(map: maplibregl.Map, scene: Scene): void {
+  // [Codex] Use the team's aligned local image instead of inconsistent GIBS tiles.
+  map.addSource('radar-image', { type: 'image', url: scene.radarJpg ?? scene.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg'), coordinates: coordsOf(scene.bounds) });
+  map.addLayer({ id: 'radar', type: 'raster', source: 'radar-image', paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0 } });
   map.addSource('water', { type: 'image', url: scene.waterPng, coordinates: coordsOf(scene.bounds) });
   map.addLayer({ id: 'water', type: 'raster', source: 'water', paint: { 'raster-opacity': 0.9, 'raster-fade-duration': 0 } });
 }
 
 export function setWaterScene(map: maplibregl.Map, scene: Scene): void {
+  const radar = map.getSource('radar-image') as maplibregl.ImageSource | undefined;
+  radar?.updateImage({ url: scene.radarJpg ?? scene.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg'), coordinates: coordsOf(scene.bounds) });
   const src = map.getSource('water') as maplibregl.ImageSource | undefined;
   src?.updateImage({ url: scene.waterPng, coordinates: coordsOf(scene.bounds) });
 }
