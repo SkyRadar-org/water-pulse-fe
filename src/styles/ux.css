@@ -152,7 +152,14 @@
     display: block !important;
   }
   .map-hint {
-    bottom: 12px;
+    top: 10px;
+    bottom: auto;
+    left: 10px;
+    transform: none;
+    max-width: calc(100% - 70px); /* leave room for the zoom buttons */
+    text-align: left;
+    border-radius: 14px;
     font-size: 13px;
+    padding: 6px 12px;
   }
 }

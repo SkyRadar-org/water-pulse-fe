@@ -71,10 +71,11 @@ export function mountMap(container: HTMLElement): MapView {
   function applyLook(s: State) {
     const summaryOn = s.mapMode === 'scene' && s.activeSummary !== null;
     const singleImage = s.mapMode === 'scene';
+    const simple = s.viewMode === 'simple' && !!sceneOf(s)?.composite;
     vis('basemap', s.layers.basemap);
-    images?.radar.setVisible(singleImage && s.layers.radar && !summaryOn);
+    images?.radar.setVisible(singleImage && s.layers.radar && !summaryOn && !simple);
     images?.water.setVisible(singleImage && s.layers.water && !summaryOn);
-    vis('swot', singleImage && s.layers.swot && !summaryOn && !!sceneOf(s)?.swot);
+    vis('swot', singleImage && s.layers.swot && !summaryOn && !simple && !!sceneOf(s)?.swot);
     vis('summary', summaryOn);
     vis('provinces', s.layers.provinces);
     vis('province-labels', s.layers.provinces);
@@ -82,7 +83,8 @@ export function mountMap(container: HTMLElement): MapView {
     images?.radar.setOpacity(s.opacity.radar);
     images?.water.setOpacity(s.opacity.water);
     if (map.getLayer('swot')) map.setPaintProperty('swot', 'raster-opacity', s.opacity.swot);
-    communes?.setOpacity(s.opacity.communes);
+    // The simple view is one colour: commune fills stay clickable but transparent (outlines remain).
+    communes?.setOpacity(simple && singleImage ? 0 : s.opacity.communes);
   }
 
   async function applyScene(s: State) {
@@ -96,14 +98,13 @@ export function mountMap(container: HTMLElement): MapView {
     if (!scene) return;
     // Keep the previous values on screen until the next ones arrive (no grey flash between frames).
     set({ radarMissing: false });
-    const blended = s.smooth && !!scene.composite;
-    const urls = sceneImageUrls(scene, s.smooth);
-    void images?.radar.show(urls.radar);
-    void images?.water.show(urls.water);
+    const urls = sceneImageUrls(scene, s.viewMode);
+    void images?.radar.show(urls.radar, s.cut);
+    void images?.water.show(urls.water, s.cut);
     setSwotScene(map, scene);
     applyLook(s); // the SWOT layer depends on whether this acquisition has a SWOT pass nearby
     try {
-      const mosaic = blended ? await getCompositeChoropleth(scene.date, scene.track) : null;
+      const mosaic = scene.composite ? await getCompositeChoropleth(scene.date, scene.track) : null;
       if (token !== requestToken) return;
       if (mosaic) {
         communes?.setChoropleth(Object.fromEntries(Object.entries(mosaic).map(([id, v]) => [id, v.pct])), mosaic);
@@ -113,6 +114,15 @@ export function mountMap(container: HTMLElement): MapView {
       if (token === requestToken) communes?.setChoropleth(values);
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  /** [Claude] Warm the HTTP cache so Play does not stall on the network (the simple view needs no radar). */
+  function warmAll(mode: State['viewMode']) {
+    for (const sc of scenes) {
+      const u = sceneImageUrls(sc, mode);
+      warmImage(u.water);
+      if (mode === 'pro') warmImage(u.radar);
     }
   }
 
@@ -142,13 +152,8 @@ export function mountMap(container: HTMLElement): MapView {
     try {
       [scenes, summaries] = await Promise.all([getScenes(), getSummaryLayers()]);
       const first = sceneOf(state) ?? scenes[0];
-      images = addImageLayers(map, first, state.smooth, () => set({ radarMissing: true }));
-      // [Claude] Warm the HTTP cache so Play does not stall on the network.
-      scenes.forEach((sc) => {
-        const u = sceneImageUrls(sc, state.smooth);
-        warmImage(u.water);
-        warmImage(u.radar);
-      });
+      images = addImageLayers(map, first, state.viewMode, () => set({ radarMissing: true }));
+      warmAll(state.viewMode);
       const data = await getCommunes();
       collection = data;
       communes = addCommunes(map, data, { onSelect: (osmId) => set({ selectedCommune: osmId }) });
@@ -167,15 +172,11 @@ export function mountMap(container: HTMLElement): MapView {
   subscribe((s, prev) => {
     if (s.tab === 'map' && prev.tab !== 'map') map.resize();
     if (!ready) return;
-    if (s.selectedDate !== prev.selectedDate || s.selectedTrack !== prev.selectedTrack || s.mapMode !== prev.mapMode || s.smooth !== prev.smooth) {
-      if (s.smooth !== prev.smooth) scenes.forEach((sc) => {
-        const u = sceneImageUrls(sc, s.smooth);
-        warmImage(u.water);
-        warmImage(u.radar);
-      });
+    if (s.selectedDate !== prev.selectedDate || s.selectedTrack !== prev.selectedTrack || s.mapMode !== prev.mapMode || s.viewMode !== prev.viewMode) {
+      if (s.viewMode !== prev.viewMode) warmAll(s.viewMode);
       void applyScene(s);
     }
-    if (s.layers !== prev.layers || s.opacity !== prev.opacity || s.activeSummary !== prev.activeSummary || s.mapMode !== prev.mapMode) {
+    if (s.layers !== prev.layers || s.opacity !== prev.opacity || s.activeSummary !== prev.activeSummary || s.mapMode !== prev.mapMode || s.viewMode !== prev.viewMode) {
       if (s.activeSummary !== prev.activeSummary) applySummary(s);
       applyLook(s);
     }

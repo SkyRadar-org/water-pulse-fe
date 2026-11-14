@@ -12,7 +12,7 @@ export interface Scene {
   /** [Claude] Nearest SWOT (NASA/CNES Ka-band) water map within 2 days, same bounds; comparison source. */
   swot?: { date: string; png: string; daysApart: number } | null;
   /** Blended playback frame: latest valid observation per pixel from any track (see backend composite.py). Absent in mock data. */
-  composite?: { png: string; radarJpg: string; maxAgeDays: number; observedPct: number; sources: { date: string; track: Track; share_pct: number }[] } | null;
+  composite?: { png: string; simplePng: string; radar: string; maxAgeDays: number; observedPct: number; sources: { date: string; track: Track; share_pct: number }[] } | null;
   gibsDate?: string; // GIBS tile date, defaults to date
 }
 

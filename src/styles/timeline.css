@@ -124,36 +124,29 @@
   color: var(--ink-2);
 }
 
-.tl-smooth {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  border-radius: 8px;
-  padding: 5px 10px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--ink-2);
-}
-
-.tl-smooth[aria-pressed='true'] {
-  background: var(--brand);
-  border-color: var(--brand);
-  color: #fff;
-}
-
-.tl-mosaic-note {
-  font-size: 12px;
-  color: var(--ink-2);
-  margin-top: 4px;
-}
-
-.timeline.latest-mode .tl-mosaic-note,
-.timeline.summary-mode .tl-mosaic-note {
+/* Simple view: one timeline bar, no orbit or maturity details. */
+.timeline.simple .tl-meta,
+.timeline.simple .tl-info,
+.timeline.simple .tl-seg:not(.tl-view),
+.timeline.simple .tl-legend > span:not(.tl-legend-note) {
   display: none;
 }
 
-.timeline.summary-mode .tl-smooth {
-  opacity: 0.4;
-  pointer-events: none;
+.timeline.simple .tl-axis {
+  padding-left: 4px;
+}
+
+/* One bar over all dates: thin ticks instead of dots, so 33 dates stay distinguishable on a phone. */
+.timeline.simple .tl-dot {
+  width: 4px;
+  height: 16px;
+  margin: -8px 0 0 -2px;
+  border-width: 1px;
+  border-radius: 2px;
+}
+
+.timeline.simple .tl-dot.selected {
+  transform: scaleX(1.8) scaleY(1.25);
 }
 
 .tl-summary-note {
@@ -375,6 +368,11 @@
   margin-left: auto;
 }
 
+/* The gap label is repeated on every orbit lane; keeping only the first avoids labels sitting on top of the dots above. */
+.tl-lane + .tl-lane .tl-gap span {
+  display: none;
+}
+
 @media (max-width: 767px) {
   .timeline {
     padding: 8px 10px 6px;
@@ -385,8 +383,46 @@
   .tl-head {
     gap: 8px;
   }
-  .tl-info {
+  .tl-info,
+  .tl-spacer,
+  .tl-meta .maturity {
     display: none;
+  }
+  /* Row 1: play, date, collapse. Row 2: view mode. Orbit filter only when expanded. */
+  .tl-collapse {
+    order: 2;
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+  }
+  .tl-view {
+    order: 3;
+    flex: 1 1 100%;
+  }
+  .tl-seg {
+    order: 4;
+    flex: 1 1 100%;
+  }
+  .tl-seg button:first-child {
+    flex: 1.8;
+  }
+  .tl-seg button {
+    flex: 1;
+    min-height: 38px;
+    padding: 6px 4px;
+  }
+  .timeline.collapsed .tl-seg:not(.tl-view),
+  .timeline.collapsed .tl-latest-note {
+    display: none;
+  }
+  .tl-lane {
+    height: 28px;
+  }
+  /* Bigger touch target without a bigger dot. */
+  .tl-dot::after {
+    content: '';
+    position: absolute;
+    inset: -9px;
   }
   .tl-legend-note {
     display: none;

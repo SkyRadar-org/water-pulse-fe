@@ -1,6 +1,8 @@
 import type { SummaryLayer, Track } from './data/types.ts';
 
 export type Tab = 'overview' | 'map' | 'reports' | 'validation' | 'about';
+/** 'pro': radar + age-faded water + per-track timeline; 'simple': one-colour water and one timeline bar (needs blended frames). */
+export type ViewMode = 'pro' | 'simple';
 export type TrackFilter = 'all' | Track;
 export type SummaryId = SummaryLayer['id'] | null;
 
@@ -32,7 +34,9 @@ export interface State {
   activeSummary: SummaryId;
   layers: LayerToggles;
   opacity: Opacities;
-  smooth: boolean;
+  viewMode: ViewMode;
+  /** The last selection jumped over a long gap without images: swap the map instantly instead of cross-fading. */
+  cut: boolean;
   playing: boolean;
   radarMissing: boolean;
 }
@@ -60,7 +64,8 @@ export const state: State = {
   layers: { basemap: true, radar: true, water: true, communes: true, provinces: true, swot: false },
   opacity: { radar: 0.85, water: 0.9, communes: 0.6, swot: 0.85 },
   playing: false,
-  smooth: true,
+  viewMode: 'pro',
+  cut: false,
   radarMissing: false,
   ...restoredSnapshot(),
 };

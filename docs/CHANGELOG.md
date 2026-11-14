@@ -1,11 +1,13 @@
 # Changelog
 
-## 2026-11-14 — Smooth playback: blended frames and cross-fade (Claude)
+## 2026-11-14 — Smooth playback, simple view and gap cuts (Claude)
 
-- Playing the raw acquisitions made the water layer shrink and grow with each track's swath (047D ≈ 83 %, 083A ≈ 67 %, 148D ≈ 37 % of the area). With **Xem ghép mượt / Blended view** on (default), each frame is the backend mosaic of the latest real observation per pixel from any track (≤ 12 days old; older = fainter, none = grey veil). Turn it off for the single-image view; statistics always use the original images.
-- New `CrossfadeImage` (map/layers.ts): next image is fetched and decoded off-screen, put on a hidden twin layer and cross-faded (450 ms), so there is no empty frame or hard cut. Commune values stay on screen until the next ones arrive; older values are drawn fainter and named in the tooltip.
-- Playback pace follows real time between acquisitions (650–1500 ms per step) in blended mode.
-- Falls back to the previous behaviour when the data source has no `composite` (e.g. mock data). Needs backend `GET /api/frontend/choropleth/composite` and `scenes[].composite`.
+- Playing the raw acquisitions made the water layer shrink and grow with each track's swath (047D ≈ 83 %, 083A ≈ 67 %, 148D ≈ 37 % of the area). Playback now always uses the backend's blended frames (no on/off switch): per pixel the latest real observation from any track, ≤ 12 days old; older = fainter, none = light grey veil. Statistics always use the original images. How the blend works: `skyradar-nisar/docs/WEB_DATA.md` and `composite.py`.
+- Everything outside Vietnamese land is transparent (no Cambodian radar / veil).
+- Two view modes (segmented control in the timeline): **Professional** (default; radar, age-faded water, one lane per orbit, commune fills) and **Simple** (one-colour water from the same mosaic with a 30-day window, one timeline bar with every date, no radar / SWOT / commune fills; orbit filter reset to "all").
+- New `CrossfadeImage` (map/layers.ts): next image is fetched and decoded off-screen, put on a hidden twin layer and cross-faded (450 ms). A jump over a gap longer than 15 days without images (e.g. 25 Jul → 11 Aug) is a cut, not a fade, and is skipped after 500 ms; the timeline still shows the gap.
+- Commune values stay on screen until the next ones arrive; older values are drawn fainter and named in the tooltip. Playback pace follows real time between acquisitions (650–1500 ms).
+- Falls back to the previous behaviour when the data source has no `composite` (e.g. mock data; the mode control is then hidden). Needs backend `GET /api/frontend/choropleth/composite` and `scenes[].composite` (`png`, `simplePng`, `radar`).
 
 ## 2026-11-14 — Automatic production deploy from main (Claude)
 

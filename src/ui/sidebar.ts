@@ -70,6 +70,7 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
   const layerSection = h('section', { class: 'sb-sec' }, h('h3', { text: T.sidebar.layers }));
   const toggles = new Map<RowKey, HTMLInputElement>();
   const sceneControls: HTMLElement[] = [];
+  const proOnly: HTMLElement[] = []; // hidden in the simple view (radar, SWOT and commune fills)
   for (const row of ROWS) {
     const id = `layer-${row.key}`;
     const text = T.sidebar.rows[row.key];
@@ -79,6 +80,7 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
     const rowEl = h('div', { class: 'sb-row' }, input, h('label', { for: id }, h('b', { text: text.label }), h('small', { text: text.hint })));
     layerSection.append(rowEl);
     if (row.key === 'radar' || row.key === 'water' || row.key === 'swot') sceneControls.push(rowEl);
+    if (row.key === 'radar' || row.key === 'swot' || row.key === 'communes') proOnly.push(rowEl);
     if (row.key === 'swot') {
       // [Claude] Which SWOT pass is shown for the selected acquisition (or that there is none within 2 days).
       const status = h('small', { class: 'sb-swot-status' });
@@ -100,6 +102,7 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
       const sliderEl = h('div', { class: 'sb-slider' }, h('span', { text: T.sidebar.opacity }), slider);
       layerSection.append(sliderEl);
       if (row.key === 'radar' || row.key === 'water' || row.key === 'swot') sceneControls.push(sliderEl);
+      if (row.key === 'radar' || row.key === 'swot' || row.key === 'communes') proOnly.push(sliderEl);
     }
   }
 
@@ -143,11 +146,15 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
         h('p', { class: 'note', text: T.panel.observationNote }));
       return;
     }
+    const water = [h('h4', { text: T.sidebar.legend.waterMap }), h('ul', { class: 'sb-leg' }, swatch('#1d4ed8', T.sidebar.legend.open))];
+    if (s.viewMode === 'simple') {
+      legend.append(...water);
+      return;
+    }
     legend.append(
       h('h4', { text: T.sidebar.legend.share }),
       h('ul', { class: 'sb-leg' }, ...CHORO_COLORS.map((c, i) => swatch(c, CHORO_LABELS[i])), swatch(NO_DATA_COLOR, T.sidebar.legend.noData)),
-      h('h4', { text: T.sidebar.legend.waterMap }),
-      h('ul', { class: 'sb-leg' }, swatch('#1d4ed8', T.sidebar.legend.open)),
+      ...water,
       h('p', { class: 'note', text: T.sidebar.legend.statusNote }),
     );
   }
@@ -156,11 +163,12 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
   let lastMode: string | undefined;
   function sync(s: State) {
     sceneControls.forEach(el => el.hidden = s.mapMode !== 'scene');
+    proOnly.forEach(el => el.hidden = (s.viewMode === 'simple' && s.mapMode === 'scene') || (sceneControls.includes(el) && s.mapMode !== 'scene'));
     for (const [k, el] of toggles) el.checked = s.layers[k];
     for (const r of radios) r.el.checked = r.id === s.activeSummary;
-    if (lastSummary !== s.activeSummary || lastMode !== s.mapMode) {
+    if (lastSummary !== s.activeSummary || lastMode !== `${s.mapMode}|${s.viewMode}`) {
       lastSummary = s.activeSummary;
-      lastMode = s.mapMode;
+      lastMode = `${s.mapMode}|${s.viewMode}`;
       renderLegend(s);
     }
   }

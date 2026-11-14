@@ -3,12 +3,13 @@ import type { Scene, Track } from '../data/types.ts';
 import { daysBetween, fmtDate, fmtShort, toMs } from '../format.ts';
 import { T } from '../i18n.ts';
 import { MATURITY_LABEL, TRACK_COLORS } from '../palette.ts';
-import { set, state, subscribe, type State, type TrackFilter } from '../state.ts';
+import { set, state, subscribe, type State, type TrackFilter, type ViewMode } from '../state.ts';
 import { h } from './dom.ts';
 
 const TRACKS: Track[] = ['047D', '083A', '148D'];
 const SOWING = '2026-11-01';
 const GAP_DAYS = 15;
+const SIMPLE_COLOR = '#1d4ed8';
 
 export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   const all = [...scenes].sort((a, b) => a.date.localeCompare(b.date) || a.track.localeCompare(b.track));
@@ -21,7 +22,10 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   const current = (s: State) => all.find((x) => same(x, { date: s.selectedDate, track: s.selectedTrack }));
 
   function select(scene: Scene) {
-    set({ selectedDate: scene.date, selectedTrack: scene.track, mapMode: 'scene' });
+    // A jump across a long stretch without images is shown as a cut, not a fade between unrelated frames.
+    const from = current(state);
+    const cut = !!from && Math.abs(daysBetween(from.date, scene.date)) > GAP_DAYS;
+    set({ selectedDate: scene.date, selectedTrack: scene.track, mapMode: 'scene', cut });
   }
 
   function setFilter(f: TrackFilter) {
@@ -46,7 +50,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
 
   // ---- play ----
   // Blended frames are paced by the real time between acquisitions (so the season "breathes" at a steady rate);
-  // raw frames keep the fixed interval.
+  // a gap without images is skipped quickly (the map cuts instead of fading). Raw frames keep the fixed interval.
   let timer: number | undefined;
   function stop() {
     if (timer !== undefined) window.clearTimeout(timer);
@@ -56,8 +60,9 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   function nextDelay(): number {
     const sc = current(state);
     const nxt = visible(state.trackFilter)[visible(state.trackFilter).findIndex((x) => sc && same(x, sc)) + 1];
-    if (!sc || !nxt || !(state.smooth && sc.composite)) return PLAY_INTERVAL_MS;
-    return Math.min(1500, Math.max(650, daysBetween(sc.date, nxt.date) * 150));
+    if (!sc || !nxt || !sc.composite) return PLAY_INTERVAL_MS;
+    const days = daysBetween(sc.date, nxt.date);
+    return days > GAP_DAYS ? 500 : Math.min(1500, Math.max(650, days * 150));
   }
   function tick() {
     timer = window.setTimeout(() => {
@@ -94,10 +99,19 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   }
   const collapseBtn = h('button', { class: 'tl-collapse', type: 'button', 'aria-label': T.timeline.collapse, title: T.timeline.collapse }, '▾');
   const hasMosaic = scenes.some((s) => s.composite);
-  const smoothBtn = h('button', { class: 'tl-smooth', type: 'button', text: T.timeline.mosaic, title: T.timeline.mosaicHelp });
-  smoothBtn.hidden = !hasMosaic;
-  smoothBtn.addEventListener('click', () => set({ smooth: !state.smooth }));
-  const mosaicNote = h('div', { class: 'tl-mosaic-note' });
+  const viewSeg = h('div', { class: 'tl-seg tl-view', role: 'group', 'aria-label': T.timeline.modeGroup, title: T.timeline.modeHelp });
+  const viewBtns = new Map<ViewMode, HTMLButtonElement>();
+  for (const m of ['pro', 'simple'] as ViewMode[]) {
+    const b = h('button', { type: 'button', text: m === 'pro' ? T.timeline.modePro : T.timeline.modeSimple });
+    b.addEventListener('click', () => {
+      if (m === state.viewMode) return;
+      // The simple view is one timeline bar over every date, so orbit filtering does not apply.
+      set(m === 'simple' ? { viewMode: m, trackFilter: 'all', cut: false } : { viewMode: m, cut: false });
+    });
+    viewBtns.set(m, b);
+    viewSeg.append(b);
+  }
+  viewSeg.hidden = !hasMosaic;
 
   const head = h(
     'div',
@@ -106,7 +120,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     h('div', { class: 'tl-now' }, dateEl, h('div', { class: 'tl-meta' }, trackEl, maturityEl)),
     infoEl,
     h('div', { class: 'tl-spacer' }),
-    smoothBtn,
+    viewSeg,
     seg,
     collapseBtn,
   );
@@ -126,13 +140,13 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     host.classList.add('collapsed');
     collapseBtn.textContent = '▴';
   }
-  host.append(head, summaryNote, latestNote, mosaicNote, body);
+  host.append(head, summaryNote, latestNote, body);
 
   const dots = new Map<string, HTMLButtonElement>();
   const key = (s: { date: string; track: Track }) => `${s.date}|${s.track}`;
   const playhead = h('div', { class: 'tl-playhead' });
 
-  function buildPlot(filter: TrackFilter) {
+  function buildPlot(filter: TrackFilter, mode: ViewMode) {
     plot.replaceChildren();
     dots.clear();
     const grid = h('div', { class: 'tl-grid' });
@@ -145,10 +159,12 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     }
     plot.append(grid);
 
-    const lanes = filter === 'all' ? TRACKS : [filter as Track];
+    const simple = mode === 'simple';
+    const lanes: (Track | null)[] = simple ? [null] : filter === 'all' ? TRACKS : [filter as Track];
     for (const t of lanes) {
-      const lane = h('div', { class: 'tl-lane' }, h('span', { class: 'tl-lane-label', text: t, style: `color:${TRACK_COLORS[t]}` }));
-      const list = all.filter((s) => s.track === t);
+      const lane = h('div', { class: 'tl-lane' });
+      if (t) lane.append(h('span', { class: 'tl-lane-label', text: t, style: `color:${TRACK_COLORS[t]}` }));
+      const list = t ? all.filter((s) => s.track === t) : all;
       list.forEach((s, i) => {
         const prev = list[i - 1];
         if (prev && daysBetween(prev.date, s.date) > GAP_DAYS) {
@@ -158,11 +174,11 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
       });
       for (const s of list) {
         const dot = h('button', {
-          class: `tl-dot ${s.maturity}`,
+          class: `tl-dot ${simple ? 'validated' : s.maturity}`,
           type: 'button',
-          style: `left:${xPct(s.date)}%;--c:${TRACK_COLORS[s.track]}`,
-          'aria-label': T.timeline.dotLabel(fmtDate(s.date), s.track, MATURITY_LABEL(s.maturity)),
-          title: `${fmtDate(s.date)} · ${s.track} · ${MATURITY_LABEL(s.maturity)}`,
+          style: `left:${xPct(s.date)}%;--c:${simple ? SIMPLE_COLOR : TRACK_COLORS[s.track]}`,
+          'aria-label': simple ? fmtDate(s.date) : T.timeline.dotLabel(fmtDate(s.date), s.track, MATURITY_LABEL(s.maturity)),
+          title: simple ? fmtDate(s.date) : `${fmtDate(s.date)} · ${s.track} · ${MATURITY_LABEL(s.maturity)}`,
         });
         dot.addEventListener('click', () => {
           stop();
@@ -227,12 +243,15 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   });
 
   // ---- render ----
-  let builtFor: TrackFilter | null = null;
+  let builtFor: string | null = null;
   function render(s: State) {
-    if (builtFor !== s.trackFilter) {
-      buildPlot(s.trackFilter);
-      builtFor = s.trackFilter;
+    const mode: ViewMode = hasMosaic ? s.viewMode : 'pro';
+    if (builtFor !== `${s.trackFilter}|${mode}`) {
+      buildPlot(s.trackFilter, mode);
+      builtFor = `${s.trackFilter}|${mode}`;
     }
+    host.classList.toggle('simple', mode === 'simple');
+    for (const [m, b] of viewBtns) b.setAttribute('aria-pressed', String(m === mode));
     const scene = current(s);
     for (const [f, b] of segBtns) b.setAttribute('aria-pressed', String(f === s.trackFilter));
     host.classList.toggle('summary-mode', s.activeSummary !== null);
@@ -240,9 +259,6 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     playBtn.textContent = s.playing ? '❚❚' : '▶';
     playBtn.setAttribute('aria-label', s.playing ? T.timeline.pause : T.timeline.play);
     if (!scene) return;
-    smoothBtn.setAttribute('aria-pressed', String(s.smooth));
-    mosaicNote.hidden = !(s.smooth && scene.composite);
-    if (scene.composite) mosaicNote.textContent = T.timeline.mosaicNote(scene.composite.maxAgeDays, scene.composite.observedPct);
     dateEl.textContent = fmtDate(scene.date);
     trackEl.textContent = T.timeline.trackLabel(scene.track);
     trackEl.style.setProperty('--c', TRACK_COLORS[scene.track]);

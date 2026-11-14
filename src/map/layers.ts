@@ -3,6 +3,7 @@ import { AOI, BASEMAP } from '../config.ts';
 import { getGeo } from '../data/dataSource.ts';
 import { T } from '../i18n.ts';
 import type { Bounds, Scene, SummaryLayer } from '../data/types.ts';
+import type { ViewMode } from '../state.ts';
 import { PROVINCE_LABELS } from './provinceLabels.ts';
 
 const FONT = ['Noto Sans Regular'];
@@ -40,9 +41,10 @@ export function coordsOf(b: Bounds): [[number, number], [number, number], [numbe
 const FADE_MS = 450;
 const radarUrlOf = (scene: Scene) => scene.radarJpg ?? scene.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg');
 
-/** Image URLs for a scene: the blended playback frame when requested and available, else the single acquisition. */
-export function sceneImageUrls(scene: Scene, blended: boolean): { radar: string; water: string } {
-  if (blended && scene.composite) return { radar: scene.composite.radarJpg, water: scene.composite.png };
+/** Image URLs for a scene: blended frames when the data has them (simple view: one-colour water only), else the single acquisition. */
+export function sceneImageUrls(scene: Scene, mode: ViewMode): { radar: string; water: string } {
+  const c = scene.composite;
+  if (c) return { radar: c.radar, water: mode === 'simple' ? c.simplePng : c.png };
   return { radar: radarUrlOf(scene), water: scene.waterPng };
 }
 
@@ -109,7 +111,7 @@ export class CrossfadeImage {
     this.fade(this.front, v, 0);
   }
 
-  async show(url: string): Promise<void> {
+  async show(url: string, instant = false): Promise<void> {
     if (url === this.current) return;
     const token = ++this.token;
     let bitmap: ImageBitmap;
@@ -125,8 +127,9 @@ export class CrossfadeImage {
     this.current = url;
     const back = 1 - this.front;
     (this.map.getSource(this.src(back)) as maplibregl.ImageSource).updateImage({ image: bitmap, coordinates: this.coordinates });
-    this.fade(this.front, 0, FADE_MS);
-    this.fade(back, this.opacity, FADE_MS);
+    const ms = instant ? 0 : FADE_MS;
+    this.fade(this.front, 0, ms);
+    this.fade(back, this.opacity, ms);
     this.front = back;
   }
 }
@@ -137,9 +140,9 @@ export interface SceneImages {
 }
 
 /** Adds the team's radar + water layers (cross-fading) and the SWOT comparison layer. */
-export function addImageLayers(map: maplibregl.Map, scene: Scene, blended: boolean, onRadarError: () => void): SceneImages {
+export function addImageLayers(map: maplibregl.Map, scene: Scene, mode: ViewMode, onRadarError: () => void): SceneImages {
   // [Codex] Use the team's aligned local image instead of inconsistent GIBS tiles.
-  const urls = sceneImageUrls(scene, blended);
+  const urls = sceneImageUrls(scene, mode);
   const coords = coordsOf(scene.bounds);
   const radar = new CrossfadeImage(map, 'radar', 'radar-image', urls.radar, coords, 0.85, onRadarError);
   const water = new CrossfadeImage(map, 'water', 'water', urls.water, coords, 0.9);

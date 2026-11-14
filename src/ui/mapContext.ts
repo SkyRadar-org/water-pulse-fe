@@ -1,4 +1,4 @@
-import { getChoropleth, getCommunes } from '../data/dataSource.ts';
+import { getChoropleth, getCommunes, getCompositeChoropleth } from '../data/dataSource.ts';
 import { hasAssessment } from '../data/observations.ts';
 import type { Scene } from '../data/types.ts';
 import { fmtDate } from '../format.ts';
@@ -36,6 +36,13 @@ export async function mountMapContext(host: HTMLElement, scenes: Scene[]): Promi
     title.textContent = T.map.sceneTitle(fmtDate(current.date), current.track);
     note.textContent = T.map.coverageLoading;
     try {
+      if (current.composite) {
+        const mosaic = await getCompositeChoropleth(current.date, current.track);
+        if (mosaic) {
+          if (my === token) note.textContent = T.map.blendCoverage(Object.keys(mosaic).length, collection.features.length);
+          return;
+        }
+      }
       const values = await getChoropleth(current.date, current.track);
       if (my === token) note.textContent = T.map.sceneCoverage(Object.keys(values).length, collection.features.length);
     } catch {

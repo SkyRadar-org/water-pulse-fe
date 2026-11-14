@@ -79,7 +79,7 @@ export function getScenes(): Promise<Scene[]> {
       waterPng: resolveAsset(s.waterPng),
       radarJpg: s.radarJpg ? resolveAsset(s.radarJpg) : s.radarJpg,
       swot: s.swot ? { ...s.swot, png: resolveAsset(s.swot.png) } : null,
-      composite: s.composite ? { ...s.composite, png: resolveAsset(s.composite.png), radarJpg: resolveAsset(s.composite.radarJpg) } : null,
+      composite: s.composite ? { ...s.composite, png: resolveAsset(s.composite.png), simplePng: resolveAsset(s.composite.simplePng), radar: resolveAsset(s.composite.radar) } : null,
     })).sort((a, b) => a.date.localeCompare(b.date) || a.track.localeCompare(b.track)),
   );
 }
