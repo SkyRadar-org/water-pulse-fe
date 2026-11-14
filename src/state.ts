@@ -32,6 +32,7 @@ export interface State {
   activeSummary: SummaryId;
   layers: LayerToggles;
   opacity: Opacities;
+  smooth: boolean;
   playing: boolean;
   radarMissing: boolean;
 }
@@ -59,6 +60,7 @@ export const state: State = {
   layers: { basemap: true, radar: true, water: true, communes: true, provinces: true, swot: false },
   opacity: { radar: 0.85, water: 0.9, communes: 0.6, swot: 0.85 },
   playing: false,
+  smooth: true,
   radarMissing: false,
   ...restoredSnapshot(),
 };

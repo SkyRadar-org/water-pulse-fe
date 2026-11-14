@@ -1,13 +1,13 @@
 import * as maplibregl from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { AOI, MAP_CENTER, MAP_ZOOM } from '../config.ts';
-import { getChoropleth, getCommunes, getScenes, getSummaryLayers } from '../data/dataSource.ts';
+import { getChoropleth, getCommunes, getCompositeChoropleth, getScenes, getSummaryLayers } from '../data/dataSource.ts';
 import { T } from '../i18n.ts';
 import type { CommuneCollection, Scene, SummaryLayer } from '../data/types.ts';
 import { latestValues } from '../data/observations.ts';
 import { set, state, subscribe, type State } from '../state.ts';
 import { addCommunes, type CommunesLayer } from './communesLayer.ts';
-import { addGeoLayers, addImageLayers, baseStyle, setSummaryLayer, setWaterScene } from './layers.ts';
+import { addGeoLayers, addImageLayers, baseStyle, sceneImageUrls, setSummaryLayer, setSwotScene, warmImage, type SceneImages } from './layers.ts';
 
 export interface MapView {
   map: maplibregl.Map;
@@ -58,6 +58,7 @@ export function mountMap(container: HTMLElement): MapView {
   let summaries: SummaryLayer[] = [];
   let communes: CommunesLayer | null = null;
   let collection: CommuneCollection | null = null;
+  let images: SceneImages | null = null;
   let ready = false;
   let requestToken = 0;
 
@@ -71,15 +72,15 @@ export function mountMap(container: HTMLElement): MapView {
     const summaryOn = s.mapMode === 'scene' && s.activeSummary !== null;
     const singleImage = s.mapMode === 'scene';
     vis('basemap', s.layers.basemap);
-    vis('radar', singleImage && s.layers.radar && !summaryOn);
-    vis('water', singleImage && s.layers.water && !summaryOn);
+    images?.radar.setVisible(singleImage && s.layers.radar && !summaryOn);
+    images?.water.setVisible(singleImage && s.layers.water && !summaryOn);
     vis('swot', singleImage && s.layers.swot && !summaryOn && !!sceneOf(s)?.swot);
     vis('summary', summaryOn);
     vis('provinces', s.layers.provinces);
     vis('province-labels', s.layers.provinces);
     communes?.setVisible(s.layers.communes);
-    map.setPaintProperty('radar', 'raster-opacity', s.opacity.radar);
-    if (map.getLayer('water')) map.setPaintProperty('water', 'raster-opacity', s.opacity.water);
+    images?.radar.setOpacity(s.opacity.radar);
+    images?.water.setOpacity(s.opacity.water);
     if (map.getLayer('swot')) map.setPaintProperty('swot', 'raster-opacity', s.opacity.swot);
     communes?.setOpacity(s.opacity.communes);
   }
@@ -93,12 +94,21 @@ export function mountMap(container: HTMLElement): MapView {
     }
     const scene = sceneOf(s);
     if (!scene) return;
-    // Clear the previous acquisition while the next JSON is loading.
-    communes?.setChoropleth({});
+    // Keep the previous values on screen until the next ones arrive (no grey flash between frames).
     set({ radarMissing: false });
-    setWaterScene(map, scene);
+    const blended = s.smooth && !!scene.composite;
+    const urls = sceneImageUrls(scene, s.smooth);
+    void images?.radar.show(urls.radar);
+    void images?.water.show(urls.water);
+    setSwotScene(map, scene);
     applyLook(s); // the SWOT layer depends on whether this acquisition has a SWOT pass nearby
     try {
+      const mosaic = blended ? await getCompositeChoropleth(scene.date, scene.track) : null;
+      if (token !== requestToken) return;
+      if (mosaic) {
+        communes?.setChoropleth(Object.fromEntries(Object.entries(mosaic).map(([id, v]) => [id, v.pct])), mosaic);
+        return;
+      }
       const values = await getChoropleth(scene.date, scene.track);
       if (token === requestToken) communes?.setChoropleth(values);
     } catch (err) {
@@ -132,11 +142,12 @@ export function mountMap(container: HTMLElement): MapView {
     try {
       [scenes, summaries] = await Promise.all([getScenes(), getSummaryLayers()]);
       const first = sceneOf(state) ?? scenes[0];
-      addImageLayers(map, first);
-      // [Claude] Warm the cache so Play does not flicker.
+      images = addImageLayers(map, first, state.smooth, () => set({ radarMissing: true }));
+      // [Claude] Warm the HTTP cache so Play does not stall on the network.
       scenes.forEach((sc) => {
-        new Image().src = sc.waterPng;
-        new Image().src = sc.radarJpg ?? sc.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg');
+        const u = sceneImageUrls(sc, state.smooth);
+        warmImage(u.water);
+        warmImage(u.radar);
       });
       const data = await getCommunes();
       collection = data;
@@ -156,7 +167,14 @@ export function mountMap(container: HTMLElement): MapView {
   subscribe((s, prev) => {
     if (s.tab === 'map' && prev.tab !== 'map') map.resize();
     if (!ready) return;
-    if (s.selectedDate !== prev.selectedDate || s.selectedTrack !== prev.selectedTrack || s.mapMode !== prev.mapMode) void applyScene(s);
+    if (s.selectedDate !== prev.selectedDate || s.selectedTrack !== prev.selectedTrack || s.mapMode !== prev.mapMode || s.smooth !== prev.smooth) {
+      if (s.smooth !== prev.smooth) scenes.forEach((sc) => {
+        const u = sceneImageUrls(sc, s.smooth);
+        warmImage(u.water);
+        warmImage(u.radar);
+      });
+      void applyScene(s);
+    }
     if (s.layers !== prev.layers || s.opacity !== prev.opacity || s.activeSummary !== prev.activeSummary || s.mapMode !== prev.mapMode) {
       if (s.activeSummary !== prev.activeSummary) applySummary(s);
       applyLook(s);

@@ -4,6 +4,7 @@ import type {
   Choropleth,
   CommuneCollection,
   CommuneProps,
+  CompositeChoropleth,
   Scene,
   SeriesPoint,
   SwotPoint,
@@ -32,6 +33,7 @@ function endpoint(name: string, params?: Record<string, string>): string {
       summary: '/api/summary',
       validation: '/api/validation',
       choropleth: '/api/choropleth',
+      'choropleth-composite': '/api/choropleth/composite',
     };
     if (name.startsWith('series:')) return `${base}/api/frontend/communes/${encodeURIComponent(name.slice(7))}/series`;
     if (name.startsWith('swot:')) return `${base}/api/frontend/communes/${encodeURIComponent(name.slice(5))}/swot`;
@@ -40,6 +42,7 @@ function endpoint(name: string, params?: Record<string, string>): string {
   if (name.startsWith('series:')) return `${base}/series/${encodeURIComponent(name.slice(7))}.json`;
   if (name.startsWith('swot:')) return `${base}/swot/${encodeURIComponent(name.slice(5))}.json`;
   if (name === 'choropleth') return `${base}/choropleth/${params!.date}_${params!.track}.json`;
+  if (name === 'choropleth-composite') return `${base}/choropleth-composite/${params!.date}_${params!.track}.json`;
   const files: Record<string, string> = {
     scenes: 'scenes.json',
     communes: 'communes.geojson',
@@ -71,7 +74,13 @@ function load<T>(fn: string, key: string, url: string): Promise<T> {
 
 export function getScenes(): Promise<Scene[]> {
   return load<Scene[]>('getScenes', 'scenes', endpoint('scenes')).then((list) =>
-    list.map((s) => ({ ...s, waterPng: resolveAsset(s.waterPng), swot: s.swot ? { ...s.swot, png: resolveAsset(s.swot.png) } : null })).sort((a, b) => a.date.localeCompare(b.date) || a.track.localeCompare(b.track)),
+    list.map((s) => ({
+      ...s,
+      waterPng: resolveAsset(s.waterPng),
+      radarJpg: s.radarJpg ? resolveAsset(s.radarJpg) : s.radarJpg,
+      swot: s.swot ? { ...s.swot, png: resolveAsset(s.swot.png) } : null,
+      composite: s.composite ? { ...s.composite, png: resolveAsset(s.composite.png), radarJpg: resolveAsset(s.composite.radarJpg) } : null,
+    })).sort((a, b) => a.date.localeCompare(b.date) || a.track.localeCompare(b.track)),
   );
 }
 
@@ -90,6 +99,11 @@ export function getCommuneSwot(osmId: string): Promise<SwotPoint[]> {
 
 export function getChoropleth(date: string, track: Track): Promise<Choropleth> {
   return load<Choropleth>('getChoropleth', `choropleth:${date}:${track}`, endpoint('choropleth', { date, track }));
+}
+
+/** Latest observation per commune up to the scene date (blended playback); null when the data source has none (mock). */
+export function getCompositeChoropleth(date: string, track: Track): Promise<CompositeChoropleth | null> {
+  return load<CompositeChoropleth>('getCompositeChoropleth', `choropleth-composite:${date}:${track}`, endpoint('choropleth-composite', { date, track })).catch(() => null);
 }
 
 export function getArea(): Promise<AreaPoint[]> {

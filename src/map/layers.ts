@@ -37,23 +37,119 @@ export function coordsOf(b: Bounds): [[number, number], [number, number], [numbe
   ];
 }
 
-/** Adds the team's water layer (per scene) and the season summary layer. */
-export function addImageLayers(map: maplibregl.Map, scene: Scene): void {
-  // [Codex] Use the team's aligned local image instead of inconsistent GIBS tiles.
-  map.addSource('radar-image', { type: 'image', url: scene.radarJpg ?? scene.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg'), coordinates: coordsOf(scene.bounds) });
-  map.addLayer({ id: 'radar', type: 'raster', source: 'radar-image', paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0 } });
-  map.addSource('water', { type: 'image', url: scene.waterPng, coordinates: coordsOf(scene.bounds) });
-  map.addLayer({ id: 'water', type: 'raster', source: 'water', paint: { 'raster-opacity': 0.9, 'raster-fade-duration': 0 } });
-  // [Claude] SWOT comparison map (orange), drawn above our water layer; hidden when the scene has no SWOT pass nearby.
-  map.addSource('swot', { type: 'image', url: scene.swot?.png ?? scene.waterPng, coordinates: coordsOf(scene.bounds) });
-  map.addLayer({ id: 'swot', type: 'raster', source: 'swot', layout: { visibility: 'none' }, paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0 } });
+const FADE_MS = 450;
+const radarUrlOf = (scene: Scene) => scene.radarJpg ?? scene.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg');
+
+/** Image URLs for a scene: the blended playback frame when requested and available, else the single acquisition. */
+export function sceneImageUrls(scene: Scene, blended: boolean): { radar: string; water: string } {
+  if (blended && scene.composite) return { radar: scene.composite.radarJpg, water: scene.composite.png };
+  return { radar: radarUrlOf(scene), water: scene.waterPng };
 }
 
-export function setWaterScene(map: maplibregl.Map, scene: Scene): void {
-  const radar = map.getSource('radar-image') as maplibregl.ImageSource | undefined;
-  radar?.updateImage({ url: scene.radarJpg ?? scene.waterPng.replace('/water/', '/radar/').replace(/\.png$/, '.jpg'), coordinates: coordsOf(scene.bounds) });
-  const src = map.getSource('water') as maplibregl.ImageSource | undefined;
-  src?.updateImage({ url: scene.waterPng, coordinates: coordsOf(scene.bounds) });
+/** Fire-and-forget request that puts an image in the HTTP cache so a later swap does not wait on the network. */
+export function warmImage(url: string): void {
+  void fetch(url).catch(() => undefined);
+}
+
+/**
+ * Two stacked image layers; a new image is decoded off-screen, put on the hidden layer and cross-faded in,
+ * so playback never shows an empty frame or a hard cut.
+ */
+export class CrossfadeImage {
+  private front = 0;
+  private token = 0;
+  private current: string;
+  private opacity: number;
+  private map: maplibregl.Map;
+  private id: string;
+  private sourceId: string;
+  private coordinates: ReturnType<typeof coordsOf>;
+  private onError?: () => void;
+
+  constructor(
+    map: maplibregl.Map,
+    id: string,
+    sourceId: string,
+    url: string,
+    coordinates: ReturnType<typeof coordsOf>,
+    opacity: number,
+    onError?: () => void,
+  ) {
+    this.map = map;
+    this.id = id;
+    this.sourceId = sourceId;
+    this.coordinates = coordinates;
+    this.onError = onError;
+    this.current = url;
+    this.opacity = opacity;
+    for (const k of [0, 1]) {
+      map.addSource(this.src(k), { type: 'image', url, coordinates });
+      map.addLayer({
+        id: this.layer(k),
+        type: 'raster',
+        source: this.src(k),
+        paint: { 'raster-opacity': k === 0 ? opacity : 0, 'raster-fade-duration': 0, 'raster-opacity-transition': { duration: FADE_MS, delay: 0 } },
+      });
+    }
+  }
+
+  private src = (k: number) => (k === 0 ? this.sourceId : `${this.sourceId}-b`);
+  private layer = (k: number) => (k === 0 ? this.id : `${this.id}-b`);
+  private fade(k: number, to: number, ms: number) {
+    this.map.setPaintProperty(this.layer(k), 'raster-opacity-transition', { duration: ms, delay: 0 });
+    this.map.setPaintProperty(this.layer(k), 'raster-opacity', to);
+  }
+
+  setVisible(on: boolean) {
+    for (const k of [0, 1]) if (this.map.getLayer(this.layer(k))) this.map.setLayoutProperty(this.layer(k), 'visibility', on ? 'visible' : 'none');
+  }
+
+  setOpacity(v: number) {
+    this.opacity = v;
+    this.fade(this.front, v, 0);
+  }
+
+  async show(url: string): Promise<void> {
+    if (url === this.current) return;
+    const token = ++this.token;
+    let bitmap: ImageBitmap;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      bitmap = await createImageBitmap(await res.blob());
+    } catch {
+      if (token === this.token) this.onError?.();
+      return;
+    }
+    if (token !== this.token) return; // a newer frame was requested while this one loaded
+    this.current = url;
+    const back = 1 - this.front;
+    (this.map.getSource(this.src(back)) as maplibregl.ImageSource).updateImage({ image: bitmap, coordinates: this.coordinates });
+    this.fade(this.front, 0, FADE_MS);
+    this.fade(back, this.opacity, FADE_MS);
+    this.front = back;
+  }
+}
+
+export interface SceneImages {
+  radar: CrossfadeImage;
+  water: CrossfadeImage;
+}
+
+/** Adds the team's radar + water layers (cross-fading) and the SWOT comparison layer. */
+export function addImageLayers(map: maplibregl.Map, scene: Scene, blended: boolean, onRadarError: () => void): SceneImages {
+  // [Codex] Use the team's aligned local image instead of inconsistent GIBS tiles.
+  const urls = sceneImageUrls(scene, blended);
+  const coords = coordsOf(scene.bounds);
+  const radar = new CrossfadeImage(map, 'radar', 'radar-image', urls.radar, coords, 0.85, onRadarError);
+  const water = new CrossfadeImage(map, 'water', 'water', urls.water, coords, 0.9);
+  // [Claude] SWOT comparison map (orange), drawn above our water layer; hidden when the scene has no SWOT pass nearby.
+  map.addSource('swot', { type: 'image', url: scene.swot?.png ?? scene.waterPng, coordinates: coords });
+  map.addLayer({ id: 'swot', type: 'raster', source: 'swot', layout: { visibility: 'none' }, paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0 } });
+  return { radar, water };
+}
+
+export function setSwotScene(map: maplibregl.Map, scene: Scene): void {
   if (scene.swot) (map.getSource('swot') as maplibregl.ImageSource | undefined)?.updateImage({ url: scene.swot.png, coordinates: coordsOf(scene.bounds) });
 }
 

@@ -95,6 +95,7 @@ export const vi: Strings = {
     radarMissing: 'Chưa tải được ảnh radar. Số liệu theo xã vẫn có thể xem được.',
     hint: 'Bấm vào một xã trên bản đồ để xem chi tiết',
     tip: (name, pct) => `${name} · ${pct === undefined ? 'không có dữ liệu cho ảnh này' : `${Math.round(pct)}% nước`}`,
+    mosaicTip: (name, pct, age, date) => `${name} · ${pct === undefined ? 'chưa có quan sát gần đây' : `${Math.round(pct)}% nước · quan sát ${date}${age > 0 ? ` (trước đó ${age} ngày)` : ''}`}`,
   },
 
   timeline: {
@@ -114,6 +115,9 @@ export const vi: Strings = {
     note: 'Mỗi chấm là một ngày vệ tinh chụp ảnh. Bấm vào chấm, hoặc bấm ▶, để xem nước lũ thay đổi theo mùa.',
     summaryNote: 'Đang xem tổng kết cả mùa — thanh thời gian tạm dừng',
     latestNote: 'Bản đồ đang hiện ảnh gần nhất của từng xã. Bấm ▶ hoặc chọn một ngày để xem lần lượt từng lần chụp.',
+    mosaic: 'Xem ghép mượt',
+    mosaicHelp: 'Xem ghép mượt: mỗi điểm hiện lần quan sát thật gần nhất từ bất kỳ quỹ đạo nào. Tắt: chỉ hiện ảnh của đúng ngày đã chọn.',
+    mosaicNote: (maxAge, observedPct) => `Xem ghép mượt · mỗi điểm là lần quan sát thật gần nhất từ mọi quỹ đạo (không quá ${maxAge} ngày, phủ ${Math.round(observedPct)}% vùng). Màu nhạt = quan sát cũ hơn; lớp xám = chưa có quan sát gần đây. Chỉ để xem cho mượt — số liệu thống kê dùng ảnh gốc.`,
     collapse: 'Thu gọn / mở rộng',
     dotLabel: (date, track, m) => `${date}, quỹ đạo ${track}, ${m}`,
     region: 'Thanh thời gian',

@@ -45,11 +45,25 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   }
 
   // ---- play ----
+  // Blended frames are paced by the real time between acquisitions (so the season "breathes" at a steady rate);
+  // raw frames keep the fixed interval.
   let timer: number | undefined;
   function stop() {
-    if (timer !== undefined) window.clearInterval(timer);
+    if (timer !== undefined) window.clearTimeout(timer);
     timer = undefined;
     if (state.playing) set({ playing: false });
+  }
+  function nextDelay(): number {
+    const sc = current(state);
+    const nxt = visible(state.trackFilter)[visible(state.trackFilter).findIndex((x) => sc && same(x, sc)) + 1];
+    if (!sc || !nxt || !(state.smooth && sc.composite)) return PLAY_INTERVAL_MS;
+    return Math.min(1500, Math.max(650, daysBetween(sc.date, nxt.date) * 150));
+  }
+  function tick() {
+    timer = window.setTimeout(() => {
+      if (!step(1)) return stop();
+      tick();
+    }, nextDelay());
   }
   function play() {
     const list = visible(state.trackFilter);
@@ -57,9 +71,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     // From the "latest per commune" view, or at the end, start from the first acquisition (select() switches to one-acquisition mode).
     if (state.mapMode === 'latest' || idx < 0 || idx >= list.length - 1) select(list[0]);
     set({ playing: true });
-    timer = window.setInterval(() => {
-      if (!step(1)) stop();
-    }, PLAY_INTERVAL_MS);
+    tick();
   }
 
   // ---- DOM ----
@@ -81,6 +93,11 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     seg.append(b);
   }
   const collapseBtn = h('button', { class: 'tl-collapse', type: 'button', 'aria-label': T.timeline.collapse, title: T.timeline.collapse }, '▾');
+  const hasMosaic = scenes.some((s) => s.composite);
+  const smoothBtn = h('button', { class: 'tl-smooth', type: 'button', text: T.timeline.mosaic, title: T.timeline.mosaicHelp });
+  smoothBtn.hidden = !hasMosaic;
+  smoothBtn.addEventListener('click', () => set({ smooth: !state.smooth }));
+  const mosaicNote = h('div', { class: 'tl-mosaic-note' });
 
   const head = h(
     'div',
@@ -89,6 +106,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     h('div', { class: 'tl-now' }, dateEl, h('div', { class: 'tl-meta' }, trackEl, maturityEl)),
     infoEl,
     h('div', { class: 'tl-spacer' }),
+    smoothBtn,
     seg,
     collapseBtn,
   );
@@ -108,7 +126,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     host.classList.add('collapsed');
     collapseBtn.textContent = '▴';
   }
-  host.append(head, summaryNote, latestNote, body);
+  host.append(head, summaryNote, latestNote, mosaicNote, body);
 
   const dots = new Map<string, HTMLButtonElement>();
   const key = (s: { date: string; track: Track }) => `${s.date}|${s.track}`;
@@ -222,6 +240,9 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     playBtn.textContent = s.playing ? '❚❚' : '▶';
     playBtn.setAttribute('aria-label', s.playing ? T.timeline.pause : T.timeline.play);
     if (!scene) return;
+    smoothBtn.setAttribute('aria-pressed', String(s.smooth));
+    mosaicNote.hidden = !(s.smooth && scene.composite);
+    if (scene.composite) mosaicNote.textContent = T.timeline.mosaicNote(scene.composite.maxAgeDays, scene.composite.observedPct);
     dateEl.textContent = fmtDate(scene.date);
     trackEl.textContent = T.timeline.trackLabel(scene.track);
     trackEl.style.setProperty('--c', TRACK_COLORS[scene.track]);

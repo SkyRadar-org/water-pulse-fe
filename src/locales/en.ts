@@ -95,6 +95,7 @@ export const en = {
     radarMissing: 'The radar image could not load. Commune data remains available.',
     hint: 'Click a commune on the map to see its details',
     tip: (name: string, pct: number | undefined): string => `${name} · ${pct === undefined ? 'no data for this image' : `${Math.round(pct)}% water`}`,
+    mosaicTip: (name: string, pct: number | undefined, age: number, date: string): string => `${name} · ${pct === undefined ? 'no recent observation' : `${Math.round(pct)}% water · observed ${date}${age > 0 ? ` (${age} days earlier)` : ''}`}`,
   },
 
   timeline: {
@@ -114,6 +115,9 @@ export const en = {
     note: 'Each dot is a day the satellite took a picture. Click a dot or press ▶ to watch the flood change over the season.',
     summaryNote: 'Showing the whole-season summary — the time slider is paused',
     latestNote: 'The map shows the latest image of each commune. Press ▶ or pick a date to step through the acquisitions.',
+    mosaic: 'Blended view',
+    mosaicHelp: 'Blended view: each point shows the most recent real observation from any track. Off: show only the single image of the selected day.',
+    mosaicNote: (maxAge: number, observedPct: number): string => `Blended view · every point is the latest real observation from any track (at most ${maxAge} days old, ${Math.round(observedPct)}% of the area covered). Paler = older; grey veil = no recent observation. For smooth viewing only — statistics use the original images.`,
     collapse: 'Collapse / expand',
     dotLabel: (date: string, track: string, m: string): string => `${date}, track ${track}, ${m}`,
     region: 'Time slider',

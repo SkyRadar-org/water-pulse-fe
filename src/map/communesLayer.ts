@@ -7,7 +7,8 @@ import { CHORO_COLORS, NO_DATA_COLOR } from '../palette.ts';
 const SRC = 'communes';
 
 export interface CommunesLayer {
-  setChoropleth(values: Choropleth): void;
+  /** `meta` (blended playback) adds the observation age/date: older values are drawn fainter and named in the tooltip. */
+  setChoropleth(values: Choropleth, meta?: Record<string, { age: number; date: string }>): void;
   setMode(mode: 'latest' | 'scene'): void;
   setSelected(osmId: string | null): void;
   setOpacity(v: number): void;
@@ -33,13 +34,16 @@ export function addCommunes(
   map.addSource(SRC, { type: 'geojson', data: data as unknown as GeoJSON.FeatureCollection, promoteId: 'osm_id' });
 
   const pct: maplibregl.ExpressionSpecification = ['coalesce', ['feature-state', 'pct'], -1];
+  const fillOpacity = (base: number): maplibregl.ExpressionSpecification => [
+    '*', base, ['-', 1, ['*', 0.35, ['min', 1, ['/', ['coalesce', ['feature-state', 'age'], 0], 12]]]],
+  ];
   map.addLayer({
     id: 'communes-fill',
     type: 'fill',
     source: SRC,
     paint: {
       'fill-color': ['step', pct, NO_DATA_COLOR, 0, CHORO_COLORS[0], 20, CHORO_COLORS[1], 40, CHORO_COLORS[2], 60, CHORO_COLORS[3], 80, CHORO_COLORS[4]],
-      'fill-opacity': 0.6,
+      'fill-opacity': fillOpacity(0.6),
     },
   });
   map.addLayer({
@@ -54,6 +58,7 @@ export function addCommunes(
 
   const geoms = new Map(data.features.map((f) => [f.properties.osm_id, f]));
   const values: Choropleth = {};
+  let ages: Record<string, { age: number; date: string }> | undefined;
   let hovered: string | null = null;
   let selected: string | null = null;
   let mode: 'latest' | 'scene' = 'latest';
@@ -81,7 +86,9 @@ export function addCommunes(
     const el = document.createElement('div');
     el.textContent = mode === 'latest'
       ? T.map.latestTip(props?.name ?? id, v, fmtDate(props?.last_date ?? null))
-      : T.map.tip(props?.name ?? id, v);
+      : ages
+        ? T.map.mosaicTip(props?.name ?? id, v, ages[id]?.age ?? 0, fmtDate(ages[id]?.date ?? null))
+        : T.map.tip(props?.name ?? id, v);
     popup.setLngLat(e.lngLat).setDOMContent(el).addTo(map);
     map.getCanvas().style.cursor = 'pointer';
   });
@@ -99,17 +106,18 @@ export function addCommunes(
         ? ['step', pct, NO_DATA_COLOR, 0, '#15803d', 10, '#d97706', 30, '#dc2626']
         : ['step', pct, NO_DATA_COLOR, 0, CHORO_COLORS[0], 20, CHORO_COLORS[1], 40, CHORO_COLORS[2], 60, CHORO_COLORS[3], 80, CHORO_COLORS[4]]);
     },
-    setChoropleth(next) {
+    setChoropleth(next, meta) {
+      ages = meta;
       for (const id of geoms.keys()) {
         const v = next[id];
         if (v === undefined) {
           delete values[id];
           // Real acquisitions only cover some communes. Use the no-data sentinel;
           // removing a never-created state crashes MapLibre 6's state reconciler.
-          map.setFeatureState({ source: SRC, id }, { pct: -1 });
+          map.setFeatureState({ source: SRC, id }, { pct: -1, age: 0 });
         } else {
           values[id] = v;
-          map.setFeatureState({ source: SRC, id }, { pct: v });
+          map.setFeatureState({ source: SRC, id }, { pct: v, age: meta?.[id]?.age ?? 0 });
         }
       }
     },
@@ -119,7 +127,7 @@ export function addCommunes(
       if (id !== null) map.setFeatureState({ source: SRC, id }, { selected: true });
     },
     setOpacity(v) {
-      map.setPaintProperty('communes-fill', 'fill-opacity', v);
+      map.setPaintProperty('communes-fill', 'fill-opacity', fillOpacity(v));
     },
     setVisible(v) {
       for (const l of ['communes-fill', 'communes-line']) map.setLayoutProperty(l, 'visibility', v ? 'visible' : 'none');

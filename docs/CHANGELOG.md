@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-14 — Smooth playback: blended frames and cross-fade (Claude)
+
+- Playing the raw acquisitions made the water layer shrink and grow with each track's swath (047D ≈ 83 %, 083A ≈ 67 %, 148D ≈ 37 % of the area). With **Xem ghép mượt / Blended view** on (default), each frame is the backend mosaic of the latest real observation per pixel from any track (≤ 12 days old; older = fainter, none = grey veil). Turn it off for the single-image view; statistics always use the original images.
+- New `CrossfadeImage` (map/layers.ts): next image is fetched and decoded off-screen, put on a hidden twin layer and cross-faded (450 ms), so there is no empty frame or hard cut. Commune values stay on screen until the next ones arrive; older values are drawn fainter and named in the tooltip.
+- Playback pace follows real time between acquisitions (650–1500 ms per step) in blended mode.
+- Falls back to the previous behaviour when the data source has no `composite` (e.g. mock data). Needs backend `GET /api/frontend/choropleth/composite` and `scenes[].composite`.
+
 ## 2026-11-14 — Automatic production deploy from main (Claude)
 
 - `.github/workflows/deploy.yml`: every push to `main` checks out this repo and `skyradar-nisar@main` side by side, runs `build:cloudflare`, `test:cloudflare` and `test:ux`, then publishes to Pages project `nisar-flood` (production) and checks `/health` on the real hostname. A failed build or test deploys nothing.

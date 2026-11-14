@@ -15,7 +15,7 @@ export default {
       return json({ detail: 'Method not allowed' }, 405, { Allow: 'GET, HEAD' });
     }
     let key = url.pathname;
-    if (key === '/api/frontend/choropleth') {
+    if (key === '/api/frontend/choropleth' || key === '/api/frontend/choropleth/composite') {
       const date = url.searchParams.get('date');
       const track = url.searchParams.get('track');
       if (!date || !['047D', '083A', '148D'].includes(track)) {
