@@ -8,6 +8,32 @@ const areaNote = 'Areas refer to observed commune coverage; absolute km² are in
 export const en = {
   ...enOverview,
   ...enReports,
+  story: {
+    title: 'NISAR follows surface water through the flood season, commune by commune.',
+    lead: 'See where water remains, check the observation date, then inspect the evidence.',
+    high: 'high-water / assessed communes',
+    optical: 'higher F1 vs Sentinel-1 · optical comparisons, Aug–Nov',
+    scenes: 'real NISAR acquisitions',
+    explore: 'Explore the 2026 flood season',
+    loading: 'Loading observations…',
+    unavailable: 'This figure is unavailable. Try again later.',
+    dates: 'Observations from June–November 2026; not live conditions today.',
+    advanced: 'Advanced controls',
+    observedCommunes: (n: number, total: number): string => `${n}/${total} communes have a recent observation. Missing observations do not mean dry land.`,
+    compositeTitle: (date: string): string => `Observations up to ${date}`,
+    compositeNote: (age: number): string => `Mosaic of observations up to ${age} days old; not a simultaneous image or live conditions.`,
+    mosaicValidated: 'Mosaic · all source products validated',
+    mosaicProvisional: 'Mosaic · not all sources validated',
+    chartTitle: 'Independent optical comparison · August–November',
+    hlsResult: (wins: number, total: number): string => `NISAR has higher F1 than Sentinel-1 in ${wins}/${total} paired comparisons with optical water maps.`,
+    swotResult: (wins: number, total: number): string => `Against independent SWOT radar (NASA/CNES): higher F1 in ${wins}/${total} paired comparisons on the same pixels.`,
+    chartAria: 'Paired F1 scores for NISAR and Sentinel-1 against optical water maps; the values are listed in the adjacent table.',
+    chartTable: 'Read the chart values',
+    pairNote: 'F1 ranges from 0 to 1; higher means closer agreement with the reference. These results apply to the paired observations, not every place or season.',
+    coverage: (pct: string): string => `${pct}% of the full commune observed`,
+    partial: 'Insufficient commune coverage for assessment',
+    waterNote: 'Water percentages refer to the observed area; coverage percentages refer to the full OSM commune.',
+  },
   htmlLang: 'en',
   pageTitle: 'SkyRadar · NISAR Water Pulse',
   app: {
@@ -74,14 +100,14 @@ export const en = {
       waterMap: 'Water detected',
       open: 'Flooded field / open water',
       perm: 'Permanent water (rivers, canals)',
-      statusNote: 'Latest covering image: ✓ below 10% water · ! at least 30% water · ? draining or insufficient coverage · – no significant flooding.',
+      statusNote: 'Latest covering image: ✓ below 10% water · ! at least 30% water · ? moderate water or insufficient coverage · – no significant flooding.',
     },
   },
 
   map: {
     modeLabel: 'Map observation mode',
     latestMode: 'Latest per commune',
-    sceneMode: 'One satellite image',
+    sceneMode: 'Time sequence',
     latestTitle: 'Water by commune · latest observation',
     latestCoverage: (n: number, total: number, start: string, end: string) => `${n}/${total} communes have sufficient coverage. Observations: ${start} – ${end}, with a separate date for each commune. These are satellite observations, not live conditions.`,
     sceneTitle: (date: string, track: string) => `Observed on ${date} · orbit ${track}`,
@@ -154,7 +180,7 @@ export const en = {
     summary: (p: CommuneProps, f: { first: string; peak: string; last: string; rec: string }): string => {
       if (p.status === 'no_flood') return `${p.name} had no significant flooding this season (highest ${p.peak_pct}% of land under water, on ${f.peak}).`;
       let s = `${p.name} first passed 20% under water on ${f.first}, peaked at ${p.peak_pct}% on ${f.peak}, and at the last image (${f.last}) it stood at ${p.last_pct}%. `;
-      if (p.coverage_sufficient === false) s += 'Coverage is insufficient for a sowing assessment.';
+      if (p.coverage_sufficient === false) s += 'Coverage is insufficient for a commune-level assessment.';
       else if (p.status === 'not_receded') s += 'At least 30% water remains on the latest image covering half the commune; compare with field conditions before planning sowing.';
       else if (p.status === 'receded') s += 'Water covers less than 10% on the latest image covering half the commune.';
       else s += 'Water covers 10–30% on the latest covering image; compare further observations on the same orbit before judging the trend.';
@@ -240,15 +266,10 @@ export const en = {
   content: {
     tagline: 'L-band radar sees flooded rice fields through clouds — commune by commune, all season long.',
     positioning: "Complements Vietnam's rapid flood mapping by tracking the whole flood season with NISAR L-band, updated 2–3 days after each overpass.",
-    heroNumbers: [
-      { big: 'Low-flood year', text: '2026 was a low-flood year in the Mekong Delta.' },
-      { big: '38 of 131', text: 'assessed communes still wet on the latest covering image (at least 30% water).' },
-      { big: '47–82% vs 35–64%', text: 'Water recall against independent optical maps: NISAR versus Sentinel-1, flood season (Aug–Nov), across 16 comparisons.' },
-    ],
     questions: [
       { q: 'Since when is it flooded?', a: 'First date a commune reaches 20% of its land under water.' },
       { q: 'When was the peak?', a: 'The highest share of land under water, and the day it happened.' },
-      { q: 'Did it drain before sowing?', a: 'Latest image covering at least half the commune: below 10% water = ready, 10–30% = draining, at least 30% = still wet.' },
+      { q: 'How much water remains?', a: 'The newest image covering at least half the commune places observed water share into <10%, 10–<30% or ≥30% groups. Check same-orbit history to assess change; low water is not a sowing recommendation.' },
     ],
     limits: [
       'Threshold calibrated against OPERA DSWx-S1 (C-band), which is not ground truth.',

@@ -23,7 +23,7 @@ export const MONTH_FORMAT = lang === 'vi' ? "'Th'M" : 'MMM';
 Chart.register(LineController, LineElement, PointElement, LinearScale, TimeScale, Tooltip, Legend, Filler, BarController, BarElement, CategoryScale);
 
 Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif";
-Chart.defaults.font.size = 12;
+Chart.defaults.font.size = 13;
 Chart.defaults.color = '#475569';
 
 export { Chart };

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-14 — Coverage-aware story and evidence (Codex, Gemini reviewed)
+
+- Use the latest acquisition covering at least 50% of each full OSM commune: 115 assessed communes in 33 high / 39 moderate / 43 low observed-water groups. Preserve the other 25 communes as insufficient observations.
+- Share an API-driven NISAR hero between Overview and About, with a flood-season CTA that resets stale map selections and starts the single playback timer from August.
+- Surface paired optical F1 results and the comparison chart, and SWOT same-pixel figures, before technical details; handle missing scores and ties explicitly.
+- Default to simple water rendering; collect layers, orbit filters and mode controls under one Advanced disclosure; retain provisional/validated source context for mosaics on phones and desktop.
+- Keep water-share and full-commune coverage denominators separate; low water is not a sowing recommendation.
+- Validation and release status: see `docs/verification/ux-implementation-20261114.md`; implementation remains on a review branch until production approval.
+
 ## 2026-11-14 — Smooth playback, simple view and gap cuts (Claude)
 
 - Playing the raw acquisitions made the water layer shrink and grow with each track's swath (047D ≈ 83 %, 083A ≈ 67 %, 148D ≈ 37 % of the area). Playback now always uses the backend's blended frames (no on/off switch): per pixel the latest real observation from any track, ≤ 12 days old; older = fainter, none = light grey veil. Statistics always use the original images. How the blend works: `skyradar-nisar/docs/WEB_DATA.md` and `composite.py`.

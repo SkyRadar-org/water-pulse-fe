@@ -1,9 +1,10 @@
-import { createAreaChart, createF1Chart } from '../charts/areaChart.ts';
+import { createAreaChart, createF1Chart, createOpticalChart } from '../charts/areaChart.ts';
 import { lang, T } from '../i18n.ts';
 import { getArea, getScenes, getValidation } from '../data/dataSource.ts';
 import type { AreaPoint, Scene, Validation, SwotValidationRow, ValidationRow } from '../data/types.ts';
 import { fmtPct, fmt2, fmtShort } from '../format.ts';
 import { h } from './dom.ts';
+import { hlsPairs, validationStats } from '../data/validationStats.ts';
 
 function median(values: number[]): number {
   const s = [...values].sort((a, b) => a - b);
@@ -27,7 +28,7 @@ function hlsTable(rows: ValidationRow[]): HTMLElement {
     h(
       'tr',
       {},
-      h('td', { text: fmtShort(r.date) }),
+      h('td', { text: `${fmtShort(r.date)}${r.track ? ` · ${r.track}` : ''}` }),
       ...pairs.flatMap((p) => {
         const a = r[p.a] as number | null;
         const b = r[p.b] as number | null;
@@ -47,7 +48,7 @@ function swotTable(rows: SwotValidationRow[]): HTMLElement {
   const head2 = h('tr', {}, h('th', { class: 'sub', text: 'NISAR' }), h('th', { class: 'sub', text: 'S-1' }));
   const cell = (a: number | null, b: number | null) => h('td', { class: `num ${a !== null && b !== null && a > b ? 'best' : ''}`, text: a === null ? '—' : fmt2(a) });
   const body = rows.map((r) => {
-    const n = r.f1_nisar_same_px ?? r.f1_nisar;
+    const n = r.f1_nisar_same_px;
     return h('tr', {},
       h('td', { text: fmtShort(r.swotDate) }),
       h('td', { text: `${fmtShort(r.nisar.slice(0, 10))} · ${r.nisar.slice(11)}` }),
@@ -82,6 +83,17 @@ export function mountValidation(host: HTMLElement): void {
 
   function build(area: AreaPoint[], v: Validation, scenes: Scene[]) {
     const V = T.validation;
+    const stats = validationStats(v);
+    const paired = hlsPairs(v);
+    const opticalCanvas = h('canvas', { role: 'img', 'aria-label': T.story.chartAria });
+    const evidence = h('section', { class: 'card vcard v-evidence' },
+      h('h3', { text: T.story.chartTitle }),
+      h('p', { class: 'v-result', text: stats.hls.total ? T.story.hlsResult(stats.hls.wins, stats.hls.total) : T.story.unavailable }),
+      h('div', { class: 'v-chart optical-chart' }, opticalCanvas),
+      h('p', { class: 'note', text: T.story.pairNote }),
+      h('p', { class: 'v-swot-result', text: stats.swot.total ? T.story.swotResult(stats.swot.wins, stats.swot.total) : T.story.unavailable }),
+      h('details', {}, h('summary', { text: T.story.chartTable }), hlsTable(paired)));
+
     const f1 = v.vsDswxS1.map((r) => r.f1);
     const flood = v.vsDswxS1.filter((r) => r.date >= '2026-09-01').map((r) => r.f1);
     const early = v.vsDswxS1.filter((r) => r.date < '2026-08-01').map((r) => r.f1);
@@ -119,6 +131,7 @@ export function mountValidation(host: HTMLElement): void {
 
     inner.replaceChildren(
       h('h2', { text: V.title }),
+      evidence,
       h('p', { class: 'lead', text: V.lead }),
       h('section', { class: 'card vcard v-plain' }, h('h3', { text: V.plainTitle }), h('ul', { class: 'v-list' }, ...V.plain.map((p) => h('li', { text: p })))),
       h('section', { class: 'card vcard' }, h('h3', { text: V.limitsTitle }), h('ul', { class: 'v-list' }, ...T.content.limits.map((l) => h('li', { text: l })))),
@@ -126,6 +139,6 @@ export function mountValidation(host: HTMLElement): void {
       h('section', { class: 'card vcard' }, h('h3', { text: V.sourcesTitle }), sourcesList()),
     );
 
-    charts.push(createAreaChart(areaCanvas, area, scenes), createF1Chart(f1Canvas, v));
+    charts.push(createOpticalChart(opticalCanvas, paired), createAreaChart(areaCanvas, area, scenes), createF1Chart(f1Canvas, v));
   }
 }

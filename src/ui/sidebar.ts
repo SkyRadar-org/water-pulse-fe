@@ -27,7 +27,7 @@ function summaryText(l: SummaryLayer): { title: string; legend: { color: string;
   };
 }
 
-export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void {
+export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): HTMLElement {
   host.classList.add('sidebar');
 
   // ---- find a commune ----
@@ -112,7 +112,8 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
 
   const legend = h('section', { class: 'sb-sec sb-legend' });
   const note = h('p', { class: 'note sb-note', text: T.areaNote });
-  host.append(findSection, layerSection, summarySection, legend, note);
+  const advanced = h('details', { class: 'sb-advanced' }, h('summary', { text: T.story.advanced }), layerSection, summarySection);
+  host.append(findSection, advanced, legend, note);
 
   function renderLegend(s: State) {
     legend.replaceChildren(h('h3', { text: T.sidebar.legend.title }));
@@ -161,4 +162,5 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): void
   subscribe(sync);
   lastSummary = undefined;
   sync(state);
+  return advanced;
 }

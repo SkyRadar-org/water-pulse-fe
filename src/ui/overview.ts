@@ -5,6 +5,7 @@ import { fmtDate, fmtNum, fmtPct, fold } from '../format.ts';
 import { T } from '../i18n.ts';
 import { set, state } from '../state.ts';
 import { h } from './dom.ts';
+import { heroBlock } from './about.ts';
 
 export type OverviewGroup = 'all' | 'high' | 'medium' | 'low' | 'insufficient';
 
@@ -157,7 +158,7 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
   const heroSection = h(
     'section',
     { class: 'ov-hero', 'aria-labelledby': 'ov-main-title' },
-    h('h1', { id: 'ov-main-title', class: 'ov-title', text: T.overview.title }),
+    h('h2', { id: 'ov-main-title', class: 'ov-title', text: T.overview.title }),
     h('p', { class: 'ov-lead', text: T.overview.lead }),
     h(
       'div',
@@ -366,8 +367,8 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
     all.find((c) => c.osm_id === '15581562') ??
     all.find((c) => isEvaluated(c) && c.reference_track === '083A');
   const exSonKien =
-    all.find((c) => c.osm_id === '15416586') ??
-    all.find((c) => isEvaluated(c) && c.reference_track === '148D');
+    all.find((c) => c.osm_id === '15012314' && isEvaluated(c)) ??
+    all.find((c) => isEvaluated(c) && c.last_pct! >= 30);
 
   const trackExampleText =
     exAnLong && exSonKien
@@ -454,7 +455,7 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
     ),
   );
 
-  root.replaceChildren(heroSection, cardsSection, listSection, h('p', { class: 'note ov-footnote', text: T.overview.cautionBody }), h('details', { class: 'ov-explanation' }, h('summary', { text: T.overview.caveats.title }), guideAndCaveatsSection));
+  root.replaceChildren(heroBlock(), heroSection, cardsSection, listSection, h('p', { class: 'note ov-footnote', text: T.story.waterNote + ' ' + T.overview.cautionBody }), h('details', { class: 'ov-explanation' }, h('summary', { text: T.overview.caveats.title }), guideAndCaveatsSection));
 
   function getFilteredRows(): CommuneProps[] {
     const q = fold(searchQuery.trim());
@@ -519,7 +520,7 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
       return h(
         'td',
         {},
-        h('span', { class: 'ov-cov-chip ov-cov-ok', text: T.overview.list.coverageSufficient }),
+        h('span', { class: 'ov-cov-chip ov-cov-ok', text: c.observed_pct != null ? T.story.coverage(fmtNum(Math.floor(c.observed_pct * 10) / 10)) : T.overview.list.coverageSufficient }),
         c.valid_km2 !== null
           ? h('span', { class: 'ov-cov-sub', text: T.overview.list.validArea(fmtNum(c.valid_km2)) })
           : null,
@@ -529,7 +530,7 @@ function buildOverview(root: HTMLElement, all: CommuneProps[]): void {
       return h(
         'td',
         {},
-        h('span', { class: 'ov-cov-chip ov-cov-partial', text: T.overview.list.coveragePartial }),
+        h('span', { class: 'ov-cov-chip ov-cov-partial', text: c.observed_pct != null ? T.story.coverage(fmtNum(Math.floor(c.observed_pct * 10) / 10)) : T.story.partial }),
         c.valid_km2 !== null
           ? h('span', { class: 'ov-cov-sub', text: T.overview.list.validArea(fmtNum(c.valid_km2)) })
           : null,

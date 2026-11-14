@@ -10,6 +10,7 @@ import './styles/ux.css';
 import './styles/overview.css';
 import './styles/decision.css';
 import './styles/reports.css';
+import './styles/story.css';
 import { DATA_MODE } from './config.ts';
 import { getScenes, getSummaryLayers } from './data/dataSource.ts';
 import { lang, switchLang, T, type Lang } from './i18n.ts';
@@ -126,8 +127,8 @@ async function buildMapView(view: HTMLElement, menuBtn: HTMLElement) {
   mapWrap.append(panel);
   view.append(context, sidebar, mapWrap, timeline);
 
-  mountSidebar(sidebar, summaries);
-  mountTimeline(timeline, scenes);
+  const advanced = mountSidebar(sidebar, summaries);
+  mountTimeline(timeline, scenes, advanced);
   mountCommunePanel(panel, scenes);
   mountMap(mapEl);
   await mountMapContext(context, scenes);

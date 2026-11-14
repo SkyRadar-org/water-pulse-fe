@@ -1,0 +1,46 @@
+/* The shared story and essential observation context remain visible on small screens. */
+.story-hero { margin: 0; }
+.story-hero .hero-nums { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.story-hero .story-date { font-size: 13px; margin: 12px 0 0; }
+.story-hero .btn-primary { min-height: 44px; }
+.story-hero button:disabled { opacity: .65; cursor: wait; }
+.story-hero h1 { font-size: clamp(24px, 3vw, 34px); }
+.story-hero .hero-num span { display: block; line-height: 1.4; }
+.ov-card-badge, .ov-card-desc, .ov-section-sub, .ov-snapshot-k,
+.ov-table th, .ov-table td, .ov-row-btn, .ov-snapshot-sub,
+.cp-evidence, .cp-label, .map-context p, .map-mode button,
+.sb-sec h3, .sb-sec h4, .sb-row small, .sb-slider, .sb-leg,
+.tl-meta, .tl-legend, .tl-ticks, .tl-summary-note, .tl-latest-note { font-size: 13px; }
+.sb-sec h3 { text-transform: none; letter-spacing: normal; }
+.sb-advanced > summary { cursor: pointer; font-weight: 600; padding: 12px 0; }
+.sb-timeline-controls .tl-seg { display: flex; margin: 8px 0; }
+.sb-timeline-controls .tl-seg button { flex: 1; font-size: 13px; min-height: 40px; padding: 5px; }
+.timeline.simple .tl-meta { display: flex; }
+.timeline.simple .tl-track { display: none; }
+.timeline.simple .tl-legend > span:not(.tl-legend-note) { display: inline-flex; }
+.timeline.simple .tl-info { display: none; }
+.map-context { padding: 8px 16px; }
+.v-result { font-size: clamp(18px, 2vw, 24px); font-weight: 700; margin: 8px 0 18px; }
+.v-swot-result { padding: 12px; border-left: 3px solid var(--brand-2); background: var(--surface-2); }
+.optical-chart { height: 300px; }
+.v-evidence details > summary { cursor: pointer; min-height: 40px; padding: 8px 0; }
+@media (max-width: 767px) {
+  .story-hero { padding: 18px 16px; }
+  .story-hero h1 { font-size: 24px; }
+  .story-hero p { font-size: 14px; margin-bottom: 12px; }
+  .story-hero .hero-nums { gap: 7px; margin-bottom: 14px; }
+  .story-hero .hero-num { padding: 9px 7px; }
+  .story-hero .hero-num b { font-size: 23px; }
+  .story-hero .hero-num span { font-size: 13px; }
+  .story-hero .hero-actions { display: flex; }
+  .story-hero .btn-primary { width: 100%; }
+  .tl-meta .maturity { display: inline-block; font-size: 13px; max-width: 185px; white-space: normal; }
+  .tl-head { flex-wrap: nowrap; gap: 8px; }
+  .tl-now { flex-wrap: wrap; gap: 4px; }
+  .tl-date { font-size: 19px; }
+  .tl-collapse { flex: none; }
+  .map-context p { font-size: 13px; line-height: 1.35; }
+  .map-context h1 { font-size: 16px; }
+  .map-context { padding: 8px 10px; }
+  .optical-chart { height: 280px; }
+}

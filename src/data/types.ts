@@ -20,6 +20,8 @@ export interface CommuneProps {
   osm_id: string;
   name: string;
   province: string;
+  area_km2?: number | null;
+  observed_pct?: number | null; // percent of the full OSM commune, 0–100
   valid_km2: number | null;
   first_flood_date: string | null;
   peak_pct: number | null;
@@ -63,6 +65,7 @@ export interface SummaryLayer {
 
 export interface ValidationRow {
   date: string;
+  track?: Track;
   f1_nisar: number;
   f1_s1: number;
   recall_nisar: number;

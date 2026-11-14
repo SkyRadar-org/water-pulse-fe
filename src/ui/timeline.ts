@@ -11,8 +11,12 @@ const SOWING = '2026-11-01';
 const GAP_DAYS = 15;
 const SIMPLE_COLOR = '#1d4ed8';
 
-export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
+export function mountTimeline(host: HTMLElement, scenes: Scene[], advanced?: HTMLElement): void {
   const all = [...scenes].sort((a, b) => a.date.localeCompare(b.date) || a.track.localeCompare(b.track));
+  if (!all.length) {
+    host.append(h('p', { role: 'status', text: T.overview.noDateRange }));
+    return;
+  }
   const minMs = toMs(all[0].date);
   const maxMs = Math.max(toMs(all[all.length - 1].date), toMs(SOWING)) + 4 * 86400000;
   const xPct = (date: string) => ((toMs(date) - minMs) / (maxMs - minMs)) * 100;
@@ -33,6 +37,7 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     set({ trackFilter: f });
     if (f !== 'all' && state.selectedTrack !== f) {
       const pool = visible(f);
+      if (!pool.length) return;
       const target = toMs(state.selectedDate);
       const nearest = pool.reduce((best, s) => (Math.abs(toMs(s.date) - target) < Math.abs(toMs(best.date) - target) ? s : best), pool[0]);
       select(nearest);
@@ -66,8 +71,9 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
   }
   function tick() {
     timer = window.setTimeout(() => {
+      timer = undefined;
       if (!step(1)) return stop();
-      tick();
+      if (timer === undefined && state.playing) tick();
     }, nextDelay());
   }
   function play() {
@@ -76,7 +82,13 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     // From the "latest per commune" view, or at the end, start from the first acquisition (select() switches to one-acquisition mode).
     if (state.mapMode === 'latest' || idx < 0 || idx >= list.length - 1) select(list[0]);
     set({ playing: true });
-    tick();
+  }
+
+  function syncPlayback() {
+    if (!state.playing || state.mapMode !== 'scene' || state.tab !== 'map' || state.activeSummary) {
+      if (timer !== undefined) stop();
+      else if (state.playing) set({ playing: false });
+    } else if (timer === undefined) tick();
   }
 
   // ---- DOM ----
@@ -120,10 +132,11 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     h('div', { class: 'tl-now' }, dateEl, h('div', { class: 'tl-meta' }, trackEl, maturityEl)),
     infoEl,
     h('div', { class: 'tl-spacer' }),
-    viewSeg,
-    seg,
+    ...(advanced ? [] : [viewSeg, seg]),
     collapseBtn,
   );
+
+  advanced?.append(h('section', { class: 'sb-sec sb-timeline-controls' }, h('h3', { text: T.timeline.modeGroup }), viewSeg, seg));
 
   const plot = h('div', { class: 'tl-plot' });
   const axis = h('div', { class: 'tl-axis' }, plot);
@@ -174,11 +187,11 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
       });
       for (const s of list) {
         const dot = h('button', {
-          class: `tl-dot ${simple ? 'validated' : s.maturity}`,
+          class: `tl-dot ${s.maturity}`,
           type: 'button',
           style: `left:${xPct(s.date)}%;--c:${simple ? SIMPLE_COLOR : TRACK_COLORS[s.track]}`,
-          'aria-label': simple ? fmtDate(s.date) : T.timeline.dotLabel(fmtDate(s.date), s.track, MATURITY_LABEL(s.maturity)),
-          title: simple ? fmtDate(s.date) : `${fmtDate(s.date)} · ${s.track} · ${MATURITY_LABEL(s.maturity)}`,
+          'aria-label': T.timeline.dotLabel(fmtDate(s.date), s.track, MATURITY_LABEL(s.maturity)),
+          title: `${fmtDate(s.date)} · ${s.track} · ${MATURITY_LABEL(s.maturity)}`,
         });
         dot.addEventListener('click', () => {
           stop();
@@ -251,6 +264,8 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
       builtFor = `${s.trackFilter}|${mode}`;
     }
     host.classList.toggle('simple', mode === 'simple');
+    seg.hidden = mode === 'simple';
+    host.classList.toggle('playing', s.playing);
     for (const [m, b] of viewBtns) b.setAttribute('aria-pressed', String(m === mode));
     const scene = current(s);
     for (const [f, b] of segBtns) b.setAttribute('aria-pressed', String(f === s.trackFilter));
@@ -262,8 +277,13 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
     dateEl.textContent = fmtDate(scene.date);
     trackEl.textContent = T.timeline.trackLabel(scene.track);
     trackEl.style.setProperty('--c', TRACK_COLORS[scene.track]);
-    maturityEl.textContent = MATURITY_LABEL(scene.maturity);
-    maturityEl.className = `maturity ${scene.maturity}`;
+    const allValidated = scene.composite
+      ? scene.composite.sources.every(source => all.some(s => s.date === source.date && s.track === source.track && s.maturity === 'validated'))
+      : scene.maturity === 'validated';
+    maturityEl.textContent = scene.composite
+      ? (allValidated ? T.story.mosaicValidated : T.story.mosaicProvisional)
+      : MATURITY_LABEL(scene.maturity);
+    maturityEl.className = `maturity ${allValidated ? 'validated' : 'provisional'}`;
     const prev = [...all].reverse().find((x) => x.track === scene.track && x.date < scene.date);
     infoEl.textContent = prev
       ? T.timeline.daysAfter(daysBetween(prev.date, scene.date))
@@ -276,8 +296,9 @@ export function mountTimeline(host: HTMLElement, scenes: Scene[]): void {
 
   subscribe((s) => {
     // Other controls pause by setting playing=false or switching to 'latest'; clear the timer too, or it keeps stepping.
-    if ((s.mapMode === 'latest' || !s.playing) && timer !== undefined) stop();
+    syncPlayback();
     render(s);
   });
   render(state);
+  syncPlayback();
 }

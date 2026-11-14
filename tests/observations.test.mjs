@@ -7,12 +7,12 @@ const read = async name => JSON.parse(await readFile(new URL('../dist/api-data/'
 const collection = await read('communes.json');
 const scenes = await read('scenes.json');
 
-test('latest map preserves all 131 assessed communes and excludes nine insufficient observations', () => {
+test('latest map preserves all 115 assessed communes and excludes 25 insufficient observations', () => {
   const values = latestValues(collection);
-  assert.equal(Object.keys(values).length, 131);
-  assert.equal(Object.values(values).filter(v => v >= 30).length, 38);
-  assert.equal(Object.values(values).filter(v => v >= 10 && v < 30).length, 40);
-  assert.equal(Object.values(values).filter(v => v < 10).length, 53);
+  assert.equal(Object.keys(values).length, 115);
+  assert.equal(Object.values(values).filter(v => v >= 30).length, 33);
+  assert.equal(Object.values(values).filter(v => v >= 10 && v < 30).length, 39);
+  assert.equal(Object.values(values).filter(v => v < 10).length, 43);
   for (const { properties: p } of collection.features) {
     if (!hasAssessment(p)) assert.equal(Object.hasOwn(values, p.osm_id), false);
   }

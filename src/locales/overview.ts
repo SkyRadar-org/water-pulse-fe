@@ -28,13 +28,13 @@ export const enOverview = {
     cards: {
       unitCommunes: (total: number): string => `/ ${total} communes`,
       clickToFilter: 'Click to filter the list',
-      highTitle: 'High Standing Water',
+      highTitle: 'High surface water',
       highThreshold: '≥ 30% water · Coverage ≥ 50%',
       highDesc: 'Prioritize a field check and compare with the local drainage plan.',
-      mediumTitle: 'Moderate Standing Water',
+      mediumTitle: 'Moderate surface water',
       mediumThreshold: '10% to < 30% · Coverage ≥ 50%',
       mediumDesc: 'Check the next observation on the same orbit to assess how water changes.',
-      lowTitle: 'Low Surface Water',
+      lowTitle: 'Low surface water',
       lowThreshold: '< 10% water · Coverage ≥ 50%',
       lowDesc: 'Low open-water fraction on radar. Does NOT automatically mean soil is ready or safe for sowing.',
       insufficientTitle: 'Insufficient observations',
@@ -44,10 +44,10 @@ export const enOverview = {
     },
 
     list: {
-      title: 'Priority Commune Inspection List',
+      title: 'Commune inspection list',
       subtitle:
         'Sorted by highest standing water fraction first. Click any commune row to inspect its latest radar scene on the map.',
-      searchPlaceholder: 'Search commune or province (e.g., Son Kien, An Long)…',
+      searchPlaceholder: 'Search commune or province (e.g., Vinh Hung, An Long)…',
       searchAria: 'Search commune by name or province',
       provinceAria: 'Filter by province',
       allProvinces: 'All provinces',
@@ -63,8 +63,8 @@ export const enOverview = {
       colCommune: 'Commune',
       colProvince: 'Province',
       colWaterPct: 'Water in last observation',
-      colObsDate: 'Observation Date',
-      colCoverage: 'Radar Coverage',
+      colObsDate: 'Observation date',
+      colCoverage: 'Radar coverage',
       colAction: 'Map',
       noObsShort: 'No observation',
       partialValueNote: 'Partial (<50% area)',
@@ -96,7 +96,7 @@ export const enOverview = {
 
     guideAndCaveatsAria: 'Data interpretation caveats and 3-step operational guide',
     caveats: {
-      title: 'Why Coverage Varies & How to Interpret Dates Safely',
+      title: 'Coverage and observation dates',
       missingNotDryTitle: (insufficient: number): string =>
         `1. ${insufficient} communes with insufficient coverage ≠ dry land`,
       missingNotDryBody: (insufficient: number, noObs: number, partial: number): string =>
@@ -121,14 +121,14 @@ export const enOverview = {
     },
 
     guide: {
-      title: '3-Step Operational Guide',
+      title: 'Three steps to inspect the data',
       lead: 'Quick workflow for irrigation and cooperative teams:',
       step1Title: 'Filter high-priority communes',
       step1Body:
         'Start with the ≥ 30% and 10% – < 30% cards or filter by your province to identify communes with substantial standing water.',
       step2Title: 'Verify observation date & coverage status',
       step2Body:
-        'Check the exact capture date and track on each row. Treat the 9 insufficient-coverage communes as unverified—never as dry.',
+        'Check the exact capture date and track on each row. Treat all insufficient-coverage communes as unverified—never as dry.',
       step3Title: 'Open the commune map & confirm in the field',
       step3Body:
         'Choose a commune, check its observation date and open the corresponding image. Confirm local conditions before deciding what to do.',
@@ -167,13 +167,13 @@ export const viOverview: typeof enOverview = {
       unitCommunes: (total: number): string => `/ ${total} xã`,
       clickToFilter: 'Bấm để lọc danh sách',
       highTitle: 'Còn nhiều nước',
-      highThreshold: 'Từ 30% diện tích có nước',
+      highThreshold: 'Từ 30% phần quan trắc có nước',
       highDesc: 'Ưu tiên kiểm tra thực địa, đối chiếu kế hoạch tiêu nước tại địa phương.',
       mediumTitle: 'Còn một phần nước',
-      mediumThreshold: 'Từ 10% đến dưới 30% nước',
+      mediumThreshold: '10% đến dưới 30% phần quan trắc có nước',
       mediumDesc: 'Theo dõi ảnh kế tiếp cùng quỹ đạo để biết nước thay đổi ra sao.',
       lowTitle: 'Ít nước trên ảnh',
-      lowThreshold: 'Dưới 10% diện tích có nước',
+      lowThreshold: 'Dưới 10% phần quan trắc có nước',
       lowDesc: 'Đối chiếu tình trạng đất trước khi quyết định xuống giống.',
       insufficientTitle: 'Chưa đủ dữ liệu',
       insufficientThreshold: 'Phủ < 50% hoặc chưa có ảnh',
@@ -185,7 +185,7 @@ export const viOverview: typeof enOverview = {
       title: 'Danh sách xã ưu tiên kiểm tra',
       subtitle:
         'Xã có nhiều nước được xếp trước. Chọn xã để đọc kết quả và xem ảnh làm bằng chứng.',
-      searchPlaceholder: 'Tìm tên xã hoặc tỉnh (VD: Sơn Kiên, An Long)…',
+      searchPlaceholder: 'Tìm tên xã hoặc tỉnh (VD: Vĩnh Hưng, An Long)…',
       searchAria: 'Tìm kiếm theo tên xã hoặc tỉnh',
       provinceAria: 'Lọc theo tỉnh',
       allProvinces: 'Tất cả tỉnh',
@@ -266,7 +266,7 @@ export const viOverview: typeof enOverview = {
         'Bấm vào thẻ "Còn nhiều nước (≥ 30%)" hoặc chọn Tỉnh của bạn để khoanh vùng ngay các xã cần ưu tiên tiêu nước.',
       step2Title: 'Kiểm tra ngày quan trắc & độ phủ',
       step2Body:
-        'Xem cột Ngày quan trắc và Độ phủ dữ liệu. Với 9 xã chưa đủ độ phủ (< 50%), cần kiểm tra trực tiếp ngoài thực địa chứ không coi là đã cạn.',
+        'Xem cột Ngày quan trắc và Độ phủ dữ liệu. Với các xã chưa đủ độ phủ (< 50%), cần kiểm tra trực tiếp ngoài thực địa chứ không coi là đã cạn.',
       step3Title: 'Mở bản đồ xã & đối chiếu thực địa',
       step3Body:
         'Chọn xã, kiểm tra ngày quan sát và mở ảnh tương ứng. Đối chiếu tình trạng tại ruộng trước khi quyết định.',

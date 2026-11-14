@@ -9,6 +9,32 @@ const two = (n: number): string => String(n).padStart(2, '0');
 export const vi: Strings = {
   ...viOverview,
   ...viReports,
+  story: {
+    title: 'NISAR theo dõi nước mặt qua mùa lũ, tổng hợp theo từng xã.',
+    lead: 'Xem nơi còn nhiều nước, kiểm tra ngày quan trắc và mở ảnh làm bằng chứng.',
+    high: 'xã nhiều nước / xã đủ phủ đánh giá',
+    optical: 'F1 cao hơn Sentinel-1 · đối chiếu quang học, tháng 8–11',
+    scenes: 'lần chụp NISAR thực tế',
+    explore: 'Xem mùa lũ 2026',
+    loading: 'Đang tải quan trắc…',
+    unavailable: 'Chưa tải được số liệu này. Vui lòng thử lại sau.',
+    dates: 'Quan trắc tháng 6–11/2026; không phải tình trạng trực tiếp hôm nay.',
+    advanced: 'Điều khiển nâng cao',
+    observedCommunes: (n, total) => `${n}/${total} xã có quan trắc gần đây. Thiếu quan trắc không đồng nghĩa đã khô.`,
+    compositeTitle: date => `Quan trắc đến ${date}`,
+    compositeNote: age => `Ảnh ghép từ quan trắc cũ tối đa ${age} ngày; không phải ảnh chụp đồng thời hoặc tình trạng trực tiếp hôm nay.`,
+    mosaicValidated: 'Ảnh ghép · mọi nguồn đã kiểm định',
+    mosaicProvisional: 'Ảnh ghép · có nguồn tạm thời',
+    chartTitle: 'Đối chiếu quang học độc lập · tháng 8–11',
+    hlsResult: (wins, total) => `NISAR có F1 cao hơn Sentinel-1 ở ${wins}/${total} cặp đối chiếu với bản đồ nước quang học.`,
+    swotResult: (wins, total) => `So với radar độc lập SWOT (NASA/CNES): F1 cao hơn ở ${wins}/${total} cặp đối chiếu trên cùng tập điểm ảnh.`,
+    chartAria: 'Biểu đồ F1 theo cặp cho NISAR và Sentinel-1 so với bản đồ nước quang học; giá trị có trong bảng bên cạnh.',
+    chartTable: 'Đọc số liệu biểu đồ',
+    pairNote: 'F1 từ 0 đến 1; càng cao càng khớp nguồn đối chiếu. Kết quả chỉ áp dụng cho các cặp quan trắc đã so sánh, không đại diện mọi nơi hoặc mọi mùa.',
+    coverage: pct => `Quan trắc ${pct}% diện tích toàn xã`,
+    partial: 'Chưa đủ độ phủ toàn xã để đánh giá',
+    waterNote: 'Tỷ lệ nước tính trên phần diện tích quan trắc; tỷ lệ phủ tính trên toàn xã theo ranh OSM.',
+  },
   htmlLang: 'vi',
   pageTitle: 'SkyRadar · NISAR Water Pulse',
   app: {
@@ -72,16 +98,16 @@ export const vi: Strings = {
       share: 'Xã: % đất bị ngập nước',
       noData: 'Không có dữ liệu cho ảnh này',
       waterMap: 'Vùng có nước (Water map)',
-      open: 'Ruộng ngập / nước mở',
+      open: 'Vùng nước mặt',
       perm: 'Nước thường xuyên (sông, kênh)',
-      statusNote: 'Ảnh gần nhất đủ phủ: ✓ dưới 10% nước · ! từ 30% nước · ? đang rút hoặc chưa đủ ảnh phủ · – không ngập đáng kể.',
+      statusNote: 'Ảnh gần nhất đủ phủ: ✓ dưới 10% nước · ! từ 30% nước · ? một phần nước hoặc chưa đủ ảnh phủ · – không ngập đáng kể.',
     },
   },
 
   map: {
     modeLabel: 'Chế độ quan sát bản đồ',
     latestMode: 'Ảnh gần nhất của từng xã',
-    sceneMode: 'Xem một lần chụp',
+    sceneMode: 'Diễn biến theo thời gian',
     latestTitle: 'Mức nước theo xã · ảnh gần nhất',
     latestCoverage: (n, total, start, end) => `${n}/${total} xã có ảnh đủ phủ để đánh giá. Quan sát từ ${start} đến ${end}, mỗi xã có ngày riêng. Đây là số liệu từ ảnh vệ tinh, không phải tình trạng trực tiếp hôm nay.`,
     sceneTitle: (date, track) => `Quan sát ngày ${date} · quỹ đạo ${track}`,
@@ -154,7 +180,7 @@ export const vi: Strings = {
     summary: (p, f) => {
       if (p.status === 'no_flood') return `${p.name} không ngập đáng kể trong mùa này (cao nhất ${p.peak_pct}% đất có nước, vào ${f.peak}).`;
       let s = `${p.name} bắt đầu ngập (từ 20% đất có nước) vào ${f.first}, ngập cao nhất ${p.peak_pct}% vào ${f.peak}, và ở ảnh cuối (${f.last}) còn ${p.last_pct}%. `;
-      if (p.coverage_sufficient === false) s += 'Chưa có ảnh phủ đủ diện tích để đánh giá xuống giống.';
+      if (p.coverage_sufficient === false) s += 'Chưa có ảnh phủ đủ diện tích để đánh giá toàn xã.';
       else if (p.status === 'not_receded') s += 'Ảnh gần nhất phủ ít nhất nửa xã còn từ 30% diện tích có nước; cần đối chiếu thực địa trước khi lên kế hoạch xuống giống.';
       else if (p.status === 'receded') s += 'Ảnh gần nhất phủ ít nhất nửa xã có dưới 10% diện tích còn nước.';
       else s += 'Ảnh gần nhất đủ phủ còn 10–30% diện tích có nước; cần đối chiếu thêm chuỗi ảnh để đánh giá xu thế.';
@@ -165,7 +191,7 @@ export const vi: Strings = {
   },
 
   validation: {
-    title: 'Mức độ tin cậy và giới hạn (Validation & limits)',
+    title: 'Mức độ tin cậy và giới hạn',
     lead: 'Chúng tôi đã đối chiếu bản đồ nước với những nguồn nào, và chỗ nào còn yếu.',
     plainTitle: 'Nói đơn giản',
     plain: [
@@ -240,15 +266,10 @@ export const vi: Strings = {
   content: {
     tagline: 'Radar băng L nhìn xuyên mây thấy ruộng lúa bị ngập — theo từng xã, suốt cả mùa lũ.',
     positioning: 'Bổ sung cho việc lập bản đồ ngập lụt nhanh của Việt Nam: theo dõi cả mùa lũ bằng NISAR băng L, cập nhật 2–3 ngày sau mỗi lần vệ tinh bay qua.',
-    heroNumbers: [
-      { big: 'Năm lũ thấp', text: '2026 là năm lũ thấp ở Đồng bằng sông Cửu Long.' },
-      { big: '38/131', text: 'xã được đánh giá còn ngập trên ảnh gần nhất đủ phủ (từ 30% diện tích có nước).' },
-      { big: '47–82% so với 35–64%', text: 'Độ phủ phát hiện nước so với ảnh quang học độc lập: NISAR và Sentinel-1, mùa lũ (tháng 8–11), qua 16 lần đối chiếu.' },
-    ],
     questions: [
       { q: 'Ngập từ khi nào?', a: 'Ngày đầu tiên xã có từ 20% đất bị ngập nước.' },
       { q: 'Ngập cao nhất lúc nào?', a: 'Tỷ lệ đất ngập nước cao nhất và ngày xảy ra.' },
-      { q: 'Nước có rút trước khi xuống giống không?', a: 'Ảnh gần nhất phủ ít nhất nửa xã: dưới 10% nước là sẵn sàng, 10–30% là đang rút, từ 30% là còn ngập.' },
+      { q: 'Còn bao nhiêu nước?', a: 'Ảnh mới nhất phủ ít nhất nửa xã chia tỷ lệ nước quan trắc thành dưới 10%, 10–dưới 30% và từ 30%. Đọc lịch sử cùng quỹ đạo để biết thay đổi; ít nước không đồng nghĩa đất sẵn sàng xuống giống.' },
     ],
     limits: [
       'Ngưỡng phân loại được hiệu chỉnh theo OPERA DSWx-S1 (băng C), vốn không phải là «sự thật mặt đất».',

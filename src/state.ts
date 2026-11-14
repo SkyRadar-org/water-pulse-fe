@@ -29,6 +29,7 @@ export interface State {
   selectedCommune: string | null;
   /** Incremented to ask the map to fly to the selected commune. */
   flyNonce: number;
+  mapResetNonce: number;
   activeSummary: SummaryId;
   layers: LayerToggles;
   opacity: Opacities;
@@ -58,11 +59,12 @@ export const state: State = {
   selectedTrack: '148D',
   selectedCommune: null,
   flyNonce: 0,
+  mapResetNonce: 0,
   activeSummary: null,
   layers: { basemap: true, radar: true, water: true, communes: true, provinces: true },
   opacity: { radar: 0.85, water: 0.9, communes: 0.6 },
   playing: false,
-  viewMode: 'pro',
+  viewMode: 'simple',
   cut: false,
   radarMissing: false,
   ...restoredSnapshot(),

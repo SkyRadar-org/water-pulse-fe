@@ -104,3 +104,22 @@ export function createF1Chart(canvas: HTMLCanvasElement, v: Validation) {
     },
   });
 }
+
+/** Paired comparisons use a category for each acquisition, never a blended track average. */
+export function createOpticalChart(canvas: HTMLCanvasElement, rows: import('../data/types.ts').ValidationRow[]) {
+  return new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => `${r.date.slice(5)}${r.track ? ` · ${r.track}` : ''}`),
+      datasets: [
+        { label: 'NISAR', data: rows.map(r => r.f1_nisar), backgroundColor: '#1d4ed8' },
+        { label: 'Sentinel-1', data: rows.map(r => r.f1_s1), backgroundColor: '#94a3b8' },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      scales: { y: { min: 0, max: 1, title: { display: true, text: 'F1' } }, x: { ticks: { maxRotation: 60, autoSkip: false } } },
+      plugins: { legend: { position: 'bottom' } },
+    },
+  });
+}

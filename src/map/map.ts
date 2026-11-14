@@ -159,6 +159,7 @@ export function mountMap(container: HTMLElement): MapView {
       if (state.activeSummary) applySummary(state);
       if (state.selectedCommune) communes.setSelected(state.selectedCommune);
       await applyScene(state);
+      if (state.mapResetNonce > 0 && !state.selectedCommune) map.fitBounds([[AOI[0], AOI[1]], [AOI[2], AOI[3]]], { padding: 30, duration: 0 });
       if (state.tab === 'map' && state.selectedCommune && state.flyNonce > 0) flyToCommune(state.selectedCommune);
     } catch (err) {
       console.error(err);
@@ -167,6 +168,7 @@ export function mountMap(container: HTMLElement): MapView {
 
   subscribe((s, prev) => {
     if (s.tab === 'map' && prev.tab !== 'map') map.resize();
+    if (s.mapResetNonce !== prev.mapResetNonce) map.fitBounds([[AOI[0], AOI[1]], [AOI[2], AOI[3]]], { padding: 30, duration: 0 });
     if (!ready) return;
     if (s.selectedDate !== prev.selectedDate || s.selectedTrack !== prev.selectedTrack || s.mapMode !== prev.mapMode || s.viewMode !== prev.viewMode) {
       if (s.viewMode !== prev.viewMode) warmAll(s.viewMode);

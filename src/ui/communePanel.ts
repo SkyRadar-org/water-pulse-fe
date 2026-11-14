@@ -3,7 +3,7 @@ import { createCommuneChart, type CommuneChartHandle } from '../charts/communeCh
 import { getCommuneSeries, getCommunes } from '../data/dataSource.ts';
 import type { CommuneProps, Scene, SeriesPoint, Track } from '../data/types.ts';
 import { hasAssessment, referenceScene } from '../data/observations.ts';
-import { downloadText, fmtDate, fmtPct } from '../format.ts';
+import { downloadText, fmtDate, fmtPct, fmtNum } from '../format.ts';
 import { T } from '../i18n.ts';
 import { STATUS_ICON, STATUS_LABEL } from '../palette.ts';
 import { set, state, subscribe } from '../state.ts';
@@ -119,6 +119,7 @@ export function mountCommunePanel(host: HTMLElement, scenes: Scene[]): void {
         h('div', { class: 'cp-status' }, h('span', { class: `chip ${p.status}`, text: hasAssessment(p) ? `${STATUS_ICON(p.status)} ${STATUS_LABEL(p.status)}` : T.overview.cards.insufficientTitle })),
         h('p', { class: 'cp-label', text: hasAssessment(p) ? T.panel.latestEvidence : p.last_pct === null ? T.panel.noObservations : T.panel.partialEvidence }),
         h('div', { class: 'cp-latest' }, h('strong', { text: fmtPct(p.last_pct) }), h('span', { text: p.last_date ? fmtDate(p.last_date) : '' })),
+        h('p', { class: 'cp-observed note', text: (p.observed_pct != null ? T.story.coverage(fmtNum(Math.floor(p.observed_pct * 10) / 10)) + '. ' : '') + T.story.waterNote }),
         h('p', { class: 'cp-next', text: decision }), evidence, viewImage,
         history,
       );

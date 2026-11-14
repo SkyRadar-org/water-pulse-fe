@@ -33,13 +33,13 @@ export async function mountMapContext(host: HTMLElement, scenes: Scene[]): Promi
     }
     const current = scenes.find(s => s.date === state.selectedDate && s.track === state.selectedTrack);
     if (!current) return;
-    title.textContent = T.map.sceneTitle(fmtDate(current.date), current.track);
+    title.textContent = current.composite ? T.story.compositeTitle(fmtDate(current.date)) : T.map.sceneTitle(fmtDate(current.date), current.track);
     note.textContent = T.map.coverageLoading;
     try {
       if (current.composite) {
         const mosaic = await getCompositeChoropleth(current.date, current.track);
         if (mosaic) {
-          if (my === token) note.textContent = T.map.blendCoverage(Object.keys(mosaic).length, collection.features.length);
+          if (my === token) note.textContent = T.story.compositeNote(current.composite.maxAgeDays) + ' ' + T.story.observedCommunes(Object.keys(mosaic).length, collection.features.length);
           return;
         }
       }
