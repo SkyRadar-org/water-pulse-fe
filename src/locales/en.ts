@@ -111,6 +111,11 @@ export const en = {
       open: 'Flooded field / open water',
       perm: 'Permanent water (rivers, canals)',
       statusNote: 'Latest covering image: ✓ below 10% water · ! at least 30% water · ? moderate water or insufficient coverage · – no significant flooding.',
+      radar: 'NISAR radar image (background)',
+      radarVeg: 'Yellow-green: vegetation, growing rice (dry land with crops)',
+      radarBuilt: 'Pink, purple: buildings, dykes, plants standing in water',
+      radarWater: 'Dark: smooth open water',
+      radarNote: 'False colour R = HH, G = HV, B = HH − HV. Context only; figures come from the water layer.',
     },
   },
 

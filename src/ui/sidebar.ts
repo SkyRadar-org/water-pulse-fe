@@ -144,6 +144,14 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): HTML
       ...water,
       h('p', { class: 'note', text: T.sidebar.legend.statusNote }),
     );
+    if (s.layers.radar) {
+      const L = T.sidebar.legend;
+      legend.append(
+        h('h4', { text: L.radar }),
+        h('ul', { class: 'sb-leg' }, swatch('#c9d64f', L.radarVeg), swatch('#c98bd3', L.radarBuilt), swatch('#1e293b', L.radarWater)),
+        h('p', { class: 'note', text: L.radarNote }),
+      );
+    }
   }
 
   let lastSummary: string | null | undefined;
@@ -153,9 +161,9 @@ export function mountSidebar(host: HTMLElement, summaries: SummaryLayer[]): HTML
     proOnly.forEach(el => el.hidden = (s.viewMode === 'simple' && s.mapMode === 'scene') || (sceneControls.includes(el) && s.mapMode !== 'scene'));
     for (const [k, el] of toggles) el.checked = s.layers[k];
     for (const r of radios) r.el.checked = r.id === s.activeSummary;
-    if (lastSummary !== s.activeSummary || lastMode !== `${s.mapMode}|${s.viewMode}`) {
+    if (lastSummary !== s.activeSummary || lastMode !== `${s.mapMode}|${s.viewMode}|${s.layers.radar}`) {
       lastSummary = s.activeSummary;
-      lastMode = `${s.mapMode}|${s.viewMode}`;
+      lastMode = `${s.mapMode}|${s.viewMode}|${s.layers.radar}`;
       renderLegend(s);
     }
   }

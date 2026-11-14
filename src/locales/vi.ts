@@ -110,6 +110,11 @@ export const vi: Strings = {
       open: 'Vùng nước mặt',
       perm: 'Nước thường xuyên (sông, kênh)',
       statusNote: 'Ảnh gần nhất đủ phủ: ✓ dưới 10% nước · ! từ 30% nước · ? một phần nước hoặc chưa đủ ảnh phủ · – không ngập đáng kể.',
+      radar: 'Ảnh radar NISAR (nền)',
+      radarVeg: 'Vàng lục: cây, lúa đang lên (đất khô có cây)',
+      radarBuilt: 'Hồng, tím: nhà cửa, đê, cây đứng trong nước',
+      radarWater: 'Tối: mặt nước phẳng',
+      radarNote: 'Màu giả R = HH, G = HV, B = HH − HV. Chỉ để xem bối cảnh; số liệu lấy từ lớp nước.',
     },
   },
 
