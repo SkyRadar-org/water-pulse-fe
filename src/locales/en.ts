@@ -54,9 +54,9 @@ export const en = {
     langTip: 'Language',
     sections: 'Sections',
   },
-  tabs: { overview: 'Overview', map: 'Map', reports: 'Reports', validation: 'Validation', about: 'About' },
+  tabs: { overview: 'Overview', advice: 'Advice', map: 'Map', reports: 'Reports', validation: 'Validation', about: 'About' },
   /** Narrow-screen labels; tabs without an entry keep their full label. */
-  tabsShort: { reports: 'Reports' } as Partial<Record<'overview' | 'map' | 'reports' | 'validation' | 'about', string>>,
+  tabsShort: { reports: 'Reports' } as Partial<Record<'overview' | 'advice' | 'map' | 'reports' | 'validation' | 'about', string>>,
   maturity: { provisional: 'Provisional', validated: 'Validated' } as Record<Maturity, string>,
   // [Claude] Direction of change between two real images of the same orbit. Measured, never a forecast.
   trend: {

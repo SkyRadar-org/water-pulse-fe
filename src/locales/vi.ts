@@ -55,7 +55,7 @@ export const vi: Strings = {
     langTip: 'Ngôn ngữ',
     sections: 'Các mục',
   },
-  tabs: { overview: 'Tổng quan', map: 'Bản đồ', reports: 'Báo cáo thống kê', validation: 'Độ tin cậy', about: 'Giới thiệu' },
+  tabs: { overview: 'Tổng quan', advice: 'Khuyến nghị', map: 'Bản đồ', reports: 'Báo cáo thống kê', validation: 'Độ tin cậy', about: 'Giới thiệu' },
   tabsShort: { reports: 'Báo cáo' },
   maturity: { provisional: 'Tạm thời (Provisional)', validated: 'Đã kiểm định (Validated)' },
   trend: {

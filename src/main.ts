@@ -11,12 +11,14 @@ import './styles/overview.css';
 import './styles/decision.css';
 import './styles/reports.css';
 import './styles/story.css';
+import './styles/advice.css';
 import { DATA_MODE } from './config.ts';
 import { getScenes, getSummaryLayers } from './data/dataSource.ts';
 import { lang, switchLang, T, type Lang } from './i18n.ts';
 import { mountMap } from './map/map.ts';
 import { set, state, subscribe, type Tab } from './state.ts';
 import { mountAbout } from './ui/about.ts';
+import { mountAdvice } from './ui/advice.ts';
 import { mountCommunePanel } from './ui/communePanel.ts';
 import { h } from './ui/dom.ts';
 import { openGuide } from './ui/guide.ts';
@@ -28,7 +30,7 @@ import { mountSidebar } from './ui/sidebar.ts';
 import { mountTimeline } from './ui/timeline.ts';
 import { mountValidation } from './ui/validation.ts';
 
-const TABS: Tab[] = ['overview', 'map', 'reports', 'validation', 'about'];
+const TABS: Tab[] = ['overview', 'advice', 'map', 'reports', 'validation', 'about'];
 /** Old bookmarks keep working after the commune list became the report tab. */
 const LEGACY_HASH: Record<string, Tab> = { communes: 'reports' };
 
@@ -85,6 +87,7 @@ function buildShell(root: HTMLElement) {
 
   const views: Record<Tab, HTMLElement> = {
     overview: h('section', { class: 'view', id: 'view-overview' }),
+    advice: h('section', { class: 'view', id: 'view-advice' }),
     map: h('section', { class: 'view view-map', id: 'view-map' }),
     reports: h('section', { class: 'view', id: 'view-reports' }),
     validation: h('section', { class: 'view', id: 'view-validation' }),
@@ -159,6 +162,7 @@ function main() {
   set({ tab: tabFromHash() });
   render();
 
+  mountAdvice(shell.views.advice);
   mountReports(shell.views.reports);
   mountOverview(shell.views.overview);
   mountValidation(shell.views.validation);

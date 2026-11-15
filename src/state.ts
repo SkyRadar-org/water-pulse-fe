@@ -1,6 +1,6 @@
 import type { SummaryLayer, Track } from './data/types.ts';
 
-export type Tab = 'overview' | 'map' | 'reports' | 'validation' | 'about';
+export type Tab = 'overview' | 'advice' | 'map' | 'reports' | 'validation' | 'about';
 /** 'pro': radar + age-faded water + per-track timeline; 'simple': one-colour water and one timeline bar (needs blended frames). */
 export type ViewMode = 'pro' | 'simple';
 export type TrackFilter = 'all' | Track;
