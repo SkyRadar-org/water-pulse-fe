@@ -49,6 +49,15 @@ export function mountAbout(host: HTMLElement): void {
       h('h2', { text: A.answersTitle }),
       h('p', { class: 'lead', text: A.answersLead }),
       h('div', { class: 'about-grid' }, ...T.content.questions.map((q) => h('div', { class: 'card' }, h('h3', { text: q.q }), h('p', { text: q.a })))),
+      h(
+        'section',
+        { class: 'card vcard about-advice' },
+        h('h3', { text: A.adviceTitle }),
+        h('p', { text: A.adviceLead }),
+        h('ul', { class: 'v-list' }, ...A.advice.map((r) => h('li', { text: r }))),
+        h('p', { class: 'note', text: A.adviceNote }),
+        h('a', { href: '#advice', class: 'btn-primary about-advice-link', text: A.adviceLink }),
+      ),
       h('section', { class: 'card vcard' }, h('h3', { text: A.readTitle }), h('ul', { class: 'v-list' }, ...A.read.map((r) => h('li', { text: r })), h('li', {}, A.readMore[0], goValidation, A.readMore[2]))),
       h('section', { class: 'card vcard' }, h('h3', { text: A.limitsTitle }), h('ul', { class: 'v-list' }, ...T.content.limits.map((l) => h('li', { text: l })))),
       h(

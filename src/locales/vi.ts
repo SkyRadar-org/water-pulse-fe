@@ -244,9 +244,19 @@ export const vi: Strings = {
 
   about: {
     title: 'Về NISAR Water Pulse',
-    intro: 'Công cụ giúp cán bộ thủy lợi, nông nghiệp và hợp tác xã ở Đồng bằng sông Cửu Long biết ruộng của từng xã còn ngập hay đã rút, để chuẩn bị xuống giống vụ Đông Xuân. Dữ liệu là ảnh radar băng L của vệ tinh NISAR (NASA–ISRO), nhìn xuyên mây nên vẫn chụp được giữa mùa mưa. Bản hiện tại thí điểm 140 xã ở Tứ giác Long Xuyên và Đồng Tháp Mười; các vùng còn lại của đồng bằng chưa triển khai.',
+    intro: 'Công cụ giúp cán bộ thủy lợi, nông nghiệp và hợp tác xã ở Đồng bằng sông Cửu Long biết ruộng của từng xã còn ngập hay đã rút, để chuẩn bị xuống giống vụ Đông Xuân, và nhận khuyến nghị việc cần làm cho từng xã. Dữ liệu là ảnh radar băng L của vệ tinh NISAR (NASA–ISRO), nhìn xuyên mây nên vẫn chụp được giữa mùa mưa. Bản hiện tại thí điểm 140 xã ở Tứ giác Long Xuyên và Đồng Tháp Mười; các vùng còn lại của đồng bằng chưa triển khai.',
     answersTitle: 'Ứng dụng trả lời những câu hỏi nào',
     answersLead: 'Với từng xã ở Tứ giác Long Xuyên và Đồng Tháp Mười (An Giang, Đồng Tháp), qua 33 lần chụp NISAR trên ba quỹ đạo từ 17/6 đến 3/11/2026:',
+    adviceTitle: 'Tab Khuyến nghị: từ nước trên ruộng đến việc cần làm',
+    adviceLead: 'Với ngày đánh giá được chọn, mỗi xã nhận một quyết định rõ ràng cho từng chủ đề, kèm một câu hành động và lý do:',
+    advice: [
+      'Xuống giống: sẵn sàng xuống giống, chờ thêm N ngày, rủi ro trễ lịch (cần bơm tiêu) hay cần kiểm tra thực địa, so với khung né rầy của tỉnh và hạn chót vụ Đông Xuân.',
+      'Bơm tiêu: lượng nước cần bơm, số máy bơm di động cần thêm và xã đã khô có thể điều máy sang.',
+      'Phân bón: xã ngập lâu nhận nhiều phù sa nên giảm được đạm và lân cho vụ đầu sau lũ, kèm tiền tiết kiệm ước tính.',
+      'Ốc bươu vàng và chuột: mức nguy cơ theo điều tra và việc ruộng còn nước lúc sạ, kèm biện pháp.',
+    ],
+    adviceNote: 'Mực nước theo xã là số đo NISAR thật (nhãn xanh). Lịch né rầy, mực nước sông, lịch xả lũ, trạm bơm, phù sa, phân bón và điều tra sinh vật hại là dữ liệu demo giả định (nhãn vàng) để minh họa, cần thay bằng số liệu chính thức của tỉnh. Mọi bảng dữ liệu đều xem và tải được trong tab.',
+    adviceLink: 'Mở tab Khuyến nghị',
     readTitle: 'Cách đọc bản đồ',
     read: [
       'Thanh thời gian chỉ có những ngày thật sự có ảnh NISAR; không có số liệu nào được suy đoán cho các ngày ở giữa.',
@@ -269,11 +279,12 @@ export const vi: Strings = {
   },
 
   guide: {
-    title: 'Dùng bản đồ này trong 3 bước',
+    title: 'Dùng ứng dụng trong 4 bước',
     steps: [
       { t: 'Tìm xã hoặc chọn nhóm cần kiểm tra', d: 'Mở Tổng quan, nhập tên xã hoặc chọn nhóm còn nhiều nước. Mỗi số liệu đều có ngày quan sát riêng.' },
       { t: 'Đọc kết quả và việc cần kiểm tra', d: 'Xem tỷ lệ nước, ngày chụp và độ phủ. Chưa đủ ảnh phủ không có nghĩa là xã đã khô.' },
       { t: 'Mở ảnh làm bằng chứng', d: 'Bấm «Xem ảnh ngày…» để đến đúng lần chụp của xã. Mở diễn biến cả mùa khi cần đối chiếu xu thế.' },
+      { t: 'Xem khuyến nghị việc cần làm', d: 'Mở tab Khuyến nghị: mỗi xã có quyết định xuống giống, điều phối bơm tiêu, giảm phân bón và nguy cơ ốc, chuột, kèm lý do. Nhãn vàng là dữ liệu demo giả định.' },
     ],
     tip: 'Kết quả giúp ưu tiên kiểm tra tại địa phương và lên kế hoạch tiêu nước, xuống giống. Ngày ảnh và điều kiện thực tế cần được đối chiếu trước khi quyết định.',
     close: 'Đã hiểu',
@@ -285,7 +296,8 @@ export const vi: Strings = {
     questions: [
       { q: 'Ngập từ khi nào?', a: 'Ngày đầu tiên xã có từ 20% đất bị ngập nước.' },
       { q: 'Ngập cao nhất lúc nào?', a: 'Tỷ lệ đất ngập nước cao nhất và ngày xảy ra.' },
-      { q: 'Còn bao nhiêu nước?', a: 'Ảnh mới nhất phủ ít nhất nửa xã chia tỷ lệ nước quan trắc thành dưới 10%, 10–dưới 30% và từ 30%. Đọc lịch sử cùng quỹ đạo để biết thay đổi; ít nước không đồng nghĩa đất sẵn sàng xuống giống.' },
+      { q: 'Còn bao nhiêu nước?', a: 'Ảnh mới nhất phủ ít nhất nửa xã chia tỷ lệ nước quan trắc thành dưới 10%, 10–dưới 30% và từ 30%. Đọc lịch sử cùng quỹ đạo để biết thay đổi; ít nước chưa chắc đã sẵn sàng xuống giống: xem tab Khuyến nghị.' },
+      { q: 'Cần làm gì tiếp theo?', a: 'Tab Khuyến nghị đưa ra cho từng xã: xuống giống ngay, chờ hay bơm tiêu; điều máy bơm về đâu; giảm bao nhiêu phân bón; nguy cơ ốc và chuột.' },
     ],
     limits: [
       'Ngưỡng phân loại được hiệu chỉnh theo OPERA DSWx-S1 (băng C), vốn không phải là «sự thật mặt đất».',
@@ -294,6 +306,7 @@ export const vi: Strings = {
       'Lớp thực vật ngập nước đã được thử và bỏ (F1 ≈ 0,02): lúa đang lớn cũng làm kênh HH sáng lên.',
       'Tháng 6–7 mức khớp thấp (F1 ≈ 0,3) do ruộng còn ướt, mới làm đất.',
       'Đầu mùa (tháng 6–7) NISAR còn báo thừa nước trên ruộng khô; công cụ dành cho mùa lũ và nước rút.',
+      'Tab Khuyến nghị dùng một phần dữ liệu demo giả định (lịch thời vụ, mực nước sông, trạm bơm, phù sa, sinh vật hại); ngày ruộng khô chỉ là ước tính kéo dài từ xu hướng hai ảnh.',
       'Không phải công cụ cảnh báo sớm: dữ liệu về sau mỗi lần bay qua 2–3 ngày, và mỗi vị trí được chụp lại sau 3–6 ngày.',
     ],
     method:
@@ -302,6 +315,7 @@ export const vi: Strings = {
       { name: 'NISAR', text: 'Radar SAR băng L của NASA/JPL/ISRO, phân phối bởi ASF DAAC (sản phẩm GCOV).', href: 'https://asf.alaska.edu/' },
       { name: 'OPERA DSWx-S1 và DSWx-HLS', text: 'Bản đồ nước mặt động của JPL / PO.DAAC — dùng để hiệu chỉnh và kiểm chứng độc lập.', href: 'https://podaac.jpl.nasa.gov/' },
       { name: 'SWOT', text: 'Vệ tinh SWOT (NASA/CNES), sản phẩm L2 KaRIn High Rate Raster, PO.DAAC — nguồn so sánh độc lập.', href: 'https://podaac.jpl.nasa.gov/SWOT' },
+      { name: 'Dữ liệu khuyến nghị', text: 'Lịch né rầy, trạm thủy văn, mực nước, xả lũ, trạm bơm, phù sa, phân bón, sinh vật hại: dữ liệu demo giả định của nhóm, tải được trong tab Khuyến nghị.', href: undefined as string | undefined },
       { name: 'Bản đồ nền', text: '© Esri, HERE, Garmin, © OpenStreetMap contributors (ODbL).', href: 'https://www.openstreetmap.org/copyright' },
       { name: 'Ranh giới', text: 'Ranh giới tỉnh, biên giới quốc gia, nhãn quần đảo Hoàng Sa và Trường Sa lấy từ SkyRadar (skyradar-web).', href: undefined },
     ],

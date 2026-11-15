@@ -245,9 +245,19 @@ export const en = {
 
   about: {
     title: 'About NISAR Water Pulse',
-    intro: 'A tool that helps irrigation and agriculture officers and cooperatives in the Mekong Delta see whether each commune\'s fields are still flooded or have drained, ahead of the winter–spring rice sowing. It uses L-band radar images from the NISAR satellite (NASA–ISRO), which see through clouds and keep working in the rainy season. This version is a pilot over 140 communes in the Long Xuyên Quadrangle and the Plain of Reeds; the rest of the delta is not covered yet.',
+    intro: 'A tool that helps irrigation and agriculture officers and cooperatives in the Mekong Delta see whether each commune\'s fields are still flooded or have drained, ahead of the winter–spring rice sowing, and get advice on what to do in each commune. It uses L-band radar images from the NISAR satellite (NASA–ISRO), which see through clouds and keep working in the rainy season. This version is a pilot over 140 communes in the Long Xuyên Quadrangle and the Plain of Reeds; the rest of the delta is not covered yet.',
     answersTitle: 'What the app answers',
     answersLead: 'For every commune of the Long Xuyên Quadrangle and the Plain of Reeds (An Giang, Đồng Tháp), across 33 NISAR acquisitions on three tracks from 17 Jun to 3 Nov 2026:',
+    adviceTitle: 'Advice tab: from water on the field to what to do',
+    adviceLead: 'For the chosen assessment date, every commune gets one clear decision per topic, with a one-line action and its reasons:',
+    advice: [
+      'Sowing: ready to sow, wait N more days, late risk (pump needed) or field check needed, against the province\'s planthopper-avoidance window and the winter–spring deadline.',
+      'Pumping: water to pump, extra mobile pumps needed, and dry communes that can lend them.',
+      'Fertiliser: long-flooded communes received more silt and can cut nitrogen and phosphate for the first crop, with the estimated saving.',
+      'Golden apple snails and rats: risk level from the survey and from fields still wet at sowing, with measures.',
+    ],
+    adviceNote: 'Water per commune is measured by NISAR (blue tag). Avoidance calendars, river levels, upstream releases, pumping stations, silt, fertiliser and pest surveys are assumed demo data (amber tag) for illustration, to be replaced by official provincial data. Every table can be viewed and downloaded in the tab.',
+    adviceLink: 'Open the Advice tab',
     readTitle: 'How to read the map',
     read: [
       'The time slider only offers dates with a real NISAR image; nothing is interpolated between them.',
@@ -270,11 +280,12 @@ export const en = {
   },
 
   guide: {
-    title: 'How to use this map in 3 steps',
+    title: 'How to use the app in 4 steps',
     steps: [
       { t: 'Find a commune or choose a group', d: 'Start in Overview and enter a commune name or select the high-water group. Each observation has its own date.' },
       { t: 'Read the result and next check', d: 'Check water fraction, date and image coverage. Insufficient observations do not establish dry conditions.' },
       { t: 'Open the image as evidence', d: 'Choose View the image from… to open the correct acquisition. Expand seasonal history when you need to compare observations.' },
+      { t: 'See what to do', d: 'Open the Advice tab: each commune gets a sowing decision, pump dispatch, fertiliser cut and snail and rat risk, with reasons. Amber tags mark assumed demo data.' },
     ],
     tip: 'Use the results to prioritize local checks and plan drainage or sowing. Compare observation dates with field conditions before deciding.',
     close: 'Got it',
@@ -286,7 +297,8 @@ export const en = {
     questions: [
       { q: 'Since when is it flooded?', a: 'First date a commune reaches 20% of its land under water.' },
       { q: 'When was the peak?', a: 'The highest share of land under water, and the day it happened.' },
-      { q: 'How much water remains?', a: 'The newest image covering at least half the commune places observed water share into <10%, 10–<30% or ≥30% groups. Check same-orbit history to assess change; low water is not a sowing recommendation.' },
+      { q: 'How much water remains?', a: 'The newest image covering at least half the commune places observed water share into <10%, 10–<30% or ≥30% groups. Check same-orbit history to assess change; low water alone is not a sowing decision: see the Advice tab.' },
+      { q: 'What should we do next?', a: 'The Advice tab tells each commune: sow now, wait or pump; where to send pumps; how much fertiliser to cut; snail and rat risk.' },
     ],
     limits: [
       'Threshold calibrated against OPERA DSWx-S1 (C-band), which is not ground truth.',
@@ -295,6 +307,7 @@ export const en = {
       'Flooded-vegetation layer was tested and dropped (F1 ≈ 0.02): growing rice also brightens HH.',
       'June–July agreement is weak (F1 ≈ 0.3) due to wet, freshly prepared paddies.',
       'Early season (Jun–Jul): the rule over-reports water on dry fields; the tool targets the flood and recession period.',
+      'The Advice tab uses some assumed demo data (crop calendars, river levels, pumps, silt, pests); the dry date is only an estimate extending the two-image trend.',
       'Not an early-warning tool: data arrive 2–3 days after each overpass, every 3–6 days per location.',
     ],
     method:
@@ -303,6 +316,7 @@ export const en = {
       { name: 'NISAR', text: 'NASA/JPL/ISRO L-band SAR, distributed by ASF DAAC (GCOV products).', href: 'https://asf.alaska.edu/' },
       { name: 'OPERA DSWx-S1 and DSWx-HLS', text: 'Dynamic Surface Water Extent, JPL / PO.DAAC — used for calibration and independent validation.', href: 'https://podaac.jpl.nasa.gov/' },
       { name: 'SWOT', text: 'Surface Water and Ocean Topography (NASA/CNES), L2 KaRIn High Rate Raster, PO.DAAC — independent comparison source.', href: 'https://podaac.jpl.nasa.gov/SWOT' },
+      { name: 'Advice data', text: 'Avoidance calendars, gauges, river levels, releases, pumps, silt, fertiliser, pests: assumed demo data by the team, downloadable in the Advice tab.', href: undefined as string | undefined },
       { name: 'Basemap', text: '© Esri, HERE, Garmin, © OpenStreetMap contributors (ODbL).', href: 'https://www.openstreetmap.org/copyright' },
       { name: 'Boundaries', text: 'Province and national boundaries, Hoàng Sa and Trường Sa labels from SkyRadar (skyradar-web).', href: undefined as string | undefined },
     ],
