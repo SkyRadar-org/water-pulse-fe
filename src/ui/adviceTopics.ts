@@ -97,7 +97,7 @@ export function renderTopic(topic: Exclude<Topic, 'sowing'>, list: Advice[], ext
       )),
       h('div', { class: 'ad-kpis' },
         kpi(fmtNum(rows.length), t('xã cần bơm tiêu', 'communes need pumping'), t('Từ quyết định xuống giống', 'From the sowing decision'), 'ad-risk'),
-        kpi(`${fmtNum(Math.round(totalM3 / 1e5) / 10)} tr m³`, t('nước cần bơm', 'water to pump'), t('Trên mức ruộng khô 15%', 'Above the 15% dry level'), 'ad-check'),
+        kpi(`${fmtNum(Math.round(totalM3 / 1e5) / 10)} ${t('tr m³', 'M m³')}`, t('nước cần bơm', 'water to pump'), t('Trên mức ruộng khô 15%', 'Above the 15% dry level'), 'ad-check'),
         kpi(fmtNum(extra), t('máy di động cần thêm', 'extra mobile pumps'), t('Để kịp khung né rầy', 'To make the window'), 'ad-wait'),
         kpi(`${fmtNum(lent)}/${fmtNum(extra)}`, t('máy điều được từ xã đã khô', 'pumps lent by dry communes'), t('Phần còn thiếu đề nghị tỉnh hỗ trợ', 'The rest from the province'), 'ad-ready'),
       ),
