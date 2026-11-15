@@ -5,7 +5,8 @@
 import Papa from 'papaparse';
 import { Chart, chartAdapters } from '../charts/register.ts';
 import { getCommunes } from '../data/dataSource.ts';
-import { addDays, CALENDARS, LEVEL_FROM, LEVEL_TO, SEASON_DEADLINE, STATIONS, stationLevels, UPSTREAM_RELEASE } from '../data/demoAgro.ts';
+import { adviceDataSection } from './adviceData.ts';
+import { addDays, CALENDARS, loadDemoData, LEVEL_FROM, LEVEL_TO, SEASON_DEADLINE, STATIONS, stationLevels, UPSTREAM_RELEASE } from '../data/demoAgro.ts';
 import { adviseAll, DECISIONS, type Advice, type Decision } from '../data/sowingAdvice.ts';
 import type { CommuneProps } from '../data/types.ts';
 import { downloadText, fmtDate, fmtNum, fmtPct, fmtShort, fold } from '../format.ts';
@@ -32,8 +33,8 @@ export function mountAdvice(host: HTMLElement): void {
   host.replaceChildren(inner);
   const load = () => {
     inner.replaceChildren(h('p', { class: 'ad-loading', role: 'status', text: A.loading }));
-    getCommunes()
-      .then((c) => build(inner, c.features.map((f) => f.properties)))
+    Promise.all([getCommunes(), loadDemoData()])
+      .then(([c]) => build(inner, c.features.map((f) => f.properties)))
       .catch((err: unknown) => {
         console.error(err);
         inner.replaceChildren(h('div', { class: 'error-box', role: 'alert' }, h('p', { text: A.loadError }), h('p', { class: 'note', text: err instanceof Error ? err.message : '' })));
@@ -178,7 +179,8 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
   );
   const method = h('details', { class: 'ad-method' }, h('summary', { text: A.methodTitle }), h('ol', {}, ...A.method.map((m) => h('li', { text: m }))));
 
-  root.replaceChildren(head, banner, controls, kpis, filterLine, h('section', { class: 'ad-results' }, count, list, more), context, method, status);
+  const dataSec = adviceDataSection(all, () => toRows(advice)) as HTMLElement & { refresh?: () => void };
+  root.replaceChildren(head, banner, controls, kpis, filterLine, h('section', { class: 'ad-results' }, count, list, more), context, dataSec, method, status);
 
   // ---------- events ----------
   dateIn.addEventListener('change', () => {
@@ -202,7 +204,14 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
     renderList();
   });
   exportBtn.addEventListener('click', () => {
-    const rows = filtered().map((a) => ({
+    const rows = toRows(filtered());
+    const name = `khuyen-nghi-xuong-giong_${evalDate}${province ? '_' + fold(province).replace(/\s+/g, '-') : ''}.csv`;
+    downloadText(name, Papa.unparse(rows));
+    status.textContent = A.exported(name);
+  });
+  function toRows(list: Advice[]) {
+    return list.map((a) => ({
+      osm_id: a.p.osm_id,
       xa: a.p.name,
       tinh: a.p.province,
       quyet_dinh: A.decision[a.decision],
@@ -218,10 +227,7 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
       khung_ne_ray_demo: `${a.cal.windowStart}..${a.cal.windowEnd}`,
       ghi_chu: 'Lich ne ray, muc nuoc song va xa lu la du lieu demo gia dinh',
     }));
-    const name = `khuyen-nghi-xuong-giong_${evalDate}${province ? '_' + fold(province).replace(/\s+/g, '-') : ''}.csv`;
-    downloadText(name, Papa.unparse(rows));
-    status.textContent = A.exported(name);
-  });
+  }
 
   function openCommune(p: CommuneProps) {
     set({ tab: 'map', mapMode: 'latest', activeSummary: null, playing: false, selectedCommune: p.osm_id, flyNonce: state.flyNonce + 1 });
@@ -386,6 +392,7 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
     renderList();
     renderCalendar();
     renderRiver();
+    dataSec.refresh?.();
   }
 
   window.addEventListener('hashchange', () => requestAnimationFrame(() => chart?.resize()));
