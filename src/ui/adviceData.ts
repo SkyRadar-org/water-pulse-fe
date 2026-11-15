@@ -98,6 +98,13 @@ export function adviceDataSection(all: CommuneProps[], adviceRows: () => Record<
       key: vi ? 'bat_dau – ket_thuc (theo ngày)' : 'bat_dau – ket_thuc (by date)',
       rows: demo('lich_xa_lu.csv'),
     },
+    ...([
+      ['tram_bom_xa.csv', 'Trạm bơm và diện tích lúa theo xã', 'Pumping stations and rice area per commune', 'Số trạm bơm cố định, công suất, máy bơm di động, độ sâu nước trung bình, diện tích lúa.', 'Fixed stations, capacity, mobile pumps, mean water depth, rice area.', 'osm_id'],
+      ['phu_sa_phan_bon.csv', 'Phù sa và mức giảm phân theo số ngày ngập', 'Silt and fertiliser cut by flood days', 'Nhóm số ngày ngập → phù sa bồi (tấn/ha), % giảm đạm và lân.', 'Flood-day group → silt (t/ha), % cut of N and P.', vi ? 'so_ngay_ngap (khoảng)' : 'so_ngay_ngap (range)'],
+      ['phan_bon_khuyen_cao.csv', 'Lượng phân khuyến cáo và giá phân theo tỉnh', 'Recommended fertiliser and prices per province', 'Đạm, lân, kali (kg/ha) và giá (đ/kg).', 'N, P, K (kg/ha) and prices (VND/kg).', 'tinh_key'],
+      ['dieu_tra_sinh_vat_hai.csv', 'Điều tra ốc bươu vàng và chuột', 'Golden apple snail and rat survey', 'Mật độ ốc (con/m²) và hang chuột (hang/100 m bờ) mỗi xã.', 'Snail density (/m²) and rat burrows (/100 m of bund) per commune.', 'osm_id'],
+      ['nguong_sinh_vat_hai.csv', 'Ngưỡng cảnh báo sinh vật hại và biện pháp', 'Pest thresholds and measures', 'Ngưỡng cảnh báo, ngưỡng nguy hiểm và biện pháp khuyến cáo.', 'Alert and danger thresholds and recommended measures.', 'loai'],
+    ] as const).map(([file, tv, te, dv, de, key]): TableDef => ({ file, kind: 'demo', title: vi ? tv : te, desc: vi ? dv : de, key, rows: demo(file) })),
     {
       file: 'khuyen_nghi_xa.csv',
       kind: 'output',

@@ -6,6 +6,8 @@ import Papa from 'papaparse';
 import { Chart, chartAdapters } from '../charts/register.ts';
 import { getCommunes } from '../data/dataSource.ts';
 import { adviceDataSection } from './adviceData.ts';
+import { extraChips, renderTopic, TOPICS, type Topic } from './adviceTopics.ts';
+import { computeExtras, type Extra } from '../data/extraAdvice.ts';
 import { addDays, CALENDARS, loadDemoData, LEVEL_FROM, LEVEL_TO, SEASON_DEADLINE, STATIONS, stationLevels, UPSTREAM_RELEASE } from '../data/demoAgro.ts';
 import { adviseAll, DECISIONS, type Advice, type Decision } from '../data/sowingAdvice.ts';
 import type { CommuneProps } from '../data/types.ts';
@@ -111,6 +113,9 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
   let expanded = false;
   let advice: Advice[] = [];
   let chart: Chart | null = null;
+  const urlTopic = new URLSearchParams(location.search).get('topic');
+  let topic: Topic = TOPICS.some((x) => x.id === urlTopic) ? (urlTopic as Topic) : 'sowing';
+  let extras = new Map<string, Extra>();
 
   // ---------- header + demo banner ----------
   const head = h('header', { class: 'ad-head' }, h('h1', { class: 'ad-title', text: A.title }), h('p', { class: 'ad-lead', text: A.lead }));
@@ -136,6 +141,9 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
   );
   controls.addEventListener('submit', (e) => e.preventDefault());
 
+  const topicBar = h('div', { class: 'ad-topics', role: 'tablist', 'aria-label': lang === 'vi' ? 'Chủ đề khuyến nghị' : 'Advice topics' });
+  const topicHost = h('div', { class: 'ad-topic-host' });
+  const sowingBox = h('div', { class: 'ad-sowing' });
   const kpis = h('div', { class: 'ad-kpis', role: 'group', 'aria-label': A.kpiAria });
   const filterLine = h('p', { class: 'ad-filterline' });
   const list = h('div', { class: 'ad-list' });
@@ -180,7 +188,26 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
   const method = h('details', { class: 'ad-method' }, h('summary', { text: A.methodTitle }), h('ol', {}, ...A.method.map((m) => h('li', { text: m }))));
 
   const dataSec = adviceDataSection(all, () => toRows(advice)) as HTMLElement & { refresh?: () => void };
-  root.replaceChildren(head, banner, controls, kpis, filterLine, h('section', { class: 'ad-results' }, count, list, more), context, dataSec, method, status);
+  sowingBox.append(kpis, filterLine, h('section', { class: 'ad-results' }, count, list, more));
+  root.replaceChildren(head, banner, controls, topicBar, sowingBox, topicHost, context, dataSec, method, status);
+  function renderTopics() {
+    topicBar.replaceChildren(
+      ...TOPICS.map((tp) => {
+        const b = h('button', { type: 'button', role: 'tab', class: 'ad-topic-btn', 'aria-selected': String(tp.id === topic) }, h('b', { text: tp.label }), h('small', { text: tp.sub }));
+        b.addEventListener('click', () => {
+          topic = tp.id;
+          renderTopics();
+          renderTopicBody();
+        });
+        return b;
+      }),
+    );
+  }
+  function renderTopicBody() {
+    sowingBox.hidden = topic !== 'sowing';
+    topicHost.hidden = topic === 'sowing';
+    if (topic !== 'sowing') topicHost.replaceChildren(renderTopic(topic, inScope(), extras, evalDate));
+  }
 
   // ---------- events ----------
   dateIn.addEventListener('change', () => {
@@ -292,6 +319,7 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
         h('span', { class: `ad-badge ad-${a.decision}`, text: badgeText(a) }),
         h('p', { class: 'ad-action', text: headline(a) }),
         h('ul', { class: 'ad-why' }, ...reasons(a).map((r) => h('li', {}, h('span', { class: `ad-dot ad-dot-${r.src}`, title: r.src === 'real' ? A.tagRealTip : A.tagDemoTip, 'aria-label': r.src === 'real' ? A.tagReal : A.tagDemo }), r.text))),
+        extras.get(p.osm_id) ? extraChips(extras.get(p.osm_id)!) : null,
       ),
       h(
         'dl',
@@ -388,6 +416,9 @@ function build(root: HTMLElement, all: CommuneProps[]): void {
 
   function render() {
     advice = adviseAll(all, evalDate);
+    extras = computeExtras(advice, evalDate);
+    renderTopics();
+    renderTopicBody();
     renderKpis();
     renderList();
     renderCalendar();

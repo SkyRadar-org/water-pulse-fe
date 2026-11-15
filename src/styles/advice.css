@@ -115,3 +115,27 @@
   .ad-erd { grid-template-columns: 1fr; }
   .ad-erd-arrow { transform: rotate(90deg); justify-self: center; }
 }
+
+/* Advice topics */
+.ad-topics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.ad-topic-btn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; cursor: pointer; font: inherit; color: var(--ink); text-align: left; }
+.ad-topic-btn b { font-size: 15px; }
+.ad-topic-btn small { color: var(--ink-2); font-size: 12px; }
+.ad-topic-btn[aria-selected='true'] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.ad-topic-btn[aria-selected='true'] small { color: #cbd5e1; }
+.ad-sowing, .ad-topic { display: flex; flex-direction: column; gap: 14px; }
+.ad-topic-head h2 { margin: 0; font-size: 19px; }
+.ad-topic-head .ad-note { font-size: 13px; max-width: 110ch; }
+.ad-topic .ad-kpis { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.ad-kpi-static { cursor: default; }
+.ad-topic-table { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; }
+.ad-topic-table .rp-table { width: 100%; font-size: 13px; }
+.ad-topic-table th small.ad-sub, .ad-sub { display: block; font-weight: 400; color: var(--ink-2); font-size: 11.5px; }
+.ad-act { display: block; min-width: 260px; max-width: 520px; white-space: normal; }
+.ad-level { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.ad-level-high { background: #fee2e2; color: #991b1b; }
+.ad-level-medium { background: #fef3c7; color: #92400e; }
+.ad-level-low { background: #dcfce7; color: #166534; }
+.ad-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 12px; }
+.ad-chips-label { color: var(--ink-2); font-weight: 600; }
+@media (max-width: 760px) { .ad-topics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

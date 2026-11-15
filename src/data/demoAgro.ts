@@ -77,7 +77,11 @@ export interface DemoTable {
 }
 export const DEMO_TABLES: DemoTable[] = [];
 export const DEMO_BASE = '/demo-data';
-export const DEMO_FILES = ['lich_ne_ray.csv', 'tram_thuy_van.csv', 'muc_nuoc_tram.csv', 'lich_xa_lu.csv'] as const;
+export const DEMO_FILES = ['lich_ne_ray.csv', 'tram_thuy_van.csv', 'muc_nuoc_tram.csv', 'lich_xa_lu.csv', 'tram_bom_xa.csv', 'phu_sa_phan_bon.csv', 'phan_bon_khuyen_cao.csv', 'dieu_tra_sinh_vat_hai.csv', 'nguong_sinh_vat_hai.csv'] as const;
+
+export function demoRows(file: (typeof DEMO_FILES)[number]): Record<string, string>[] {
+  return DEMO_TABLES.find((t) => t.file === file)?.rows ?? [];
+}
 
 async function loadCsv(file: string): Promise<DemoTable> {
   const res = await fetch(`${DEMO_BASE}/${file}`);
@@ -89,8 +93,9 @@ async function loadCsv(file: string): Promise<DemoTable> {
 let loading: Promise<void> | null = null;
 /** Loads the demo CSV tables once and fills CALENDARS, STATIONS, levels and UPSTREAM_RELEASE. */
 export function loadDemoData(): Promise<void> {
-  loading ??= Promise.all(DEMO_FILES.map(loadCsv)).then(([cal, st, lv, rel]) => {
-    DEMO_TABLES.splice(0, DEMO_TABLES.length, cal, st, lv, rel);
+  loading ??= Promise.all(DEMO_FILES.map(loadCsv)).then((tables) => {
+    const [cal, st, lv, rel] = tables;
+    DEMO_TABLES.splice(0, DEMO_TABLES.length, ...tables);
     CALENDARS.splice(0, CALENDARS.length, ...cal.rows.map((r) => ({
       key: r.tinh_key,
       label: r.tinh,

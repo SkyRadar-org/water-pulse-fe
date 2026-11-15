@@ -1,10 +1,10 @@
 import type { Decision } from '../data/sowingAdvice.ts';
 
 const viAdvice = {
-  title: 'Khuyến nghị xuống giống',
-  lead: 'Mỗi xã nhận một quyết định cho vụ Đông Xuân 2026–2027: xuống giống được chưa, chờ bao lâu, hay cần bơm tiêu để kịp lịch né rầy. Quyết định ghép mức nước NISAR đo thật với lịch thời vụ và thủy văn.',
+  title: 'Khuyến nghị cho khuyến nông',
+  lead: 'Mỗi xã nhận các kết luận hành động cho vụ Đông Xuân 2026–2027: khi nào xuống giống, cần điều bao nhiêu máy bơm, giảm phân bón bao nhiêu nhờ phù sa, và mức nguy cơ ốc bươu vàng, chuột. Kết luận ghép mức nước NISAR đo thật với các bảng dữ liệu demo giả định.',
   demoTitle: 'Bản thử nghiệm: có dùng dữ liệu demo giả định',
-  demoBody: 'Lịch xuống giống né rầy của từng tỉnh, mực nước sông Mekong tại Tân Châu – Châu Đốc và lịch xả lũ thượng nguồn trên trang này là DỮ LIỆU DEMO GIẢ ĐỊNH, không phải số liệu chính thức. Chỉ mức nước theo xã (nhãn NISAR) là đo từ ảnh vệ tinh thật. Không dùng trang này để ra quyết định thật khi chưa thay bằng lịch của Sở NN&MT và số liệu trạm thủy văn.',
+  demoBody: 'Lịch né rầy, mực nước sông Mekong, lịch xả lũ thượng nguồn, trạm bơm, phù sa và phân bón, điều tra ốc và chuột trên trang này là DỮ LIỆU DEMO GIẢ ĐỊNH, không phải số liệu chính thức. Chỉ mức nước theo xã (nhãn NISAR) là đo từ ảnh vệ tinh thật. Không dùng trang này để ra quyết định thật khi chưa thay bằng lịch của Sở NN&MT và số liệu trạm thủy văn.',
   tagReal: 'NISAR đo thật',
   tagDemo: 'Demo giả định',
   tagRealTip: 'Đo từ ảnh radar NISAR, cùng quỹ đạo, không gộp quỹ đạo',
@@ -98,10 +98,10 @@ const viAdvice = {
 export type AdviceStrings = typeof viAdvice;
 
 const enAdvice: AdviceStrings = {
-  title: 'Sowing advice',
-  lead: 'Each commune gets one decision for the 2026–27 winter–spring crop: sow now, wait how long, or pump water out to make the planthopper-avoidance window. It combines real NISAR water measurements with the crop calendar and river data.',
+  title: 'Advice for extension officers',
+  lead: 'Each commune gets actionable conclusions for the 2026–27 winter–spring crop: when to sow, how many pumps to send, how much fertiliser to cut thanks to silt, and the snail and rat risk. They combine real NISAR water with assumed demo tables.',
   demoTitle: 'Prototype: uses assumed demo data',
-  demoBody: 'The provinces’ planthopper-avoidance sowing calendars, Mekong water levels at Tân Châu and Châu Đốc and the upstream release schedule on this page are ASSUMED DEMO DATA, not official figures. Only the per-commune water share (NISAR tag) is measured from real satellite images. Do not use this page for real decisions until those are replaced by official calendars and gauge data.',
+  demoBody: 'The avoidance calendars, Mekong levels, upstream releases, pumping stations, silt and fertiliser figures and the snail and rat survey on this page are ASSUMED DEMO DATA, not official figures. Only the per-commune water share (NISAR tag) is measured from real satellite images. Do not use this page for real decisions until those are replaced by official calendars and gauge data.',
   tagReal: 'NISAR measured',
   tagDemo: 'Assumed demo',
   tagRealTip: 'Measured from NISAR radar images, same orbit, orbits never merged',
